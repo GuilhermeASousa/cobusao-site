@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadê o Ônibus? - Acompanhe seu ônibus em tempo real</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 40px 0;
+        }
+        header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            color: #2c3e50;
+        }
+        header p {
+            font-size: 1.2em;
+            color: #7f8c8d;
+        }
+        .cta-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .cta-button:hover {
+            background-color: #2980b9;
+        }
+        section {
+            background-color: #fff;
+            margin-bottom: 20px;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        h2 {
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        h3 {
+            color: #34495e;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        ul li::before {
+            content: '✔';
+            color: #2ecc71;
+            margin-right: 10px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+            color: #95a5a6;
+        }
+        a {
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cadê o Ônibus?</h1>
+            <p>Seu assistente para o transporte público do Rio de Janeiro.</p>
+            <a href="" class="cta-button">Baixe na Google Play</a>
+        </header>
+
+        <main>
+            <section id="features">
+                <h2>Funcionalidades</h2>
+                <ul>
+                    <li>Acompanhe a posição dos ônibus em tempo real no mapa.</li>
+                    <li>Favorite suas linhas e paradas para acesso rápido.</li>
+                    <li>Receba alertas de chegada quando seu ônibus estiver perto.</li>
+                    <li>Veja a contagem de veículos rodando em suas linhas favoritas.</li>
+                    <li>Interface limpa, rápida e focada no que importa.</li>
+                </ul>
+            </section>
+            
+            <section id="privacy">
+                <h2>Política de Privacidade</h2>
+                <p><strong>Data de vigência: 25 de Julho de 2025</strong></p>
+                <p>Esta Política de Privacidade descreve como <strong>Guialshy</strong> ("nós", "nosso") coleta, usa e protege as informações quando você utiliza nosso aplicativo móvel "Cadê o Ônibus?" (o "Serviço").</p>
+                <p>Ao utilizar o nosso Serviço, você concorda com a coleta e uso de informações de acordo com esta política.</p>
+
+                <h3>1. Informações que Coletamos</h3>
+                <p>Para fornecer e melhorar nosso Serviço, coletamos os seguintes tipos de informações:</p>
+                <h4>a) Dados de Localização:</h4>
+                <ul>
+                    <li>Coletamos sua localização geográfica precisa em primeiro plano (enquanto o app está aberto) para exibir sua posição no mapa em relação aos ônibus e paradas.</li>
+                    <li>Quando você ativa um alerta de chegada, coletamos sua localização em segundo plano (enquanto o app está fechado) através de um serviço de primeiro plano para monitorar a proximidade do ônibus e enviar a notificação no momento certo. Esta coleta cessa assim que o alerta é concluído ou cancelado.</li>
+                    <li>Não armazenamos um histórico de sua localização em nossos servidores.</li>
+                </ul>
+                <h4>b) Dados de Uso do Aplicativo:</h4>
+                <ul>
+                    <li><strong>Linhas Favoritas e Paradas Favoritas:</strong> Armazenamos a lista de linhas e paradas de ônibus que você marca como favoritas. Esta informação é salva localmente no seu dispositivo usando SharedPreferences e é usada exclusivamente para personalizar sua experiência, como filtrar os ônibus visíveis no mapa e exibir o painel de favoritos.</li>
+                    <li><strong>Alertas Ativos:</strong> Armazenamos localmente os alertas de chegada que você configura. Esta informação é usada pelo serviço em segundo plano para saber qual ônibus e parada monitorar.</li>
+                </ul>
+                <h4>c) Informações que NÃO Coletamos:</h4>
+                <p>Nós não coletamos, solicitamos ou armazenamos nenhuma informação de identificação pessoal, como seu nome, endereço de e-mail, número de telefone ou contatos. O uso do aplicativo é totalmente anônimo.</p>
+
+                <h3>2. Como Usamos Suas Informações</h3>
+                <p>As informações que coletamos são usadas para os seguintes propósitos:</p>
+                <ul>
+                    <li>Para operar e manter a funcionalidade principal do Serviço (mostrar ônibus no mapa).</li>
+                    <li>Para fornecer recursos personalizados, como exibir apenas suas linhas favoritas e seu painel de paradas.</li>
+                    <li>Para fornecer o serviço de alerta de chegada, que requer monitoramento de localização em segundo plano.</li>
+                    <li>Para melhorar a experiência do usuário e a funcionalidade do aplicativo.</li>
+                </ul>
+
+                <h3>3. Compartilhamento de Informações e Serviços de Terceiros</h3>
+                <p>Nós não vendemos nem alugamos suas informações para terceiros. O compartilhamento de dados é limitado ao estritamente necessário para o funcionamento do app:</p>
+                <ul>
+                    <li><strong>Backend Próprio:</strong> O aplicativo se comunica com nosso servidor (hospedado na Render.com) para obter a lista consolidada de posições dos ônibus. Nenhuma informação pessoal ou de localização sua é enviada para este servidor.</li>
+                    <li><strong>APIs Públicas:</strong> O aplicativo, em modo de fallback, pode se conectar diretamente às APIs públicas de dados de mobilidade do Rio de Janeiro (dados.mobilidade.rio) para obter as posições dos ônibus.</li>
+                </ul>
+
+                <h3>4. Segurança dos Dados</h3>
+                <p>A segurança de seus dados é importante para nós. As informações de favoritos e alertas são armazenadas apenas no seu dispositivo. Embora nos esforcemos para usar meios comercialmente aceitáveis para proteger suas informações, lembre-se de que nenhum método de transmissão pela Internet ou método de armazenamento eletrônico é 100% seguro.</p>
+
+                <h3>5. Privacidade Infantil</h3>
+                <p>Nosso Serviço não se destina a menores de 13 anos. Não coletamos intencionalmente informações de identificação pessoal de crianças menores de 13 anos. Se você é pai ou responsável e está ciente de que seu filho nos forneceu informações, entre em contato conosco para que possamos tomar as medidas necessárias.</p>
+
+                <h3>6. Alterações a Esta Política de Privacidade</h3>
+                <p>Podemos atualizar nossa Política de Privacidade de tempos em tempos. Notificaremos você sobre quaisquer alterações, publicando a nova Política de Privacidade nesta página. Recomenda-se que você revise esta Política de Privacidade periodicamente para quaisquer alterações.</p>
+                
+                <h3>7. Contato</h3>
+                <p>Se você tiver alguma dúvida sobre esta Política de Privacidade, entre em contato conosco pelo e-mail: <a href="mailto:cobusao@gmail.com">cobusao@gmail.com</a></p>
+            </section>
+        </main>
+        
+        <footer>
+            <p>© 2025 Cadê o Ônibus?. Todos os direitos reservados.</p>
+        </footer>
+    </div>
+</body>
+</html>
