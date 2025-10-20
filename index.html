@@ -1,167 +1,418 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadê o Ônibus? - Acompanhe seu ônibus em tempo real</title>
+    <title>Cadê o Ônibus? - App de Ônibus em Tempo Real (Rio, SP, BH)</title>
+    <meta name="description"
+        content="Acompanhe seu ônibus em tempo real, defina alertas de chegada e planeje suas viagens no Rio de Janeiro, São Paulo e Belo Horizonte.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-        
+        /* 1. Configurações Globais e Modo Claro/Escuro */
+        :root {
+            --primary-color: #1C83E4;
+            --primary-dark: #1565C0;
+            --bg-color: #f8f9fa;
+            --card-color: #ffffff;
+            --text-color: #333;
+            --text-light: #555;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            --border-radius: 12px;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --card-color: #1e1e1e;
+            --text-color: #f0f0f0;
+            --text-light: #aaa;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
-            line-height: 1.6;
+            line-height: 1.7;
             margin: 0;
-            padding: 0;
-            background-color: #f4f7f6;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
+
         .container {
-            max-width: 800px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 20px;
         }
-        header {
-            text-align: center;
-            padding: 40px 0;
+
+        /* 2. Cabeçalho e Navegação */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
         }
-        header h1 {
-            font-size: 2.5em;
-            margin: 0;
-            color: #2c3e50;
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
         }
-        header p {
-            font-size: 1.2em;
-            color: #7f8c8d;
+
+        .theme-switch {
+            cursor: pointer;
+            font-size: 1.5em;
+            color: var(--text-light);
         }
-        .cta-button {
+
+        .theme-switch .fa-sun {
+            display: none;
+        }
+
+        body.dark-mode .theme-switch .fa-sun {
             display: inline-block;
-            margin-top: 20px;
-            padding: 12px 25px;
-            background-color: #3498db;
+        }
+
+        body.dark-mode .theme-switch .fa-moon {
+            display: none;
+        }
+
+        /* 3. Seção Hero (Principal) */
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            font-weight: 800;
+            margin: 0 0 10px 0;
+            line-height: 1.2;
+            background: linear-gradient(90deg, var(--primary-color), #34e89e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2em;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            background-color: var(--primary-color);
             color: #fff;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 50px;
             font-weight: 600;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
         }
+
         .cta-button:hover {
-            background-color: #2980b9;
+            background-color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
         }
-        section {
-            background-color: #fff;
-            margin-bottom: 20px;
+
+        .cta-button.secondary {
+            background-color: var(--card-color);
+            color: var(--primary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .cta-button.secondary:hover {
+            background-color: #eee;
+            transform: translateY(-3px);
+        }
+
+        body.dark-mode .cta-button.secondary:hover {
+            background-color: #2c2c2c;
+        }
+
+        .cta-button i {
+            font-size: 1.2em;
+        }
+
+        /* 4. Seção Mockup (SVG) */
+        .mockup {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .mockup svg {
+            width: 80%;
+            max-width: 300px;
+            height: auto;
+        }
+
+        /* 5. Seção de Funcionalidades */
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 40px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .feature-card {
+            background: var(--card-color);
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
         }
-        h2 {
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 10px;
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        body.dark-mode .feature-card:hover {
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .feature-card i {
+            font-size: 2em;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+        }
+
+        .feature-card p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 0.95em;
+        }
+
+        /* 6. Seção de Cidades */
+        .cities {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            margin-top: 60px;
+            box-shadow: var(--shadow);
+        }
+
+        .cities h2 {
             margin-top: 0;
-            color: #2c3e50;
         }
-        h3 {
-            color: #34495e;
+
+        .city-pills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
         }
-        ul {
-            list-style-type: none;
-            padding: 0;
+
+        .city-pill {
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
         }
-        ul li {
-            padding: 8px 0;
-            border-bottom: 1px solid #ecf0f1;
-        }
-        ul li::before {
-            content: '✔';
-            color: #2ecc71;
-            margin-right: 10px;
-        }
+
+        /* 7. Footer */
         footer {
             text-align: center;
-            padding: 20px;
-            font-size: 0.9em;
-            color: #95a5a6;
+            padding: 40px 20px;
+            margin-top: 40px;
+            color: var(--text-light);
         }
-        a {
-            color: #3498db;
+
+        footer a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: var(--primary-color);
+        }
+
+        footer .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <header>
-            <h1>Cadê o Ônibus?</h1>
-            <p>Seu assistente para o transporte público do Rio de Janeiro.</p>
-            <a href="" class="cta-button">Baixe na Google Play</a>
-        </header>
 
-        <main>
-            <section id="features">
-                <h2>Funcionalidades</h2>
-                <ul>
-                    <li>Acompanhe a posição dos ônibus em tempo real no mapa.</li>
-                    <li>Favorite suas linhas e paradas para acesso rápido.</li>
-                    <li>Receba alertas de chegada quando seu ônibus estiver perto.</li>
-                    <li>Veja a contagem de veículos rodando em suas linhas favoritas.</li>
-                    <li>Interface limpa, rápida e focada no que importa.</li>
-                </ul>
-            </section>
-            
-            <section id="privacy">
-                <h2>Política de Privacidade</h2>
-                <p><strong>Data de vigência: 25 de Julho de 2025</strong></p>
-                <p>Esta Política de Privacidade descreve como <strong>Guialshy</strong> ("nós", "nosso") coleta, usa e protege as informações quando você utiliza nosso aplicativo móvel "Cadê o Ônibus?" (o "Serviço").</p>
-                <p>Ao utilizar o nosso Serviço, você concorda com a coleta e uso de informações de acordo com esta política.</p>
+    <nav class="container">
+        <a href="#" class="logo">
+            <i class="fa-solid fa-bus"></i> Cadê o Ônibus?
+        </a>
+        <div class="theme-switch" id="theme-toggle" title="Mudar tema">
+            <i class="fa-solid fa-moon"></i>
+            <i class="fa-solid fa-sun"></i>
+        </div>
+    </nav>
 
-                <h3>1. Informações que Coletamos</h3>
-                <p>Para fornecer e melhorar nosso Serviço, coletamos os seguintes tipos de informações:</p>
-                <h4>a) Dados de Localização:</h4>
-                <ul>
-                    <li>Coletamos sua localização geográfica precisa em primeiro plano (enquanto o app está aberto) para exibir sua posição no mapa em relação aos ônibus e paradas.</li>
-                    <li>Quando você ativa um alerta de chegada, coletamos sua localização em segundo plano (enquanto o app está fechado) através de um serviço de primeiro plano para monitorar a proximidade do ônibus e enviar a notificação no momento certo. Esta coleta cessa assim que o alerta é concluído ou cancelado.</li>
-                    <li>Não armazenamos um histórico de sua localização em nossos servidores.</li>
-                </ul>
-                <h4>b) Dados de Uso do Aplicativo:</h4>
-                <ul>
-                    <li><strong>Linhas Favoritas e Paradas Favoritas:</strong> Armazenamos a lista de linhas e paradas de ônibus que você marca como favoritas. Esta informação é salva localmente no seu dispositivo usando SharedPreferences e é usada exclusivamente para personalizar sua experiência, como filtrar os ônibus visíveis no mapa e exibir o painel de favoritos.</li>
-                    <li><strong>Alertas Ativos:</strong> Armazenamos localmente os alertas de chegada que você configura. Esta informação é usada pelo serviço em segundo plano para saber qual ônibus e parada monitorar.</li>
-                </ul>
-                <h4>c) Informações que NÃO Coletamos:</h4>
-                <p>Nós não coletamos, solicitamos ou armazenamos nenhuma informação de identificação pessoal, como seu nome, endereço de e-mail, número de telefone ou contatos. O uso do aplicativo é totalmente anônimo.</p>
+    <main>
+        <section class="hero container">
+            <h1>Nunca mais perca seu ônibus.</h1>
+            <p>
+                Acompanhe seu ônibus em tempo real, saiba o horário de chegada,
+                favorite suas linhas e planeje suas viagens com facilidade.
+            </p>
+            <div class="cta-buttons">
+                <a href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" class="cta-button" target="_blank">
+                    <i class="fa-brands fa-google-play"></i>
+                    Baixar na Google Play
+                </a>
 
-                <h3>2. Como Usamos Suas Informações</h3>
-                <p>As informações que coletamos são usadas para os seguintes propósitos:</p>
-                <ul>
-                    <li>Para operar e manter a funcionalidade principal do Serviço (mostrar ônibus no mapa).</li>
-                    <li>Para fornecer recursos personalizados, como exibir apenas suas linhas favoritas e seu painel de paradas.</li>
-                    <li>Para fornecer o serviço de alerta de chegada, que requer monitoramento de localização em segundo plano.</li>
-                    <li>Para melhorar a experiência do usuário e a funcionalidade do aplicativo.</li>
-                </ul>
+                <a href="https://cadeoonibus-web.onrender.com" class="cta-button secondary" target="_blank">
+                    <i class="fa-solid fa-globe"></i>
+                    Acessar Versão Web
+                </a>
+            </div>
+        </section>
 
-                <h3>3. Compartilhamento de Informações e Serviços de Terceiros</h3>
-                <p>Nós não vendemos nem alugamos suas informações para terceiros. O compartilhamento de dados é limitado ao estritamente necessário para o funcionamento do app:</p>
-                <ul>
-                    <li><strong>Backend Próprio:</strong> O aplicativo se comunica com nosso servidor (hospedado na Render.com) para obter a lista consolidada de posições dos ônibus. Nenhuma informação pessoal ou de localização sua é enviada para este servidor.</li>
-                    <li><strong>APIs Públicas:</strong> O aplicativo, em modo de fallback, pode se conectar diretamente às APIs públicas de dados de mobilidade do Rio de Janeiro (dados.mobilidade.rio) para obter as posições dos ônibus.</li>
-                </ul>
+        <section class="mockup">
+            <svg xmlns="http://www.w3.org/2000/svg" width="300" height="600" viewBox="0 0 300 600" fill="none">
+                <rect width="300" height="600" rx="40" fill="var(--card-color)" stroke="var(--text-light)"
+                    stroke-width="4" />
+                <rect x="15" y="15" width="270" height="570" rx="25" fill="var(--bg-color)" />
+                <line x1="120" y1="30" x2="180" y2="30" stroke="var(--text-light)" stroke-width="8"
+                    stroke-linecap="round" />
+                <path d="M 40 100 L 100 150 L 100 300 L 200 400 L 260 450" stroke="var(--text-light)" stroke-width="3"
+                    fill="none" opacity="0.3" />
+                <path d="M 50 120 L 110 170 L 110 320 L 210 420 L 270 470" stroke="var(--primary-color)"
+                    stroke-width="3" fill="none" opacity="0.4" />
+                <circle cx="200" cy="400" r="8" fill="var(--primary-color)" stroke="var(--card-color)"
+                    stroke-width="2" />
+                <path d="M196.464 394.464L192 380L208 396L196.464 394.464Z" fill="var(--primary-color)" />
+                <circle cx="100" cy="300" r="8" fill="var(--primary-color)" stroke="var(--card-color)"
+                    stroke-width="2" />
+                <path d="M96.464 294.464L92 280L108 296L96.464 294.464Z" fill="var(--primary-color)" />
+            </svg>
+        </section>
 
-                <h3>4. Segurança dos Dados</h3>
-                <p>A segurança de seus dados é importante para nós. As informações de favoritos e alertas são armazenadas apenas no seu dispositivo. Embora nos esforcemos para usar meios comercialmente aceitáveis para proteger suas informações, lembre-se de que nenhum método de transmissão pela Internet ou método de armazenamento eletrônico é 100% seguro.</p>
+        <section class="container">
+            <h2 class="section-title">Um app completo para sua viagem</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <h3>Mapa em Tempo Real</h3>
+                    <p>Veja onde seu ônibus está agora, com posições atualizadas em segundos.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-bell"></i>
+                    <h3>Alertas de Chegada</h3>
+                    <p>Crie alertas e seja notificado quando o ônibus estiver a 1 minuto da sua parada.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-star"></i>
+                    <h3>Linhas e Paradas Favoritas</h3>
+                    <p>Acesso rápido às linhas e paradas que você mais usa, com cores e ícones personalizáveis.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-route"></i>
+                    <h3>Planejador de Rotas (Em breve)</h3>
+                    <p>Descubra a melhor rota de transporte público para chegar ao seu destino.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-users"></i>
+                    <h3>Dados Colaborativos</h3>
+                    <p>Informe (e veja) a lotação do ônibus e a situação do ar-condicionado com a ajuda de outros
+                        usuários.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-city"></i>
+                    <h3>Múltiplas Cidades</h3>
+                    <p>Acompanhe os ônibus na palma da sua mão em diversas capitais do Brasil.</p>
+                </div>
+            </div>
+        </section>
 
-                <h3>5. Privacidade Infantil</h3>
-                <p>Nosso Serviço não se destina a menores de 13 anos. Não coletamos intencionalmente informações de identificação pessoal de crianças menores de 13 anos. Se você é pai ou responsável e está ciente de que seu filho nos forneceu informações, entre em contato conosco para que possamos tomar as medidas necessárias.</p>
+        <section class="cities container">
+            <h2 class="section-title">Já disponível em:</h2>
+            <div class="city-pills">
+                <span class="city-pill">Rio de Janeiro, RJ</span>
+                <span class="city-pill">São Paulo, SP</span>
+                <span class="city-pill">Belo Horizonte, BH</span>
+            </div>
+        </section>
 
-                <h3>6. Alterações a Esta Política de Privacidade</h3>
-                <p>Podemos atualizar nossa Política de Privacidade de tempos em tempos. Notificaremos você sobre quaisquer alterações, publicando a nova Política de Privacidade nesta página. Recomenda-se que você revise esta Política de Privacidade periodicamente para quaisquer alterações.</p>
-                
-                <h3>7. Contato</h3>
-                <p>Se você tiver alguma dúvida sobre esta Política de Privacidade, entre em contato conosco pelo e-mail: <a href="mailto:cobusao@gmail.com">cobusao@gmail.com</a></p>
-            </section>
-        </main>
-        
-        <footer>
-            <p>© 2025 Cadê o Ônibus?. Todos os direitos reservados.</p>
-        </footer>
-    </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="privacidade.html">Política de Privacidade</a>
+                <span>|</span>
+                <a href="mailto:cobusao@gmail.com">Contato</a>
+            </div>
+            <p>© 2025 Cadê o Ônibus? (Guialshy). Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+
+        // Verifica o tema salvo no localStorage
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            body.classList.toggle('dark-mode', savedTheme === 'dark');
+        } else {
+            // Se não tiver salvo, verifica a preferência do sistema
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            body.classList.toggle('dark-mode', prefersDark);
+        }
+
+        // Adiciona o evento de clique no botão
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            // Salva a preferência no localStorage
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    </script>
 </body>
+
 </html>
