@@ -1,1161 +1,168 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadê o Ônibus? - O App Inteligente de Transporte Público</title>
-    <meta name="description"
-        content="Rastreamento em tempo real no Rio, SP e BH. Economize dados, bateria e tempo com o app de ônibus mais rápido do Brasil.">
-
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://cadeoonibus-web.onrender.com/">
-    <meta property="og:title" content="Cadê o Ônibus? - Chega de esperar no ponto">
-    <meta property="og:description" content="Veja onde seu ônibus está agora. Leve, rápido e sem cadastro.">
-    <meta property="og:image" content="https://cadeoonibus-web.onrender.com/og-image.jpg">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <link rel="icon" type="image/png" href="favicon.png">
-
-    <style>
-        /* --- VARIÁVEIS E TEMA --- */
-        :root {
-            /* Cores Vivas e Modernas */
-            --primary: #2563EB;
-            --primary-dark: #1e40af;
-            --accent: #06B6D4;
-            --accent-glow: rgba(6, 182, 212, 0.5);
-            --gradient-main: linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
-            --gradient-dark: linear-gradient(135deg, #1e40af 0%, #0e7490 100%);
-
-            /* Fundo e Texto Light */
-            --bg-body: #F8FAFC;
-            --bg-surface: #FFFFFF;
-            --bg-glass: rgba(255, 255, 255, 0.7);
-            --text-main: #0F172A;
-            --text-sec: #475569;
-            --border: #E2E8F0;
-
-            /* Sombras */
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.15);
-
-            --radius: 16px;
-        }
-
-        body.dark-mode {
-            /* Fundo e Texto Dark */
-            --bg-body: #020617;
-            --bg-surface: #0F172A;
-            --bg-glass: rgba(15, 23, 42, 0.7);
-            --text-main: #F1F5F9;
-            --text-sec: #94A3B8;
-            --border: #1E293B;
-
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-            --shadow-glow: 0 0 30px rgba(37, 99, 235, 0.25);
-        }
-
-        /* --- RESET --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Red Hat Display', sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            line-height: 1.6;
-            overflow-x: hidden;
-            transition: background 0.3s, color 0.3s;
-        }
-
-        h1,
-        h2,
-        h3,
-        h4,
-        .brand-font {
-            font-family: 'Red Hat Display', sans-serif;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        /* --- UTILITÁRIOS --- */
-        .text-gradient {
-            background: var(--gradient-main);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .badge {
-            background: rgba(37, 99, 235, 0.1);
-            color: var(--primary);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 12px;
-        }
-
-        /* --- HEADER & NAV --- */
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 100;
-            background: var(--bg-glass);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 70px;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--text-main);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo i {
-            color: var(--primary);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 30px;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-sec);
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: color 0.2s;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-
-        .nav-actions {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .theme-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .theme-btn:hover {
-            background: var(--bg-surface);
-            transform: scale(1.05);
-        }
-
-        .theme-btn .fa-sun {
-            display: none;
-        }
-
-        body.dark-mode .theme-btn .fa-sun {
-            display: block;
-            color: #FBBF24;
-        }
-
-        body.dark-mode .theme-btn .fa-moon {
-            display: none;
-        }
-
-        /* --- HERO SECTION --- */
-        .hero {
-            padding-top: 140px;
-            padding-bottom: 80px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            align-items: center;
-            gap: 60px;
-            position: relative;
-        }
-
-        /* Background Glow Effect */
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -20%;
-            right: -10%;
-            width: 600px;
-            height: 600px;
-            background: var(--gradient-main);
-            filter: blur(180px);
-            opacity: 0.15;
-            z-index: -1;
-            border-radius: 50%;
-        }
-
-        .hero-content h1 {
-            font-size: 4rem;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            letter-spacing: -1.5px;
-        }
-
-        .hero-content p {
-            font-size: 1.25rem;
-            color: var(--text-sec);
-            margin-bottom: 40px;
-            max-width: 540px;
-        }
-
-        .cta-wrapper {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 14px 28px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .btn-primary {
-            background: var(--gradient-main);
-            color: white;
-            box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.23);
-        }
-
-        .btn-sec {
-            background: var(--bg-surface);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-        }
-
-        .btn-sec:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        /* --- MOCKUP 3D --- */
-        .mockup-container {
-            perspective: 1500px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .phone {
-            width: 300px;
-            height: 600px;
-            background: #000;
-            border-radius: 40px;
-            border: 8px solid #1f2937;
-            position: relative;
-            transform: rotateY(-15deg) rotateX(10deg);
-            box-shadow: 20px 20px 50px rgba(0, 0, 0, 0.3);
-            transition: transform 0.5s ease-out;
-            overflow: hidden;
-        }
-
-        .phone:hover {
-            transform: rotateY(0deg) rotateX(0deg);
-        }
-
-        .screen {
-            width: 100%;
-            height: 100%;
-            background: var(--bg-body);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Simulação UI do App */
-        .app-map {
-            width: 100%;
-            height: 100%;
-            background: #e2e8f0;
-            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
-            background-size: 24px 24px;
-            position: relative;
-        }
-
-        body.dark-mode .app-map {
-            background: #1e293b;
-            background-image: radial-gradient(#334155 1.5px, transparent 1.5px);
-        }
-
-        .bus-marker {
-            position: absolute;
-            top: 40%;
-            left: 50%;
-            width: 44px;
-            height: 44px;
-            background: var(--primary);
-            border-radius: 50% 50% 50% 0;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            animation: pulsePin 2s infinite;
-        }
-
-        .bus-marker i {
-            transform: rotate(45deg);
-            color: white;
-            font-size: 1.2rem;
-        }
-
-        .app-ui-card {
-            position: absolute;
-            bottom: 30px;
-            left: 20px;
-            right: 20px;
-            background: var(--bg-surface);
-            padding: 15px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            animation: slideUp 1s ease-out;
-        }
-
-        .app-notif {
-            position: absolute;
-            top: 50px;
-            left: 10px;
-            right: 10px;
-            background: rgba(46, 204, 113, 0.95);
-            padding: 12px;
-            border-radius: 12px;
-            color: white;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
-            animation: slideDown 3s infinite alternate;
-        }
-
-        @keyframes pulsePin {
-            0% {
-                transform: translate(-50%, -50%) rotate(-45deg) scale(1);
-            }
-
-            50% {
-                transform: translate(-50%, -50%) rotate(-45deg) scale(1.1);
-            }
-
-            100% {
-                transform: translate(-50%, -50%) rotate(-45deg) scale(1);
-            }
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(100px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-
-            20% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-
-            80% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-
-            to {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-        }
-
-        /* --- STATS SECTION --- */
-        .stats-section {
-            background: var(--bg-surface);
-            padding: 60px 0;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            text-align: center;
-        }
-
-        .stat-item h3 {
-            font-size: 2.5rem;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-
-        .stat-item p {
-            color: var(--text-sec);
-            font-weight: 500;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* --- FEATURES GRID --- */
-        .section {
-            padding: 100px 0;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 60px;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .section-header h2 {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-        }
-
-        .section-header p {
-            color: var(--text-sec);
-            font-size: 1.1rem;
-        }
-
-        .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-        }
-
-        .bento-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 32px;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .bento-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .bento-card.wide {
-            grid-column: span 2;
-        }
-
-        .card-icon {
-            width: 56px;
-            height: 56px;
-            background: rgba(37, 99, 235, 0.1);
-            color: var(--primary);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 24px;
-        }
-
-        .bento-card h3 {
-            font-size: 1.25rem;
-            margin-bottom: 12px;
-        }
-
-        .bento-card p {
-            color: var(--text-sec);
-            font-size: 0.95rem;
-        }
-
-        /* --- TECH SECTION (EXPLICANDO O BACKEND) --- */
-        .tech-section {
-            background: var(--bg-surface);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tech-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            align-items: center;
-            gap: 50px;
-        }
-
-        .tech-visual {
-            background: #111;
-            border-radius: 20px;
-            padding: 30px;
-            font-family: monospace;
-            color: #2ecc71;
-            font-size: 0.9rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            position: relative;
-        }
-
-        .tech-visual::before {
-            content: '● Servidor Conectado';
-            color: #2ecc71;
-            position: absolute;
-            top: 15px;
-            left: 20px;
-            font-size: 0.8rem;
-        }
-
-        .code-line {
-            margin-bottom: 8px;
-            opacity: 0;
-            animation: typeCode 4s infinite;
-        }
-
-        .code-line:nth-child(1) {
-            animation-delay: 0s;
-        }
-
-        .code-line:nth-child(2) {
-            animation-delay: 1s;
-        }
-
-        .code-line:nth-child(3) {
-            animation-delay: 2s;
-        }
-
-        @keyframes typeCode {
-            0% {
-                opacity: 0;
-                transform: translateX(-10px);
-            }
-
-            10% {
-                opacity: 1;
-                transform: translateX(0);
-            }
-
-            90% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 0;
-            }
-        }
-
-        /* --- CITIES --- */
-        .cities-wrapper {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .city-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            padding: 10px 24px;
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .city-card img {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-        }
-
-        /* --- DOWNLOAD / CTA FINAL --- */
-        .final-cta {
-            background: var(--gradient-dark);
-            border-radius: 30px;
-            padding: 80px 40px;
-            text-align: center;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .final-cta h2 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: white;
-        }
-
-        .final-cta p {
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 40px;
-            font-size: 1.2rem;
-        }
-
-        /* QR Code Box */
-        .qr-box {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
-            display: inline-block;
-            margin-top: 30px;
-        }
-
-        .qr-box img {
-            width: 120px;
-            height: 120px;
-        }
-
-        .qr-label {
-            color: #333;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-top: 5px;
-        }
-
-        /* --- FAQ --- */
-        .faq-item {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            margin-bottom: 15px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .faq-item:hover {
-            border-color: var(--primary);
-        }
-
-        .faq-question {
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s;
-            color: var(--text-sec);
-            margin-top: 0;
-            font-size: 0.95rem;
-        }
-
-        .faq-item.active .faq-answer {
-            max-height: 200px;
-            margin-top: 15px;
-        }
-
-        .faq-icon {
-            transition: transform 0.3s;
-        }
-
-        .faq-item.active .faq-icon {
-            transform: rotate(180deg);
-        }
-
-        /* --- FOOTER --- */
-        footer {
-            background: var(--bg-surface);
-            border-top: 1px solid var(--border);
-            padding: 60px 0 20px;
-            margin-top: 100px;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .footer-links a {
-            display: block;
-            color: var(--text-sec);
-            text-decoration: none;
-            margin-bottom: 10px;
-        }
-
-        .footer-links a:hover {
-            color: var(--primary);
-        }
-
-        .copyright {
-            text-align: center;
-            color: var(--text-sec);
-            font-size: 0.9rem;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-        }
-
-        /* --- RESPONSIVO --- */
-        @media (max-width: 900px) {
-            .hero {
-                grid-template-columns: 1fr;
-                text-align: center;
-                padding-top: 100px;
-                gap: 40px;
-            }
-
-            .hero-content {
-                order: 1;
-            }
-
-            .hero-image {
-                order: 2;
-            }
-
-            .hero-content h1 {
-                font-size: 3rem;
-            }
-
-            .cta-wrapper {
-                justify-content: center;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .bento-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .bento-card.wide {
-                grid-column: span 1;
-            }
-
-            .tech-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .nav-links {
-                display: none;
-            }
-
-            /* Simplificação mobile */
-            .footer-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-        }
-
-        .tech-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            text-align: center;
-        }
-
-        .tech-card {
-            background: var(--bg-surface);
-            padding: 40px 30px;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            transition: transform 0.3s;
-        }
-
-        .tech-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-        }
-
-        .tech-icon {
-            width: 70px;
-            height: 70px;
-            background: var(--gradient-main);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            margin: 0 auto 25px;
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
-        }
-    </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cadê o Ônibus? — O App Inteligente de Transporte Público</title>
+    <meta name="description" content="Rastreamento em tempo real no Rio, SP e BH. Economize dados, bateria e tempo com o app de ônibus mais rápido do Brasil." />
+    <meta name="keywords" content="ônibus, transporte público, tempo real, cadê o ônibus, app de ônibus, rastreamento de ônibus" />
+
+    <meta property="og:site_name" content="Cadê o Ônibus?" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Cadê o Ônibus? — Chega de esperar no ponto" />
+    <meta property="og:description" content="Veja onde seu ônibus está agora. Leve, rápido e sem cadastro." />
+    <meta property="og:url" content="https://cadeoonibus-web.onrender.com/" />
+    <meta property="og:image" content="https://cadeoonibus-web.onrender.com/og-image.jpg" />
+    <meta property="og:locale" content="pt_BR" />
+
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-
-    <header>
-        <nav class="container">
-            <a href="#" class="logo">
-                <img src="app-logo.png" alt="Logo" style="width: 32px; height: 32px; border-radius: 8px;"> Cadê o
-                Ônibus?
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="index.html">
+                <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
             </a>
-
-            <div class="nav-links">
-                <a href="#funcionalidades">Funcionalidades</a>
-                <a href="#tecnologia">Tecnologia</a>
-                <a href="#cidades">Cidades</a>
-                <a href="#faq">Dúvidas</a>
-            </div>
-
-            <div class="nav-actions">
-                <button class="theme-btn" id="theme-toggle" title="Alternar Tema">
-                    <i class="fa-solid fa-moon"></i>
-                    <i class="fa-solid fa-sun"></i>
-                </button>
-                <a href="https://cadeoonibus-web.onrender.com" target="_blank" class="btn btn-primary"
-                    style="padding: 10px 20px; font-size: 0.9rem;">
-                    Web App
-                </a>
-            </div>
-        </nav>
+            <nav class="site-nav">
+                <a class="active" href="index.html">Início</a>
+                <a href="https://cadeoonibus-web.onrender.com" target="_blank">Versão Web</a>
+                <a href="privacidade.html">Privacidade</a>
+                <a href="termos-uso.html">Termos</a>
+                <a href="suporte.html">Suporte</a>
+            </nav>
+        </div>
     </header>
 
-    <main>
+    <section class="home-hero">
+        <div class="home-hero-icon">
+            <img src="app-logo.png" alt="Cadê o Ônibus?" />
+        </div>
+        <span class="eyebrow"><span class="eyebrow-dot"></span> 100% Grátis e Sem Anúncios</span>
+        <h1>O ônibus tá vindo? Saiba agora.</h1>
+        <p class="lede">Rastreamento em tempo real, previsões exatas e alertas de chegada. Tudo isso sem gastar sua bateria ou seu plano de dados.</p>
 
-        <section class="hero container">
-            <div class="hero-content">
-                <div class="badge"><i class="fa-solid fa-bolt"></i> Novo Modo Ultra Rápido</div>
-                <h1>O ônibus tá vindo?<br> <span class="text-gradient">Saiba agora.</span></h1>
-                <p>
-                    Rastreamento em tempo real, previsões exatas e alertas de chegada.
-                    Tudo isso sem gastar sua bateria ou seu plano de dados.
-                </p>
-                <div class="cta-wrapper">
-                    <a href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" target="_blank"
-                        class="btn btn-primary">
-                        <i class="fa-brands fa-google-play"></i> Baixar para Android
-                    </a>
-                    <a href="https://cadeoonibus-web.onrender.com" target="_blank" class="btn btn-sec">
-                        <i class="fa-solid fa-globe"></i> Acessar no Navegador
-                    </a>
-                </div>
-                <div style="margin-top: 30px; font-size: 0.9rem; color: var(--text-sec);">
-                    <i class="fa-solid fa-star" style="color: #FBBF24;"></i>
-                    <i class="fa-solid fa-star" style="color: #FBBF24;"></i>
-                    <i class="fa-solid fa-star" style="color: #FBBF24;"></i>
-                    <i class="fa-solid fa-star" style="color: #FBBF24;"></i>
-                    <i class="fa-solid fa-star" style="color: #FBBF24;"></i>
-                    <span style="margin-left: 8px;">Aprovado por passageiros reais.</span>
-                </div>
+        <div class="cta-row">
+            <a class="btn-primary" href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" target="_blank">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 3.5v17a1 1 0 001.5.87l14-8.5a1 1 0 000-1.74l-14-8.5A1 1 0 004 3.5z" fill="#fff"/></svg>
+                Baixar no Google Play
+            </a>
+            <a class="btn-secondary" href="https://cadeoonibus-web.onrender.com" target="_blank">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" stroke="currentColor" stroke-width="2"/></svg>
+                Acessar no Navegador
+            </a>
+        </div>
+        <div class="platform-row">
+            <span class="platform-chip"><span class="dot"></span> Android — disponível</span>
+            <span class="platform-chip"><span class="dot"></span> Web — disponível</span>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h3>3</h3>
+                <p>Grandes Capitais</p>
             </div>
-
-            <div class="hero-image mockup-container">
-                <div class="phone">
-                    <div class="screen">
-                        <div class="app-map">
-                            <div class="app-notif">
-                                <i class="fa-solid fa-bell"></i>
-                                <div>
-                                    <div>Seu ônibus está chegando!</div>
-                                    <div style="font-size:0.7rem; opacity:0.8;">Linha 883 a 200m de você.</div>
-                                </div>
-                            </div>
-
-                            <div class="bus-marker">
-                                <i class="fa-solid fa-bus"></i>
-                            </div>
-
-                            <div class="app-ui-card">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <div>
-                                        <div style="font-weight:700; color:var(--text-main);">883 - Bangu</div>
-                                        <div style="font-size:0.8rem; color:var(--text-sec);"><i
-                                                class="fa-solid fa-snowflake" style="color:#3B82F6"></i> Ar ligado •
-                                            Vazio</div>
-                                    </div>
-                                    <div
-                                        style="background:#2563EB; color:white; padding:5px 10px; border-radius:8px; font-weight:700;">
-                                        5 min
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="stat-item">
+                <h3>+19.000</h3>
+                <p>Ônibus Monitorados</p>
             </div>
-        </section>
-
-        <section class="stats-section">
-            <div class="container stats-grid">
-                <div class="stat-item">
-                    <h3>3</h3>
-                    <p>Grandes Capitais</p>
-                </div>
-                <div class="stat-item">
-                    <h3>+19.000</h3>
-                    <p>Ônibus Monitorados</p>
-                </div>
-                <div class="stat-item">
-                    <h3>+2.000</h3>
-                    <p>Linhas de Ônibus</p>
-                </div>
-                <div class="stat-item">
-                    <h3>100%</h3>
-                    <p>Gratuito</p>
-                </div>
+            <div class="stat-item">
+                <h3>+2.000</h3>
+                <p>Linhas de Ônibus</p>
             </div>
-        </section>
-
-        <section id="funcionalidades" class="section container">
-            <div class="section-header">
-                <h2>Tudo o que você precisa</h2>
-                <p>Projetado para quem depende do transporte público todos os dias.</p>
-            </div>
-
-            <div class="bento-grid">
-                <div class="bento-card wide">
-                    <div class="card-icon"><i class="fa-solid fa-map-location-dot"></i></div>
-                    <h3>Rastreamento Preciso</h3>
-                    <p>Diferente de outros apps, usamos dados diretos das prefeituras. Você vê o ônibus se mexendo no
-                        mapa em tempo real, sem atrasos irritantes.</p>
-                </div>
-                <div class="bento-card">
-                    <div class="card-icon"><i class="fa-solid fa-bell-ring"></i></div>
-                    <h3>Alertas de Chegada</h3>
-                    <p>Configure um alarme. O celular vibra quando o ônibus estiver a 1km, 500m ou chegando no ponto.
-                    </p>
-                </div>
-                <div class="bento-card">
-                    <div class="card-icon"><i class="fa-solid fa-users-viewfinder"></i></div>
-                    <h3>Colaborativo</h3>
-                    <p>O ônibus tá lotado? O ar tá quebrado? Veja relatos de outros passageiros antes de embarcar.</p>
-                </div>
-                <div class="bento-card wide">
-                    <div class="card-icon"><i class="fa-solid fa-bolt"></i></div>
-                    <h3>Economia de Dados (Lazy Loading)</h3>
-                    <p>Nosso sistema inteligente só baixa os dados da linha que você está olhando. Isso significa que o
-                        app gasta até 80% menos internet que os concorrentes.</p>
-                </div>
-                <div class="bento-card">
-                    <div class="card-icon"><i class="fa-solid fa-moon"></i></div>
-                    <h3>Modo Escuro</h3>
-                    <p>Interface bonita e confortável para usar à noite ou economizar bateria em telas OLED.</p>
-                </div>
-                <div class="bento-card wide">
-                    <div class="card-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
-                    <h3>100% Gratuito e Sem Anúncios</h3>
-                    <p>Feito de passageiro para passageiro. Sem planos premium, sem telas de propaganda e sem
-                        necessidade de criar conta.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="tecnologia" class="section container">
-            <div class="section-header">
-                <div class="badge">Performance</div>
-                <h2>Por que o app é tão leve?</h2>
-                <p>A maioria dos apps baixa todos os dados da cidade de uma vez. Nós fazemos diferente.</p>
-            </div>
-
-            <div class="tech-cards-grid">
-                <div class="tech-card">
-                    <div class="tech-icon"><i class="fa-solid fa-cloud-arrow-down"></i></div>
-                    <h3>Sob Demanda</h3>
-                    <p>O app só baixa os dados da linha que você está olhando. Mudou de linha? Baixamos a nova.</p>
-                </div>
-                <div class="tech-card">
-                    <div class="tech-icon"><i class="fa-solid fa-microchip"></i></div>
-                    <h3>Cérebro na Nuvem</h3>
-                    <p>O cálculo pesado de rotas é feito no nosso servidor, não no seu celular. Seu processador
-                        agradece.</p>
-                </div>
-                <div class="tech-card">
-                    <div class="tech-icon"><i class="fa-solid fa-battery-full"></i></div>
-                    <h3>Economia Real</h3>
-                    <p>Menos processamento significa menos uso de bateria. Use o dia todo sem medo.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="cidades" class="section container" style="text-align: center;">
-            <div class="section-header">
-                <h2>Cobertura</h2>
-                <p>Estamos presentes nas maiores metrópoles.</p>
-            </div>
-            <div class="cities-wrapper">
-                <div class="city-card">
-                    <i class="fa-solid fa-umbrella-beach" style="color: #F59E0B;"></i> Rio de Janeiro (RJ)
-                </div>
-                <div class="city-card">
-                    <i class="fa-solid fa-building" style="color: #6B7280;"></i> São Paulo (SP)
-                </div>
-                <div class="city-card">
-                    <i class="fa-solid fa-mountain-city" style="color: #10B981;"></i> Belo Horizonte (MG)
-                </div>
-            </div>
-        </section>
-
-        <section id="faq" class="section container">
-            <div class="section-header">
-                <h2>Perguntas Frequentes</h2>
-            </div>
-            <div style="max-width: 700px; margin: 0 auto;">
-                <div class="faq-item" onclick="this.classList.toggle('active')">
-                    <div class="faq-question">
-                        Preciso criar conta para usar?
-                        <i class="fa-solid fa-chevron-down faq-icon"></i>
-                    </div>
-                    <div class="faq-answer">
-                        Não! Acreditamos que transporte público deve ser acessível e rápido. Basta baixar e usar. Não
-                        pedimos e-mail, telefone nem login social.
-                    </div>
-                </div>
-                <div class="faq-item" onclick="this.classList.toggle('active')">
-                    <div class="faq-question">
-                        O app funciona sem internet?
-                        <i class="fa-solid fa-chevron-down faq-icon"></i>
-                    </div>
-                    <div class="faq-answer">
-                        Você precisa de internet para ver a posição dos ônibus em tempo real. Porém, seus favoritos e o
-                        mapa básico ficam salvos no celular para carregar mais rápido.
-                    </div>
-                </div>
-                <div class="faq-item" onclick="this.classList.toggle('active')">
-                    <div class="faq-question">
-                        Como vocês sabem se o ônibus está cheio?
-                        <i class="fa-solid fa-chevron-down faq-icon"></i>
-                    </div>
-                    <div class="faq-answer">
-                        Usamos a força da comunidade! Os próprios usuários informam a lotação no app. É um dado
-                        colaborativo e anônimo.
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="container" style="margin-bottom: -50px; position: relative; z-index: 10;">
-            <div class="final-cta">
-                <h2>Comece a economizar tempo hoje</h2>
-                <p>Junte-se a milhares de passageiros que já sabem onde o ônibus está.</p>
-                <div class="cta-wrapper" style="justify-content: center;">
-                    <a href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" target="_blank"
-                        class="btn" style="background: white; color: var(--primary);">
-                        <i class="fa-brands fa-google-play"></i> Baixar Agora
-                    </a>
-                </div>
-
-                <div class="qr-box">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus"
-                        alt="QR Code">
-                    <div class="qr-label">Escaneie para baixar</div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <footer>
-        <div class="container footer-content">
-            <div>
-                <a href="#" class="logo" style="margin-bottom: 20px;">
-                    <img src="app-logo.png" alt="Logo" style="width: 32px; height: 32px; border-radius: 8px;"> Cadê o
-                    Ônibus?
-                </a>
-                <p style="color: var(--text-sec); max-width: 300px;">
-                    A missão de tornar o transporte público mais previsível e menos estressante para todos os
-                    brasileiros.
-                </p>
-                <div style="margin-top: 20px; font-size: 1.5rem; display: flex; gap: 15px;">
-                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
-                    <a href="mailto:cobusao@gmail.com"><i class="fa-solid fa-envelope"></i></a>
-                </div>
-            </div>
-            <div>
-                <h4 style="margin-bottom: 20px;">Links Úteis</h4>
-                <div class="footer-links">
-                    <a href="privacidade.html">Política de Privacidade</a>
-                    <a href="termos-uso.html">Termos de Uso</a>
-                    <a href="https://cadeoonibus-web.onrender.com">Versão Web</a>
-                    <a href="mailto:cobusao@gmail.com">Suporte</a>
-                </div>
+            <div class="stat-item">
+                <h3>100%</h3>
+                <p>Gratuito</p>
             </div>
         </div>
-        <div class="copyright">
-            © 2026 Cadê o Ônibus? (Guialshy). Todos os direitos reservados.
+    </section>
+
+    <section class="section">
+        <div class="section-head">
+            <p class="section-eyebrow">Tudo o que você precisa</p>
+            <h2>Projetado para o dia a dia</h2>
+            <p>Mais leve, mais rápido e feito para quem depende do transporte público.</p>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.3 7-11.5a7 7 0 10-14 0C5 14.7 12 21 12 21z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.4" stroke="#fff" stroke-width="1.6"/></svg>
+                </div>
+                <h3>Rastreamento Preciso</h3>
+                <p>Usamos dados diretos das prefeituras. Você vê o ônibus se mexendo no mapa em tempo real, sem atrasos irritantes.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M18 16v-5a6 6 0 10-12 0v5l-2 2v1h16v-1l-2-2z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 21a2 2 0 004 0" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+                </div>
+                <h3>Alertas de Chegada</h3>
+                <p>Configure um alarme. O celular vibra quando o ônibus estiver a 1km, 500m ou chegando no ponto.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 21v-2a4 4 0 00-3-3.87" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 3.13a4 4 0 010 7.75" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <h3>Recursos Colaborativos</h3>
+                <p>O ônibus tá lotado? O ar tá quebrado? Veja relatos de outros passageiros antes de embarcar.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <h3>Economia de Dados</h3>
+                <p>Nosso sistema baixa os dados apenas da linha que você está visualizando, gastando até 80% menos internet.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <h3>Modo Escuro</h3>
+                <p>Interface bonita e confortável para usar à noite ou economizar bateria em telas OLED.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.6"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18" stroke="#fff" stroke-width="1.6"/></svg>
+                </div>
+                <h3>3 Grandes Capitais</h3>
+                <p>Disponível no Rio de Janeiro (RJ), São Paulo (SP) e Belo Horizonte (MG).</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-flush-top">
+        <div class="premium-strip" style="border: 2px solid var(--primary); background: rgba(37, 99, 235, 0.03);">
+            <div style="font-size: 2.5rem; margin-bottom: 16px;">✨</div>
+            <h2 style="color: var(--primary);">100% Gratuito. Zero Anúncios.</h2>
+            <p>Diferente de outros aplicativos, o <strong>Cadê o Ônibus?</strong> foi feito de passageiro para passageiro. Não há planos premium, não pedimos cadastro e você <strong>nunca será interrompido por propagandas</strong>.</p>
+            <div class="cta-row" style="margin-top: 32px;">
+                <a class="btn-primary" href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" target="_blank">
+                    Baixar grátis no Google Play
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a class="brand" href="index.html">
+                <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
+            </a>
+            <div class="footer-links">
+                <a href="termos-uso.html">Termos de Uso</a>
+                <a href="privacidade.html">Política de Privacidade</a>
+                <a href="suporte.html">Suporte</a>
+                <a href="https://cadeoonibus-web.onrender.com" target="_blank">Versão Web</a>
+            </div>
+            <div class="copyright">© 2026 Cadê o Ônibus? (Guialshy). Todos os direitos reservados.</div>
         </div>
     </footer>
-
-    <script>
-        // Lógica de Tema Dark/Light
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-
-        // Verifica preferência salva ou do sistema
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            body.classList.toggle('dark-mode', savedTheme === 'dark');
-        } else {
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            body.classList.toggle('dark-mode', prefersDark);
-        }
-
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
-        });
-
-        // Efeito de FAQ
-        const faqItems = document.querySelectorAll('.faq-item');
-        faqItems.forEach(item => {
-            item.addEventListener('click', () => {
-                // Fecha outros (opcional)
-                // faqItems.forEach(i => { if(i !== item) i.classList.remove('active'); });
-            });
-        });
-    </script>
 </body>
-
 </html>

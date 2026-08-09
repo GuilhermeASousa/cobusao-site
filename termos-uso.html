@@ -1,351 +1,140 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Termos de Uso - Cadê o Ônibus?</title>
-    <meta name="description" content="Termos de Serviço do aplicativo Cadê o Ônibus.">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Termos de Uso — Cadê o Ônibus?</title>
+    <meta name="description" content="Termos de Serviço do aplicativo Cadê o Ônibus." />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="icon" type="image/png" href="favicon.png">
+    <meta property="og:site_name" content="Cadê o Ônibus?" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Termos de Uso — Cadê o Ônibus?" />
+    <meta property="og:url" content="https://cadeoonibus-web.onrender.com/termos-uso.html" />
+    <meta property="og:locale" content="pt_BR" />
 
-    <style>
-        /* --- VARIÁVEIS --- */
-        :root {
-            --primary: #2563EB;
-            --gradient-main: linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
-            --bg-body: #F8FAFC;
-            --bg-surface: #FFFFFF;
-            --text-main: #0F172A;
-            --text-sec: #475569;
-            --border: #E2E8F0;
-            --radius: 16px;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        }
-
-        body.dark-mode {
-            --primary: #3B82F6;
-            --bg-body: #020617;
-            --bg-surface: #0F172A;
-            --text-main: #F1F5F9;
-            --text-sec: #94A3B8;
-            --border: #1E293B;
-        }
-
-        /* --- RESET --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Red Hat Display', sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            line-height: 1.7;
-            padding-bottom: 60px;
-            transition: background 0.3s, color 0.3s;
-        }
-
-        h1,
-        h2,
-        h3,
-        .brand-font {
-            font-family: 'Red Hat Display', sans-serif;
-        }
-
-        .container {
-            max-width: 850px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        /* --- NAVBAR --- */
-        nav {
-            padding: 20px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-
-        .back-link {
-            text-decoration: none;
-            color: var(--text-sec);
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: color 0.2s;
-            background: var(--bg-surface);
-            padding: 8px 16px;
-            border-radius: 50px;
-            border: 1px solid var(--border);
-        }
-
-        .back-link:hover {
-            color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .theme-btn {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .theme-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .theme-btn .fa-sun {
-            display: none;
-        }
-
-        body.dark-mode .theme-btn .fa-sun {
-            display: block;
-            color: #FBBF24;
-        }
-
-        body.dark-mode .theme-btn .fa-moon {
-            display: none;
-        }
-
-        /* --- HEADER DO DOCUMENTO --- */
-        header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-            background: var(--gradient-main);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .meta-info {
-            font-size: 0.95rem;
-            color: var(--text-sec);
-            font-weight: 500;
-        }
-
-        /* --- CONTEÚDO DA POLÍTICA --- */
-        .policy-card {
-            background: var(--bg-surface);
-            padding: 50px;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .policy-card p {
-            margin-bottom: 20px;
-            color: var(--text-sec);
-        }
-
-        .policy-card h2 {
-            font-size: 1.6rem;
-            color: var(--text-main);
-            margin-top: 40px;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .policy-card h2:first-child {
-            margin-top: 0;
-        }
-
-        .policy-card h3 {
-            font-size: 1.2rem;
-            color: var(--primary);
-            margin-top: 25px;
-            margin-bottom: 10px;
-        }
-
-        .policy-card ul {
-            padding-left: 20px;
-            margin-bottom: 20px;
-            color: var(--text-sec);
-        }
-
-        .policy-card li {
-            margin-bottom: 8px;
-        }
-
-        .highlight-box {
-            background: rgba(37, 99, 235, 0.05);
-            border-left: 4px solid var(--primary);
-            padding: 20px;
-            border-radius: 0 12px 12px 0;
-            margin: 20px 0;
-        }
-
-        a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* Footer simples */
-        footer {
-            text-align: center;
-            margin-top: 60px;
-            color: var(--text-sec);
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 768px) {
-            .policy-card {
-                padding: 30px 20px;
-            }
-
-            h1 {
-                font-size: 2.2rem;
-            }
-        }
-    </style>
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="index.html">
+                <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Início</a>
+                <a href="https://cadeoonibus-web.onrender.com" target="_blank">Versão Web</a>
+                <a href="privacidade.html">Privacidade</a>
+                <a class="active" href="termos-uso.html">Termos</a>
+                <a href="suporte.html">Suporte</a>
+            </nav>
+        </div>
+    </header>
 
-    <nav class="container">
-        <a href="index.html" class="back-link">
-            <i class="fa-solid fa-arrow-left"></i> Voltar ao site
-        </a>
-        <button class="theme-btn" id="theme-toggle" title="Alternar Tema">
-            <i class="fa-solid fa-moon"></i>
-            <i class="fa-solid fa-sun"></i>
-        </button>
-    </nav>
+    <section class="hero">
+        <h1>Termos de Uso</h1>
+        <p class="lede">Estes Termos regem o uso do aplicativo <strong>Cadê o Ônibus?</strong>, disponível para dispositivos móveis. Ao instalar, acessar ou usar o aplicativo, você concorda com o que está descrito aqui.</p>
+        <span class="updated-badge"><span class="dot"></span> Última atualização em 14 de Julho de 2026</span>
+    </section>
 
-    <main class="container">
-        <header>
-            <h1>Termos de Uso</h1>
-            <p class="meta-info">Última atualização: 14 de Julho de 2026</p>
-        </header>
+    <div class="layout">
+        <article class="doc">
+            <section id="servico">
+                <h2>1. Sobre o serviço</h2>
+                <p>
+                    O Cadê o Ônibus? é um aplicativo totalmente <strong>gratuito e sem anúncios</strong>, criado para
+                    fornecer informações de transporte público, incluindo horários, rotas e a posição estimada de ônibus
+                    em tempo real. O aplicativo funciona integrando-se com fontes públicas de dados para as cidades do
+                    <strong>Rio de Janeiro, São Paulo e Belo Horizonte</strong>.
+                </p>
+                <p>
+                    As funcionalidades estão abertas a todos os usuários, sem necessidade de cadastro, conta premium ou
+                    pagamento.
+                </p>
+            </section>
 
-        <article class="policy-card">
-            <p>
-                Estes Termos regem o uso do aplicativo <strong>Cadê o Ônibus?</strong>, disponível para dispositivos
-                móveis.
-                Ao instalar, acessar ou usar o aplicativo, você concorda com o que está descrito aqui.
-            </p>
-
-            <h2>1. Sobre o serviço</h2>
-            <p>
-                O Cadê o Ônibus? é um aplicativo totalmente <strong>gratuito e sem anúncios</strong>, criado para
-                fornecer informações de transporte público, incluindo horários, rotas e a posição estimada de ônibus
-                em tempo real. O aplicativo funciona integrando-se com fontes públicas de dados para as cidades do
-                <strong>Rio de Janeiro, São Paulo e Belo Horizonte</strong>.
-            </p>
-            <p>
-                As funcionalidades estão abertas a todos os usuários, sem necessidade de cadastro, conta premium ou
-                pagamento.
-            </p>
-
-            <h2>2. Precisão dos Dados ("Como Está")</h2>
-            <p>
-                As posições dos veículos e previsões de chegada exibidas no mapa são baseadas nos sinais de GPS dos
-                ônibus reportados pelas prefeituras.
-            </p>
-            <div class="highlight-box">
-                <p style="margin:0"><strong>Atenção:</strong> O serviço é fornecido "como está". Não garantimos a
+            <section id="precisao">
+                <h2>2. Precisão dos Dados e Inteligência Artificial</h2>
+                <p>
+                    As posições dos veículos e previsões de chegada exibidas no mapa são baseadas nos sinais de GPS dos
+                    ônibus reportados pelas prefeituras. Além disso, utilizamos recursos de <strong>Inteligência Artificial</strong> (IA) no backend para processar relatórios de trânsito colaborativos.
+                </p>
+                <div class="callout">
+                    <strong>Atenção:</strong> O serviço é fornecido "como está". Não garantimos a
                     exatidão 100% dos dados. Podem ocorrer atrasos de rede, falta de sinal GPS no veículo ou
-                    divergências.
+                    divergências. O processamento automático por IA pode eventualmente gerar avisos equivocados (alucinações).
                     O aplicativo é uma ferramenta de apoio e não nos responsabilizamos por perdas de compromissos
-                    decorrentes de
-                    informações exibidas.</p>
-            </div>
+                    decorrentes de informações exibidas.
+                </div>
+            </section>
 
-            <h2>3. Uso dos Recursos Colaborativos</h2>
-            <p>
-                O aplicativo possui recursos onde o usuário pode reportar o status do ônibus (ex: lotado, ar
-                condicionado
-                quebrado). Ao usar esses recursos, você concorda em:
-            </p>
-            <ul>
-                <li>Fornecer informações verdadeiras para ajudar a comunidade.</li>
-                <li>Não realizar spam, flood ou enviar relatórios automatizados.</li>
-                <li>Usar os recursos sociais de forma anônima e respeitosa.</li>
-            </ul>
+            <section id="colaborativos">
+                <h2>3. Uso dos Recursos Colaborativos</h2>
+                <p>
+                    O aplicativo possui recursos onde o usuário pode reportar o status do ônibus (ex: lotado, ar
+                    condicionado quebrado). Ao usar esses recursos, você concorda em:
+                </p>
+                <ul>
+                    <li>Fornecer informações verdadeiras para ajudar a comunidade.</li>
+                    <li>Não realizar spam, flood ou enviar relatórios automatizados.</li>
+                    <li>Usar os recursos sociais de forma anônima e respeitosa.</li>
+                </ul>
+            </section>
 
-            <h2>4. Restrições de Uso</h2>
-            <p>
-                Ao utilizar o Cadê o Ônibus?, você concorda em não tentar aplicar engenharia reversa no código, não
-                realizar interceptação das APIs internas para uso em outros projetos e não usar bots ou processos
-                automatizados
-                para sobrecarregar nossos servidores.
-            </p>
+            <section id="restricoes">
+                <h2>4. Restrições de Uso</h2>
+                <p>
+                    Ao utilizar o Cadê o Ônibus?, você concorda em não tentar aplicar engenharia reversa no código, não
+                    realizar interceptação das APIs internas para uso em outros projetos e não usar bots ou processos automatizados
+                    para sobrecarregar nossos servidores.
+                </p>
+            </section>
 
-            <h2>5. Privacidade</h2>
-            <p>
-                A forma como tratamos a sua localização e dados anônimos está descrita em detalhes na nossa
-                <a href="privacidade.html">Política de Privacidade</a>. Ao concordar com estes Termos, você também
-                concorda com nossa Política de Privacidade.
-            </p>
+            <section id="privacidade">
+                <h2>5. Privacidade</h2>
+                <p>
+                    A forma como tratamos a sua localização e dados anônimos está descrita em detalhes na nossa
+                    <a href="privacidade.html">Política de Privacidade</a>. Ao concordar com estes Termos, você também
+                    concorda com nossa Política de Privacidade.
+                </p>
+            </section>
 
-            <h2>6. Disponibilidade e Atualizações</h2>
-            <p>
-                Trabalhamos para manter os serviços sempre online, mas os desenvolvedores reservam-se o direito de
-                interromper, atualizar ou modificar as funcionalidades a qualquer momento, para manutenção ou evolução
-                do
-                sistema, sem necessidade de aviso prévio.
-            </p>
+            <section id="disponibilidade">
+                <h2>6. Disponibilidade e Atualizações</h2>
+                <p>
+                    Trabalhamos para manter os serviços sempre online, mas os desenvolvedores reservam-se o direito de
+                    interromper, atualizar ou modificar as funcionalidades a qualquer momento, para manutenção ou evolução do
+                    sistema, sem necessidade de aviso prévio.
+                </p>
+            </section>
 
-            <h2>7. Contato</h2>
-            <p>
-                Se você tiver alguma dúvida sobre estes Termos, reportar algum erro ou sugestão, entre em contato
-                conosco:
-            </p>
-            <p>
-                <strong>E-mail:</strong> <a href="mailto:cobusao@gmail.com">cobusao@gmail.com</a>
-            </p>
-
+            <section id="contato">
+                <h2>7. Contato</h2>
+                <p>
+                    Se você tiver alguma dúvida sobre estes Termos, reportar algum erro ou sugestão, entre em contato
+                    conosco:
+                </p>
+                <ul>
+                    <li><strong>E-mail:</strong> <a href="mailto:cobusao@gmail.com">cobusao@gmail.com</a></li>
+                </ul>
+                <p>Veja também nossa <a href="suporte.html">página de suporte</a>.</p>
+            </section>
         </article>
+    </div>
 
-        <footer>
-            © 2026 Cadê o Ônibus? (Guialshy). Todos os direitos reservados.
-        </footer>
-    </main>
-
-    <script>
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        const savedTheme = localStorage.getItem('theme');
-
-        if (savedTheme) {
-            body.classList.toggle('dark-mode', savedTheme === 'dark');
-        } else {
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            body.classList.toggle('dark-mode', prefersDark);
-        }
-
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
-        });
-    </script>
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a class="brand" href="index.html">
+                <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
+            </a>
+            <div class="footer-links">
+                <a href="termos-uso.html">Termos de Uso</a>
+                <a href="privacidade.html">Política de Privacidade</a>
+                <a href="suporte.html">Suporte</a>
+                <a href="https://cadeoonibus-web.onrender.com" target="_blank">Versão Web</a>
+            </div>
+            <div class="copyright">© 2026 Cadê o Ônibus? (Guialshy). Todos os direitos reservados.</div>
+        </div>
+    </footer>
 </body>
-
 </html>
