@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Observatório de Planos Operacionais SPPO — Cadê o Ônibus?</title>
+    <meta name="description" content="Histórico completo e comparador de alterações nos planos operacionais das linhas de ônibus municipais do Rio de Janeiro (SMTR) de 2022 a 2026." />
+    <meta name="keywords" content="planos operacionais, smtr rio, onibus rio de janeiro, sppo, historico linhas onibus, cade o onibus" />
+
+    <meta property="og:site_name" content="Cadê o Ônibus?" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Observatório de Planos Operacionais SPPO — Cadê o Ônibus?" />
+    <meta property="og:description" content="Acompanhe a evolução de viagens, extinções, linhas criadas e mudanças operacionais no transporte municipal do Rio de Janeiro." />
+    <meta property="og:url" content="https://cadeoonibus.api.br/planos-operacionais.html" />
+    <meta property="og:image" content="https://web.cadeoonibus.api.br/og-image.jpg" />
+    <meta property="og:locale" content="pt_BR" />
+
+    <link rel="icon" type="image/png" href="app-logo.png" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/planos.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Header Integrado -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="index.html">
+                <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Início</a>
+                <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
+                <a class="active" href="planos-operacionais.html">Planos Operacionais (Rio)</a>
+                <a href="privacidade.html">Privacidade</a>
+                <a href="termos-uso.html">Termos</a>
+                <a href="suporte.html">Suporte</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal do Observatório -->
+    <main class="observatorio-container">
+        <!-- Hero Section -->
+        <div class="obs-hero">
+            <span class="eyebrow"><span class="eyebrow-dot"></span> Dados Oficiais SMTR-Rio (2022–2026)</span>
+            <h1>Observatório de Planos Operacionais</h1>
+            <p>Monitore a evolução histórica das linhas municipais de ônibus do Rio de Janeiro (SPPO). Acompanhe aumentos, cortes de viagens, linhas criadas e extinções.</p>
+            
+            <div class="obs-badge-row">
+                <span class="obs-tag" id="obs-plans-badge"><span class="dot"></span> Carregando planos...</span>
+                <span class="obs-tag"><span class="dot" style="background:#10b981;"></span> Equivalências LECD Unificadas</span>
+                <span class="obs-tag"><span class="dot" style="background:#f59e0b;"></span> 4 Consórcios Monitorados</span>
+            </div>
+        </div>
+
+        <!-- Navegação por Abas -->
+        <nav class="obs-nav-tabs">
+            <button class="obs-tab-btn active" data-tab="overview">
+                <i class="fa-solid fa-chart-pie"></i> Visão Geral & KPIs
+            </button>
+            <button class="obs-tab-btn" data-tab="linhas">
+                <i class="fa-solid fa-bus"></i> Explorador de Linhas
+            </button>
+            <button class="obs-tab-btn" data-tab="comparador">
+                <i class="fa-solid fa-code-compare"></i> Comparador de Períodos
+            </button>
+            <button class="obs-tab-btn" data-tab="extincoes">
+                <i class="fa-solid fa-triangle-exclamation"></i> Linhas Extintas
+            </button>
+            <button class="obs-tab-btn" data-tab="catalogo">
+                <i class="fa-solid fa-folder-open"></i> Catálogo SMTR
+            </button>
+        </nav>
+
+        <!-- ABA 1: VISÃO GERAL -->
+        <div id="pane-overview" class="obs-pane active">
+            <!-- Grid de KPIs -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i class="fa-solid fa-bus"></i></div>
+                    <div class="kpi-info">
+                        <h4>Total de Linhas</h4>
+                        <div class="kpi-value" id="kpi-total-lines">-</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background:rgba(16,185,129,0.12); color:#10b981;"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="kpi-info">
+                        <h4>Linhas Ativas</h4>
+                        <div class="kpi-value" id="kpi-active-lines">-</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background:rgba(239,68,68,0.12); color:#ef4444;"><i class="fa-solid fa-circle-xmark"></i></div>
+                    <div class="kpi-info">
+                        <h4>Linhas Extintas</h4>
+                        <div class="kpi-value" id="kpi-extinct-lines">-</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background:rgba(16,185,129,0.12); color:#10b981;"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                    <div class="kpi-info">
+                        <h4>Com Aumento</h4>
+                        <div class="kpi-value" id="kpi-increased-lines">-</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background:rgba(245,158,11,0.12); color:#f59e0b;"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                    <div class="kpi-info">
+                        <h4>Com Redução</h4>
+                        <div class="kpi-value" id="kpi-decreased-lines">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fa-solid fa-chart-line" style="color:var(--primary); margin-right:8px;"></i> Evolução de Viagens e Frota na Cidade</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="chart-timeline"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fa-solid fa-chart-pie" style="color:var(--primary); margin-right:8px;"></i> Divisão por Consórcio</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="chart-consortium"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Destaques -->
+            <div class="highlights-grid">
+                <div class="highlight-box">
+                    <h3 style="color:#10b981;"><i class="fa-solid fa-arrow-up-right-dots"></i> Maiores Aumentos de Viagens</h3>
+                    <div class="highlight-list" id="list-gainers"></div>
+                </div>
+
+                <div class="highlight-box">
+                    <h3 style="color:#ef4444;"><i class="fa-solid fa-arrow-down-right-dots"></i> Maiores Reduções de Viagens</h3>
+                    <div class="highlight-list" id="list-losers"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 2: EXPLORADOR DE LINHAS -->
+        <div id="pane-linhas" class="obs-pane">
+            <div class="controls-bar">
+                <div class="search-box-wrap">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="line-search-input" class="search-input" placeholder="Buscar por número (ex: 826, 433, SP513) ou LECD (ex: LECD157)..." />
+                </div>
+
+                <div class="filter-group">
+                    <button class="filter-chip active" data-filter-cons="ALL">Todos</button>
+                    <button class="filter-chip" data-filter-cons="INTERSUL">Intersul</button>
+                    <button class="filter-chip" data-filter-cons="INTERNORTE">Internorte</button>
+                    <button class="filter-chip" data-filter-cons="TRANSCARIOCA">Transcarioca</button>
+                    <button class="filter-chip" data-filter-cons="SANTA CRUZ">Santa Cruz</button>
+                </div>
+
+                <div class="filter-group">
+                    <button class="filter-chip active" data-filter-status="ALL">Status: Todos</button>
+                    <button class="filter-chip" data-filter-status="ACTIVE">Ativas</button>
+                    <button class="filter-chip" data-filter-status="EXTINCT">Extintas</button>
+                    <button class="filter-chip" data-filter-status="INCREASED">Aumentaram</button>
+                    <button class="filter-chip" data-filter-status="DECREASED">Reduziram</button>
+                </div>
+            </div>
+
+            <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;" id="lines-results-count">Carregando linhas...</div>
+            <div class="lines-grid" id="obs-lines-grid"></div>
+        </div>
+
+        <!-- ABA 3: COMPARADOR DE PERÍODOS -->
+        <div id="pane-comparador" class="obs-pane">
+            <div class="diff-selector-card">
+                <h3 style="margin-bottom:14px;"><i class="fa-solid fa-code-compare" style="color:var(--primary); margin-right:8px;"></i> Comparar Alterações Entre Dois Planos</h3>
+                <div class="diff-selectors-row">
+                    <div class="diff-field">
+                        <label for="diff-select-1">Plano Base (Data Inicial):</label>
+                        <select id="diff-select-1" class="diff-select"></select>
+                    </div>
+                    <div class="diff-field">
+                        <label for="diff-select-2">Plano Comparado (Data Final):</label>
+                        <select id="diff-select-2" class="diff-select"></select>
+                    </div>
+                    <button id="btn-run-diff" class="btn-compare">
+                        <i class="fa-solid fa-arrows-rotate"></i> Comparar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Balanço de Alterações -->
+            <div class="kpi-grid">
+                <div class="kpi-card" style="border-left: 4px solid #10b981;">
+                    <div class="kpi-info">
+                        <h4>Linhas Criadas</h4>
+                        <div class="kpi-value" id="diff-count-added" style="color:#10b981;">0</div>
+                    </div>
+                </div>
+                <div class="kpi-card" style="border-left: 4px solid #ef4444;">
+                    <div class="kpi-info">
+                        <h4>Linhas Extintas</h4>
+                        <div class="kpi-value" id="diff-count-removed" style="color:#ef4444;">0</div>
+                    </div>
+                </div>
+                <div class="kpi-card" style="border-left: 4px solid #10b981;">
+                    <div class="kpi-info">
+                        <h4>Viagens Aumentadas</h4>
+                        <div class="kpi-value" id="diff-count-increased" style="color:#10b981;">0</div>
+                    </div>
+                </div>
+                <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
+                    <div class="kpi-info">
+                        <h4>Viagens Reduzidas</h4>
+                        <div class="kpi-value" id="diff-count-decreased" style="color:#f59e0b;">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros do Comparador -->
+            <div class="controls-bar" style="margin-top:20px;">
+                <div class="filter-group">
+                    <button class="filter-chip active" data-diff-filter="ALL">Todas as Alterações</button>
+                    <button class="filter-chip" data-diff-filter="ADDED">Apenas Criadas</button>
+                    <button class="filter-chip" data-diff-filter="REMOVED">Apenas Extintas</button>
+                    <button class="filter-chip" data-diff-filter="INCREASED">Apenas com Aumento</button>
+                    <button class="filter-chip" data-diff-filter="DECREASED">Apenas com Redução</button>
+                </div>
+            </div>
+
+            <!-- Tabela de Resultados do Diff -->
+            <div class="obs-table-wrap">
+                <table class="obs-table">
+                    <thead>
+                        <tr>
+                            <th>Linha</th>
+                            <th>Itinerário</th>
+                            <th>Consórcio</th>
+                            <th id="th-diff-date-1">Data 1</th>
+                            <th id="th-diff-date-2">Data 2</th>
+                            <th>Variação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-diff-results">
+                        <tr><td colspan="6" style="text-align:center; padding:24px; color:var(--text-muted);">Clique em Comparar para carregar o balanço.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABA 4: LINHAS EXTINTAS -->
+        <div id="pane-extincoes" class="obs-pane">
+            <div class="obs-table-wrap">
+                <table class="obs-table">
+                    <thead>
+                        <tr>
+                            <th>Linha</th>
+                            <th>Último Itinerário Registrado</th>
+                            <th>Consórcio</th>
+                            <th>Última Aparição</th>
+                            <th>Pico Histórico (Viagens DU)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-extinct-lines">
+                        <tr><td colspan="5" style="text-align:center; padding:24px; color:var(--text-muted);">Carregando linhas extintas...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABA 5: CATÁLOGO OFICIAL SMTR -->
+        <div id="pane-catalogo" class="obs-pane">
+            <div class="obs-table-wrap">
+                <table class="obs-table">
+                    <thead>
+                        <tr>
+                            <th>Data de Vigência</th>
+                            <th>Documento Oficial da SMTR</th>
+                            <th>Total de Linhas</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-plans-catalog">
+                        <tr><td colspan="4" style="text-align:center; padding:24px; color:var(--text-muted);">Carregando catálogo de planos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Detalhes da Linha -->
+    <div class="obs-modal-backdrop" id="obs-line-modal">
+        <div class="obs-modal">
+            <div class="obs-modal-header">
+                <div>
+                    <h2 id="modal-line-code" style="font-size:1.6rem; font-weight:800; color:var(--text);">-</h2>
+                    <div id="modal-line-name" style="font-size:0.95rem; color:var(--text-muted); margin-top:2px;">-</div>
+                </div>
+                <button class="obs-modal-close" id="obs-modal-close-btn">&times;</button>
+            </div>
+            <div class="obs-modal-body">
+                <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
+                    <span class="badge badge-intersul" id="modal-line-consortium">-</span>
+                    <span class="badge badge-status-gain" id="modal-line-trips">-</span>
+                </div>
+
+                <h3 style="font-size:1rem; font-weight:700; margin-bottom:12px;"><i class="fa-solid fa-chart-line" style="color:var(--primary); margin-right:6px;"></i> Histórico de Viagens Operacionais (2022–2026)</h3>
+                <div class="chart-wrapper" style="height:220px; margin-bottom:24px;">
+                    <canvas id="chart-modal-line"></canvas>
+                </div>
+
+                <h3 style="font-size:1rem; font-weight:700; margin-bottom:12px;"><i class="fa-solid fa-list-check" style="color:var(--primary); margin-right:6px;"></i> Tabela de Planos Operacionais</h3>
+                <div class="obs-table-wrap">
+                    <table class="obs-table" style="font-size:0.85rem;">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Viagens DU</th>
+                                <th>Viagens Sáb</th>
+                                <th>Viagens Dom</th>
+                                <th>Km DU</th>
+                                <th>Consórcio</th>
+                                <th>Itinerário</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-modal-timeline"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Integrado -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a class="brand" href="index.html">
+                <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
+            </a>
+            <div class="footer-links">
+                <a href="planos-operacionais.html">Planos Operacionais</a>
+                <a href="termos-uso.html">Termos de Uso</a>
+                <a href="privacidade.html">Política de Privacidade</a>
+                <a href="suporte.html">Suporte</a>
+                <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
+            </div>
+            <div class="copyright">© 2026 Cadê o Ônibus? (Guialshy). Todos os direitos reservados.</div>
+        </div>
+    </footer>
+
+    <!-- Script da Aplicação -->
+    <script src="js/planos.js"></script>
+</body>
+</html>
