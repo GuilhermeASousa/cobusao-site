@@ -490,8 +490,13 @@ async function runClientDiff() {
   const increased = [];
   const decreased = [];
   const unchanged = [];
+  const seenCanonicalKeys = new Set();
 
   for (const [code, details] of Object.entries(state.linesDetailMap)) {
+    const canonicalKey = details.line_code || details.normalized_code || code;
+    if (seenCanonicalKeys.has(canonicalKey)) continue;
+    seenCanonicalKeys.add(canonicalKey);
+
     const timeline = details.timeline || [];
     const entry1 = timeline.find(t => t.date === d1);
     const entry2 = timeline.find(t => t.date === d2);
@@ -706,7 +711,7 @@ async function openLineModal(lineCode) {
   let line = state.linesDetailMap[lineCode];
 
   // Se não estiver carregado na memória, tenta carregar o JSON
-  if (!line) {
+  if (!line && Object.keys(state.linesDetailMap).length === 0) {
     try {
       const res = await fetch("planos-data/lines_detail.json");
       if (res.ok) {
@@ -714,6 +719,17 @@ async function openLineModal(lineCode) {
         line = state.linesDetailMap[lineCode];
       }
     } catch (e) {}
+  }
+
+  // Tenta encontrar por alias ou normalized_code caso a chave primária seja diferente
+  if (!line && state.linesDetailMap) {
+    const qCode = String(lineCode).toUpperCase().replace(/\s+/g, "");
+    line = Object.values(state.linesDetailMap).find(l => {
+      const pCode = (l.line_code || "").toUpperCase().replace(/\s+/g, "");
+      const nCode = (l.normalized_code || "").toUpperCase().replace(/\s+/g, "");
+      const aliases = (l.aliases || []).map(a => String(a).toUpperCase().replace(/\s+/g, ""));
+      return pCode === qCode || nCode === qCode || aliases.includes(qCode);
+    });
   }
 
   if (!line) {
