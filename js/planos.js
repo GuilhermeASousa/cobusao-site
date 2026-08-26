@@ -16,7 +16,10 @@ const state = {
   activeFilterConsortium: "ALL",
   activeFilterStatus: "ALL",
   currentDiffData: null,
-  currentDiffFilter: "ALL"
+  currentDiffFilter: "ALL",
+  diffSortBy: "diff_desc",
+  diffSearchQuery: "",
+  modalTimelineOrder: "desc"
 };
 
 // Inicialização
@@ -256,10 +259,10 @@ function renderConsortiumChart(timeline) {
    5. Grid de Linhas e Filtros
    ========================================================================== */
 function setupEventListeners() {
-  // Busca em tempo real
+  // Busca em tempo real na aba de Linhas
   const searchInput = document.getElementById("line-search-input");
   if (searchInput) {
-    searchInput.addEventListener("input", (e) => {
+    searchInput.addEventListener("input", () => {
       applyLineFilters();
     });
   }
@@ -292,7 +295,7 @@ function setupEventListeners() {
     });
   }
 
-  // Filtros do Comparador
+  // Filtros do Comparador (Pills)
   document.querySelectorAll("[data-diff-filter]").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll("[data-diff-filter]").forEach(b => b.classList.remove("active"));
@@ -301,6 +304,47 @@ function setupEventListeners() {
       renderDiffTableResults();
     });
   });
+
+  // Campo de busca dentro do comparador
+  const diffSearchInput = document.getElementById("diff-search-input");
+  if (diffSearchInput) {
+    diffSearchInput.addEventListener("input", (e) => {
+      state.diffSearchQuery = (e.target.value || "").trim().toLowerCase();
+      renderDiffTableResults();
+    });
+  }
+
+  // Select "Ordenar por:" do comparador
+  const diffSortSelect = document.getElementById("diff-sort-select");
+  if (diffSortSelect) {
+    diffSortSelect.addEventListener("change", (e) => {
+      state.diffSortBy = e.target.value;
+      renderDiffTableResults();
+    });
+  }
+
+  // Clique nos cabeçalhos da tabela do comparador para ordenar interativamente
+  document.querySelectorAll("#pane-comparador .sortable-th").forEach(th => {
+    th.addEventListener("click", () => {
+      const sortKey = th.getAttribute("data-sort-key");
+      toggleDiffSortKey(sortKey);
+    });
+  });
+
+  // Botão de inverter ordem no histórico do modal
+  const btnToggleOrder = document.getElementById("btn-toggle-modal-order");
+  if (btnToggleOrder) {
+    btnToggleOrder.addEventListener("click", () => {
+      state.modalTimelineOrder = state.modalTimelineOrder === "desc" ? "asc" : "desc";
+      const label = document.getElementById("modal-order-label");
+      if (label) {
+        label.textContent = state.modalTimelineOrder === "desc" ? "Mais Recentes Primeiro" : "Mais Antigos Primeiro";
+      }
+      if (state.currentModalLine) {
+        renderModalHistoryTable(state.currentModalLine.timeline || []);
+      }
+    });
+  }
 
   // Fechar Modal
   const modalClose = document.getElementById("obs-modal-close-btn");
@@ -311,6 +355,31 @@ function setupEventListeners() {
       if (e.target === modalBackdrop) closeLineModal();
     });
   }
+}
+
+function toggleDiffSortKey(key) {
+  const current = state.diffSortBy;
+  let next = "diff_desc";
+
+  if (key === "code") {
+    next = current === "line_asc" ? "line_desc" : "line_asc";
+  } else if (key === "name") {
+    next = current === "name_asc" ? "name_desc" : "name_asc";
+  } else if (key === "consortium") {
+    next = current === "consortium_asc" ? "consortium_desc" : "consortium_asc";
+  } else if (key === "trips1") {
+    next = current === "trips1_desc" ? "trips1_asc" : "trips1_desc";
+  } else if (key === "trips2") {
+    next = current === "trips2_desc" ? "trips2_asc" : "trips2_desc";
+  } else if (key === "delta") {
+    next = current === "diff_desc" ? "diff_asc" : (current === "diff_asc" ? "pct_desc" : "diff_desc");
+  }
+
+  state.diffSortBy = next;
+  const select = document.getElementById("diff-sort-select");
+  if (select) select.value = next;
+
+  renderDiffTableResults();
 }
 
 function applyLineFilters() {
@@ -506,23 +575,63 @@ function renderDiffTableResults() {
   if (state.currentDiffFilter === "ALL") {
     list = [...added, ...removed, ...increased, ...decreased];
   } else if (state.currentDiffFilter === "ADDED") {
-    list = added;
+    list = [...added];
   } else if (state.currentDiffFilter === "REMOVED") {
-    list = removed;
+    list = [...removed];
   } else if (state.currentDiffFilter === "INCREASED") {
-    list = increased;
+    list = [...increased];
   } else if (state.currentDiffFilter === "DECREASED") {
-    list = decreased;
+    list = [...decreased];
   }
 
-  // Ordena por maior variação absoluta
-  list.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+  // 1. Filtragem por busca
+  if (state.diffSearchQuery) {
+    const q = state.diffSearchQuery;
+    list = list.filter(item => {
+      const code = (item.code || "").toLowerCase();
+      const displayCode = (item.display_code || "").toLowerCase();
+      const name = (item.name || "").toLowerCase();
+      const consortium = (item.consortium || "").toLowerCase();
+      return code.includes(q) || displayCode.includes(q) || name.includes(q) || consortium.includes(q);
+    });
+  }
 
+  // 2. Ordenação
+  const sort = state.diffSortBy || "diff_desc";
+  list.sort((a, b) => {
+    if (sort === "diff_desc") return b.delta - a.delta;
+    if (sort === "diff_asc") return a.delta - b.delta;
+    if (sort === "pct_desc") return b.delta_pct - a.delta_pct;
+    if (sort === "pct_asc") return a.delta_pct - b.delta_pct;
+    if (sort === "line_asc") return naturalCompare(a.display_code || a.code, b.display_code || b.code, true);
+    if (sort === "line_desc") return naturalCompare(a.display_code || a.code, b.display_code || b.code, false);
+    if (sort === "abs_diff") return Math.abs(b.delta) - Math.abs(a.delta);
+    if (sort === "name_asc") return (a.name || "").localeCompare(b.name || "", "pt-BR");
+    if (sort === "name_desc") return (b.name || "").localeCompare(a.name || "", "pt-BR");
+    if (sort === "consortium_asc") return (a.consortium || "").localeCompare(b.consortium || "", "pt-BR");
+    if (sort === "consortium_desc") return (b.consortium || "").localeCompare(a.consortium || "", "pt-BR");
+    if (sort === "trips1_desc") return b.trips1 - a.trips1;
+    if (sort === "trips1_asc") return a.trips1 - b.trips1;
+    if (sort === "trips2_desc") return b.trips2 - a.trips2;
+    if (sort === "trips2_asc") return a.trips2 - b.trips2;
+    return b.delta - a.delta;
+  });
+
+  // Atualiza cabeçalhos de data
   setText("th-diff-date-1", formatDateBR(date1));
   setText("th-diff-date-2", formatDateBR(date2));
 
+  // Atualiza indicadores de ordenação nos cabeçalhos da tabela
+  updateDiffHeaderSortIcons(sort);
+
+  // Contador de resultados
+  const countEl = document.getElementById("diff-results-count");
+  if (countEl) {
+    countEl.textContent = `Exibindo ${list.length} de ${added.length + removed.length + increased.length + decreased.length} alterações`;
+  }
+
   if (list.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Nenhuma alteração encontrada para este filtro.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 28px; color: var(--text-muted);"><i class="fa-solid fa-magnifying-glass" style="margin-right:6px;"></i> Nenhuma alteração encontrada para estes filtros.</td></tr>`;
     return;
   }
 
@@ -532,29 +641,62 @@ function renderDiffTableResults() {
 
     if (item.status === "added") {
       badgeClass = "badge-status-gain";
-      badgeText = "Linha Criada";
+      badgeText = `<i class="fa-solid fa-plus"></i> Linha Criada (+${item.trips2} vg)`;
     } else if (item.status === "removed") {
       badgeClass = "badge-status-extinct";
-      badgeText = "Linha Extinta";
+      badgeText = `<i class="fa-solid fa-ban"></i> Extinta (-${item.trips1} vg)`;
     } else if (item.status === "increased") {
       badgeClass = "badge-status-gain";
-      badgeText = `+${item.delta} (${item.delta_pct.toFixed(0)}%)`;
+      badgeText = `<i class="fa-solid fa-arrow-up"></i> +${item.delta} (+${item.delta_pct.toFixed(0)}%)`;
     } else if (item.status === "decreased") {
       badgeClass = "badge-status-loss";
-      badgeText = `${item.delta} (${item.delta_pct.toFixed(0)}%)`;
+      badgeText = `<i class="fa-solid fa-arrow-down"></i> ${item.delta} (${item.delta_pct.toFixed(0)}%)`;
     }
 
+    const rowClass = item.status === "increased" || item.status === "added" ? "row-highlight-gain" : (item.status === "decreased" || item.status === "removed" ? "row-highlight-loss" : "");
+
     return `
-      <tr onclick="openLineModal('${item.code}')" style="cursor: pointer;">
-        <td><strong>${escapeHTML(item.display_code)}</strong></td>
+      <tr class="${rowClass}" onclick="openLineModal('${item.code}')" style="cursor: pointer;">
+        <td><strong><span class="line-badge" style="font-size:0.9rem;">${escapeHTML(item.display_code || item.code)}</span></strong></td>
         <td>${escapeHTML(item.name || "-")}</td>
         <td><span class="badge ${getConsortiumClass(item.consortium)}">${escapeHTML(item.consortium || "-")}</span></td>
-        <td>${item.trips1}</td>
-        <td><strong>${item.trips2}</strong></td>
+        <td>${item.trips1 !== undefined ? item.trips1 : "-"}</td>
+        <td><strong>${item.trips2 !== undefined ? item.trips2 : "-"}</strong></td>
         <td><span class="badge ${badgeClass}">${badgeText}</span></td>
       </tr>
     `;
   }).join("");
+}
+
+function updateDiffHeaderSortIcons(sort) {
+  const iconMap = {
+    code: { asc: "line_asc", desc: "line_desc" },
+    name: { asc: "name_asc", desc: "name_desc" },
+    consortium: { asc: "consortium_asc", desc: "consortium_desc" },
+    trips1: { asc: "trips1_asc", desc: "trips1_desc" },
+    trips2: { asc: "trips2_asc", desc: "trips2_desc" },
+    delta: { asc: "diff_asc", desc: "diff_desc" }
+  };
+
+  document.querySelectorAll("#pane-comparador .sortable-th").forEach(th => {
+    const key = th.getAttribute("data-sort-key");
+    const icon = th.querySelector(".sort-icon");
+    if (!icon || !iconMap[key]) return;
+
+    if (sort === iconMap[key].asc) {
+      icon.className = "fa-solid fa-sort-up sort-icon active";
+    } else if (sort === iconMap[key].desc) {
+      icon.className = "fa-solid fa-sort-down sort-icon active";
+    } else {
+      icon.className = "fa-solid fa-sort sort-icon";
+    }
+  });
+}
+
+function naturalCompare(a, b, asc = true) {
+  const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+  const cmp = collator.compare(String(a || ''), String(b || ''));
+  return asc ? cmp : -cmp;
 }
 
 /* ==========================================================================
@@ -601,10 +743,11 @@ function renderModalChart(timeline) {
   const ctx = document.getElementById("chart-modal-line");
   if (!ctx || timeline.length === 0) return;
 
-  const labels = timeline.map(t => formatDateBR(t.date));
-  const du = timeline.map(t => t.trips_du);
-  const sab = timeline.map(t => t.trips_sab);
-  const dom = timeline.map(t => t.trips_dom);
+  const chronological = [...timeline].sort((a, b) => a.date.localeCompare(b.date));
+  const labels = chronological.map(t => formatDateBR(t.date));
+  const du = chronological.map(t => t.trips_du);
+  const sab = chronological.map(t => t.trips_sab);
+  const dom = chronological.map(t => t.trips_dom);
 
   if (state.charts.modal) state.charts.modal.destroy();
 
@@ -654,17 +797,82 @@ function renderModalHistoryTable(timeline) {
   const tbody = document.getElementById("tbody-modal-timeline");
   if (!tbody) return;
 
-  tbody.innerHTML = timeline.map(row => `
-    <tr>
-      <td><strong>${formatDateBR(row.date)}</strong></td>
-      <td>${row.trips_du}</td>
-      <td>${row.trips_sab}</td>
-      <td>${row.trips_dom}</td>
-      <td>${row.km_du ? row.km_du.toFixed(1) : "-"} km</td>
-      <td><span class="badge ${getConsortiumClass(row.consortium)}">${escapeHTML(row.consortium || "-")}</span></td>
-      <td>${escapeHTML(row.route_name || "-")}</td>
-    </tr>
-  `).join("");
+  if (!timeline || timeline.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 20px; color: var(--text-muted);">Nenhum histórico operacional registrado.</td></tr>`;
+    return;
+  }
+
+  // 1. Cria cópia cronológica (mais antiga para mais recente) para calcular variações com precisão
+  const chronological = [...timeline].sort((a, b) => a.date.localeCompare(b.date));
+
+  // 2. Calcula as métricas de variação para cada plano relativo ao plano anterior imediato
+  const enriched = chronological.map((curr, idx) => {
+    const prev = idx > 0 ? chronological[idx - 1] : null;
+    const deltaDU = prev ? curr.trips_du - prev.trips_du : 0;
+    const deltaPct = prev && prev.trips_du > 0 ? (deltaDU / prev.trips_du) * 100 : (curr.trips_du > 0 && !prev ? 100 : 0);
+    const deltaSab = prev ? curr.trips_sab - prev.trips_sab : 0;
+    const deltaDom = prev ? curr.trips_dom - prev.trips_dom : 0;
+    const deltaKm = prev && prev.km_du ? (curr.km_du || 0) - prev.km_du : 0;
+
+    return {
+      ...curr,
+      hasPrev: !!prev,
+      prevDate: prev ? prev.date : null,
+      deltaDU,
+      deltaPct,
+      deltaSab,
+      deltaDom,
+      deltaKm
+    };
+  });
+
+  // 3. Ordena para exibição conforme preferência do usuário (padrão: mais recentes primeiro)
+  const displayList = state.modalTimelineOrder === "desc" 
+    ? [...enriched].reverse() 
+    : [...enriched];
+
+  tbody.innerHTML = displayList.map(row => {
+    let deltaBadge = "";
+    let rowClass = "";
+
+    if (!row.hasPrev) {
+      deltaBadge = `<span class="badge badge-subtle" title="Primeiro plano registrado desta linha"><i class="fa-solid fa-flag-checkered"></i> Base Inicial</span>`;
+    } else if (row.deltaDU > 0) {
+      rowClass = "row-highlight-gain";
+      deltaBadge = `<span class="badge badge-status-gain" title="+${row.deltaDU} viagens/DU (+${row.deltaPct.toFixed(1)}%) vs plano de ${formatDateBR(row.prevDate)}"><i class="fa-solid fa-arrow-up"></i> +${row.deltaDU} (+${row.deltaPct.toFixed(0)}%)</span>`;
+    } else if (row.deltaDU < 0) {
+      rowClass = "row-highlight-loss";
+      deltaBadge = `<span class="badge badge-status-loss" title="${row.deltaDU} viagens/DU (${row.deltaPct.toFixed(1)}%) vs plano de ${formatDateBR(row.prevDate)}"><i class="fa-solid fa-arrow-down"></i> ${row.deltaDU} (${row.deltaPct.toFixed(0)}%)</span>`;
+    } else {
+      deltaBadge = `<span class="badge badge-subtle" style="opacity:0.75;" title="Mesmo volume de viagens em dias úteis do plano anterior"><i class="fa-solid fa-equals"></i> Estável</span>`;
+    }
+
+    // Variação secundária para sábados e domingos
+    let sabExtra = "";
+    if (row.hasPrev && row.deltaSab !== 0) {
+      const color = row.deltaSab > 0 ? "color:#10b981;" : "color:#ef4444;";
+      sabExtra = ` <span style="${color} font-size:0.75rem; font-weight:700;">(${row.deltaSab > 0 ? '+' : ''}${row.deltaSab})</span>`;
+    }
+
+    let domExtra = "";
+    if (row.hasPrev && row.deltaDom !== 0) {
+      const color = row.deltaDom > 0 ? "color:#10b981;" : "color:#ef4444;";
+      domExtra = ` <span style="${color} font-size:0.75rem; font-weight:700;">(${row.deltaDom > 0 ? '+' : ''}${row.deltaDom})</span>`;
+    }
+
+    return `
+      <tr class="${rowClass}">
+        <td><strong>${formatDateBR(row.date)}</strong></td>
+        <td><strong style="font-size:0.95rem;">${row.trips_du}</strong></td>
+        <td>${deltaBadge}</td>
+        <td>${row.trips_sab}${sabExtra}</td>
+        <td>${row.trips_dom}${domExtra}</td>
+        <td>${row.km_du ? row.km_du.toFixed(1) + ' km' : "-"}</td>
+        <td><span class="badge ${getConsortiumClass(row.consortium)}">${escapeHTML(row.consortium || "-")}</span></td>
+        <td style="max-width:220px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${escapeHTML(row.route_name || "")}">${escapeHTML(row.route_name || "-")}</td>
+      </tr>
+    `;
+  }).join("");
 }
 
 /* ==========================================================================

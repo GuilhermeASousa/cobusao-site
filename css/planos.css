@@ -440,7 +440,107 @@
 .badge-status-active { background: rgba(16, 185, 129, 0.15); color: #34d399; }
 .badge-status-extinct { background: rgba(239, 68, 68, 0.15); color: #f87171; }
 .badge-status-gain { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-.badge-status-loss { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+.badge-status-loss { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.badge-subtle { background: rgba(255, 255, 255, 0.06); color: var(--text-muted); border: 1px solid var(--surface-border); }
+
+/* Linhas com destaque no histórico ou comparador */
+tr.row-highlight-gain td { background: rgba(16, 185, 129, 0.04); }
+tr.row-highlight-loss td { background: rgba(239, 68, 68, 0.04); }
+tr.row-highlight-gain:hover td { background: rgba(16, 185, 129, 0.09) !important; }
+tr.row-highlight-loss:hover td { background: rgba(239, 68, 68, 0.09) !important; }
+
+/* Barra de Ações e Ordenação do Comparador */
+.diff-actions-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.diff-search-wrap {
+  min-width: 260px;
+}
+
+.diff-sort-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  padding: 4px 10px;
+  border-radius: 10px;
+}
+
+.diff-sort-wrapper label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.diff-sort-wrapper select.diff-select {
+  border: none;
+  background: transparent;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+}
+
+/* Cabeçalhos Ordenáveis */
+.sortable-th {
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sortable-th:hover {
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: var(--primary) !important;
+}
+
+.sort-icon {
+  font-size: 0.75rem;
+  margin-left: 4px;
+  opacity: 0.35;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.sortable-th:hover .sort-icon {
+  opacity: 0.8;
+}
+
+.sort-icon.active {
+  opacity: 1;
+  color: var(--primary);
+}
+
+/* Botão de Toggle da Ordem do Modal */
+.modal-order-toggle-btn {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+
+.modal-order-toggle-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(37, 99, 235, 0.06);
+}
 
 /* Comparador de Períodos */
 .diff-selector-card {

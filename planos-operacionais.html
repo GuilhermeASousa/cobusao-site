@@ -228,7 +228,7 @@
                 </div>
             </div>
 
-            <!-- Filtros do Comparador -->
+            <!-- Filtros e Ordenação do Comparador -->
             <div class="controls-bar" style="margin-top:20px;">
                 <div class="filter-group">
                     <button class="filter-chip active" data-diff-filter="ALL">Todas as Alterações</button>
@@ -237,6 +237,35 @@
                     <button class="filter-chip" data-diff-filter="INCREASED">Apenas com Aumento</button>
                     <button class="filter-chip" data-diff-filter="DECREASED">Apenas com Redução</button>
                 </div>
+
+                <div class="diff-actions-bar">
+                    <div class="search-box-wrap diff-search-wrap">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="diff-search-input" class="search-input" placeholder="Filtrar por linha (ex: 665) ou itinerário..." />
+                    </div>
+
+                    <div class="diff-sort-wrapper">
+                        <label for="diff-sort-select">
+                            <i class="fa-solid fa-arrow-down-short-wide"></i> Ordenar por:
+                        </label>
+                        <select id="diff-sort-select" class="diff-select">
+                            <option value="diff_desc">Maior Aumento de Viagens (+vg)</option>
+                            <option value="diff_asc">Maior Redução de Viagens (-vg)</option>
+                            <option value="pct_desc">Maior Variação Percentual (+%)</option>
+                            <option value="pct_asc">Maior Redução Percentual (-%)</option>
+                            <option value="line_asc">Linha: Crescente (001 → 999)</option>
+                            <option value="line_desc">Linha: Decrescente (999 → 001)</option>
+                            <option value="abs_diff">Maior Impacto Absoluto (|Δ|)</option>
+                            <option value="name_asc">Itinerário (A → Z)</option>
+                            <option value="consortium_asc">Consórcio (A → Z)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:0.85rem; color:var(--text-muted);">
+                <span id="diff-results-count">Carregando balanço...</span>
+                <span style="font-size:0.8rem;"><i class="fa-solid fa-circle-info"></i> Dica: Clique no cabeçalho das colunas para ordenar</span>
             </div>
 
             <!-- Tabela de Resultados do Diff -->
@@ -244,12 +273,12 @@
                 <table class="obs-table">
                     <thead>
                         <tr>
-                            <th>Linha</th>
-                            <th>Itinerário</th>
-                            <th>Consórcio</th>
-                            <th id="th-diff-date-1">Data 1</th>
-                            <th id="th-diff-date-2">Data 2</th>
-                            <th>Variação</th>
+                            <th class="sortable-th" data-sort-key="code">Linha <i class="fa-solid fa-sort sort-icon"></i></th>
+                            <th class="sortable-th" data-sort-key="name">Itinerário <i class="fa-solid fa-sort sort-icon"></i></th>
+                            <th class="sortable-th" data-sort-key="consortium">Consórcio <i class="fa-solid fa-sort sort-icon"></i></th>
+                            <th class="sortable-th" data-sort-key="trips1" id="th-diff-date-1">Data 1 <i class="fa-solid fa-sort sort-icon"></i></th>
+                            <th class="sortable-th" data-sort-key="trips2" id="th-diff-date-2">Data 2 <i class="fa-solid fa-sort sort-icon"></i></th>
+                            <th class="sortable-th" data-sort-key="delta">Variação <i class="fa-solid fa-sort sort-icon"></i></th>
                         </tr>
                     </thead>
                     <tbody id="tbody-diff-results">
@@ -320,13 +349,19 @@
                     <canvas id="chart-modal-line"></canvas>
                 </div>
 
-                <h3 style="font-size:1rem; font-weight:700; margin-bottom:12px;"><i class="fa-solid fa-list-check" style="color:var(--primary); margin-right:6px;"></i> Tabela de Planos Operacionais</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                    <h3 style="font-size:1rem; font-weight:700; margin:0;"><i class="fa-solid fa-list-check" style="color:var(--primary); margin-right:6px;"></i> Tabela de Planos Operacionais & Comparações</h3>
+                    <button id="btn-toggle-modal-order" class="modal-order-toggle-btn" title="Alternar entre ordem cronológica e mais recente primeiro">
+                        <i class="fa-solid fa-arrow-down-short-wide"></i> <span id="modal-order-label">Mais Recentes Primeiro</span>
+                    </button>
+                </div>
                 <div class="obs-table-wrap">
                     <table class="obs-table" style="font-size:0.85rem;">
                         <thead>
                             <tr>
                                 <th>Data</th>
                                 <th>Viagens DU</th>
+                                <th>Variação DU (vs anterior)</th>
                                 <th>Viagens Sáb</th>
                                 <th>Viagens Dom</th>
                                 <th>Km DU</th>
