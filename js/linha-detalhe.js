@@ -197,12 +197,38 @@ function setupMap() {
   }).addTo(state.map);
 
   state.routeLayer = L.layerGroup().addTo(state.map);
-  state.stopsLayer = L.layerGroup().addTo(state.map);
+  state.stopsLayer = L.layerGroup();
   state.vehiclesLayer = L.layerGroup().addTo(state.map);
+
+  state.map.on('zoomend', updateStopsVisibilityByZoom);
 
   window.addEventListener('resize', () => {
     if (state.map) state.map.invalidateSize();
   });
+}
+
+/**
+ * Controla a visibilidade dos pontos de parada baseado no nível de zoom
+ * (Exibe as paradas apenas em zoom aproximado >= 14 para não poluir o mapa em visão panorâmica)
+ */
+function updateStopsVisibilityByZoom() {
+  if (!state.map || !state.stopsLayer) return;
+  const currentZoom = state.map.getZoom();
+  const toggleBtn = document.getElementById('btn-map-toggle-stops');
+
+  if (state.stopsVisible && currentZoom >= 14) {
+    if (!state.map.hasLayer(state.stopsLayer)) {
+      state.stopsLayer.addTo(state.map);
+    }
+    if (toggleBtn) toggleBtn.style.color = 'var(--primary)';
+  } else {
+    if (state.map.hasLayer(state.stopsLayer)) {
+      state.map.removeLayer(state.stopsLayer);
+    }
+    if (toggleBtn && !state.stopsVisible) {
+      toggleBtn.style.color = 'var(--text-muted)';
+    }
+  }
 }
 
 // Cliente Socket.IO global
@@ -596,12 +622,15 @@ function drawRouteAndStops() {
         if (state.map) {
           state.map.invalidateSize();
           state.map.fitBounds(bounds, { padding: [40, 40] });
+          updateStopsVisibilityByZoom();
         }
       }, 150);
     }
   } catch (e) {
     console.warn('Erro ao ajustar bounds do mapa:', e);
   }
+
+  updateStopsVisibilityByZoom();
 }
 
 /**
@@ -1277,10 +1306,14 @@ function setupEventListeners() {
     toggleStopsBtn.addEventListener('click', () => {
       state.stopsVisible = !state.stopsVisible;
       if (state.stopsVisible) {
-        state.stopsLayer.addTo(state.map);
-        toggleStopsBtn.style.color = 'var(--primary)';
+        if (state.map && state.map.getZoom() < 14) {
+          state.map.setZoom(14.5);
+        }
+        updateStopsVisibilityByZoom();
       } else {
-        state.map.removeLayer(state.stopsLayer);
+        if (state.map && state.map.hasLayer(state.stopsLayer)) {
+          state.map.removeLayer(state.stopsLayer);
+        }
         toggleStopsBtn.style.color = 'var(--text-muted)';
       }
     });

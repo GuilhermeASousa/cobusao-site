@@ -148,6 +148,18 @@ export function switchCity(newCitySlug) {
 }
 
 /**
+ * Extrai o código numérico base de linhas para identificar variantes reais (ex: 01DC -> 1, 0001 -> 1)
+ */
+function getBaseLineCode(code) {
+  const upper = (code || '').trim().toUpperCase();
+  const match = upper.match(/^(\d+)[A-Z]{2}$/);
+  if (match) {
+    return match[1].replace(/^0+/, '');
+  }
+  return upper.replace(/^0+/, '');
+}
+
+/**
  * Carrega o arquivo `line_info.json` de todos os subsistemas do polo regional (ex: Rio + DETRO, SP + EMTU + Campinas)
  */
 async function loadCityLines(citySlug) {
@@ -225,23 +237,21 @@ async function loadCityLines(citySlug) {
       });
     });
 
-    // Deduplicação inteligente de linhas com mesma descrição e código variante no mesmo subsistema
+    // Deduplicação inteligente de variantes reais (ex: 01 e 01DC) mantendo todas as linhas de números diferentes intactas
     const deduplicatedMap = new Map();
 
     mergedList.forEach(item => {
       const normDesc = item.description.toLowerCase().replace(/\s+/g, ' ').trim();
       const code = item.codigo.trim().toUpperCase();
-      const groupKey = `${item.cityKey}_${normDesc}`;
+      const baseCode = getBaseLineCode(code);
+      const groupKey = `${item.cityKey}__${baseCode}__${normDesc}`;
 
       if (deduplicatedMap.has(groupKey)) {
         const existing = deduplicatedMap.get(groupKey);
         const existingCode = existing.codigo.trim().toUpperCase();
 
-        // Prefere o código oficial mais completo/canônico (ex: '01DC' em vez de '01' genérico)
-        if (code.startsWith(existingCode) || (code.replace(/^0+/, '') === existingCode.replace(/^0+/, ''))) {
-          if (code.length >= existingCode.length) {
-            deduplicatedMap.set(groupKey, item);
-          }
+        if (code.length > existingCode.length) {
+          deduplicatedMap.set(groupKey, item);
         }
       } else {
         deduplicatedMap.set(groupKey, item);

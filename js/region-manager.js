@@ -21,7 +21,7 @@ class RegionManager {
     this.modalEl = null;
     this.selectedFilterRegion = 'Todas';
     this.searchQuery = '';
-    
+
     // Inicializa quando o DOM estiver pronto
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.init());
@@ -205,7 +205,7 @@ class RegionManager {
             </a>
             <a href="planos-operacionais.html" id="drawer-planos-link" class="drawer-link">
               <i class="fa-solid fa-chart-line"></i>
-              <span>Planos Operacionais (Rio)</span>
+              <span>Planos Operacionais</span>
             </a>
 
             <div class="drawer-nav-divider"></div>
@@ -325,7 +325,7 @@ class RegionManager {
       }
     });
 
-    // 2. Link para "Planos Operacionais (Rio)" -> só aparece quando for Rio de Janeiro
+    // 2. Link para "Planos Operacionais" -> só aparece quando for Rio de Janeiro
     document.querySelectorAll('a[href*="planos-operacionais.html"]').forEach(link => {
       if (isRio) {
         link.style.display = '';

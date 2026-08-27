@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Observatório de Planos Operacionais SPPO — Cadê o Ônibus?</title>
-    <meta name="description" content="Histórico completo e comparador de alterações nos planos operacionais das linhas de ônibus municipais do Rio de Janeiro (SMTR) de 2022 a 2026." />
-    <meta name="keywords" content="planos operacionais, smtr rio, onibus rio de janeiro, sppo, historico linhas onibus, cade o onibus" />
+    <meta name="description"
+        content="Histórico completo e comparador de alterações nos planos operacionais das linhas de ônibus municipais do Rio de Janeiro (SMTR) de 2022 a 2026." />
+    <meta name="keywords"
+        content="planos operacionais, smtr rio, onibus rio de janeiro, sppo, historico linhas onibus, cade o onibus" />
 
     <meta property="og:site_name" content="Cadê o Ônibus?" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Observatório de Planos Operacionais SPPO — Cadê o Ônibus?" />
-    <meta property="og:description" content="Acompanhe a evolução de viagens, extinções, linhas criadas e mudanças operacionais no transporte municipal do Rio de Janeiro." />
+    <meta property="og:description"
+        content="Acompanhe a evolução de viagens, extinções, linhas criadas e mudanças operacionais no transporte municipal do Rio de Janeiro." />
     <meta property="og:url" content="https://cadeoonibus.api.br/planos-operacionais.html" />
     <meta property="og:image" content="https://web.cadeoonibus.api.br/og-image.jpg" />
     <meta property="og:locale" content="pt_BR" />
@@ -24,6 +28,7 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
+
 <body>
     <!-- Header Integrado -->
     <header class="site-header">
@@ -36,7 +41,8 @@
                 </div>
             </a>
 
-            <button class="header-region-pill" type="button" id="btn-header-region-selector" title="Trocar região / cidade">
+            <button class="header-region-pill" type="button" id="btn-header-region-selector"
+                title="Trocar região / cidade">
                 <span class="pill-dot"></span>
                 <span class="pill-flag" id="header-region-flag">🏖️</span>
                 <span class="pill-text" id="header-region-label">Rio de Janeiro (RJ)</span>
@@ -46,7 +52,7 @@
             <nav class="site-nav">
                 <a href="linhas.html">Linhas de Ônibus</a>
                 <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
-                <a class="active" href="planos-operacionais.html" id="nav-planos-link">Planos Operacionais (Rio)</a>
+                <a class="active" href="planos-operacionais.html" id="nav-planos-link">Planos Operacionais</a>
                 <a href="privacidade.html">Privacidade</a>
                 <a href="termos-uso.html">Termos</a>
                 <a href="suporte.html">Suporte</a>
@@ -60,12 +66,15 @@
         <div class="obs-hero">
             <span class="eyebrow"><span class="eyebrow-dot"></span> Dados Oficiais SMTR-Rio (2022–2026)</span>
             <h1>Observatório de Planos Operacionais</h1>
-            <p>Monitore a evolução histórica das linhas municipais de ônibus do Rio de Janeiro (SPPO). Acompanhe aumentos, cortes de viagens, linhas criadas e extinções.</p>
-            
+            <p>Monitore a evolução histórica das linhas municipais de ônibus do Rio de Janeiro (SPPO). Acompanhe
+                aumentos, cortes de viagens, linhas criadas e extinções.</p>
+
             <div class="obs-badge-row">
                 <span class="obs-tag" id="obs-plans-badge"><span class="dot"></span> Carregando planos...</span>
-                <span class="obs-tag"><span class="dot" style="background:#10b981;"></span> Equivalências LECD Unificadas</span>
-                <span class="obs-tag"><span class="dot" style="background:#f59e0b;"></span> 4 Consórcios Monitorados</span>
+                <span class="obs-tag"><span class="dot" style="background:#10b981;"></span> Equivalências LECD
+                    Unificadas</span>
+                <span class="obs-tag"><span class="dot" style="background:#f59e0b;"></span> 4 Consórcios
+                    Monitorados</span>
             </div>
         </div>
 
@@ -100,28 +109,32 @@
                     </div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background:rgba(16,185,129,0.12); color:#10b981;"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="kpi-icon" style="background:rgba(16,185,129,0.12); color:#10b981;"><i
+                            class="fa-solid fa-circle-check"></i></div>
                     <div class="kpi-info">
                         <h4>Linhas Ativas</h4>
                         <div class="kpi-value" id="kpi-active-lines">-</div>
                     </div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background:rgba(239,68,68,0.12); color:#ef4444;"><i class="fa-solid fa-circle-xmark"></i></div>
+                    <div class="kpi-icon" style="background:rgba(239,68,68,0.12); color:#ef4444;"><i
+                            class="fa-solid fa-circle-xmark"></i></div>
                     <div class="kpi-info">
                         <h4>Linhas Extintas</h4>
                         <div class="kpi-value" id="kpi-extinct-lines">-</div>
                     </div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background:rgba(16,185,129,0.12); color:#10b981;"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                    <div class="kpi-icon" style="background:rgba(16,185,129,0.12); color:#10b981;"><i
+                            class="fa-solid fa-arrow-trend-up"></i></div>
                     <div class="kpi-info">
                         <h4>Com Aumento</h4>
                         <div class="kpi-value" id="kpi-increased-lines">-</div>
                     </div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background:rgba(245,158,11,0.12); color:#f59e0b;"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                    <div class="kpi-icon" style="background:rgba(245,158,11,0.12); color:#f59e0b;"><i
+                            class="fa-solid fa-arrow-trend-down"></i></div>
                     <div class="kpi-info">
                         <h4>Com Redução</h4>
                         <div class="kpi-value" id="kpi-decreased-lines">-</div>
@@ -133,7 +146,8 @@
             <div class="charts-grid">
                 <div class="chart-card">
                     <div class="chart-header">
-                        <h3><i class="fa-solid fa-chart-line" style="color:var(--primary); margin-right:8px;"></i> Evolução de Viagens e Frota na Cidade</h3>
+                        <h3><i class="fa-solid fa-chart-line" style="color:var(--primary); margin-right:8px;"></i>
+                            Evolução de Viagens e Frota na Cidade</h3>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="chart-timeline"></canvas>
@@ -142,7 +156,8 @@
 
                 <div class="chart-card">
                     <div class="chart-header">
-                        <h3><i class="fa-solid fa-chart-pie" style="color:var(--primary); margin-right:8px;"></i> Divisão por Consórcio</h3>
+                        <h3><i class="fa-solid fa-chart-pie" style="color:var(--primary); margin-right:8px;"></i>
+                            Divisão por Consórcio</h3>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="chart-consortium"></canvas>
@@ -153,12 +168,14 @@
             <!-- Destaques -->
             <div class="highlights-grid">
                 <div class="highlight-box">
-                    <h3 style="color:#10b981;"><i class="fa-solid fa-arrow-up-right-dots"></i> Maiores Aumentos de Viagens</h3>
+                    <h3 style="color:#10b981;"><i class="fa-solid fa-arrow-up-right-dots"></i> Maiores Aumentos de
+                        Viagens</h3>
                     <div class="highlight-list" id="list-gainers"></div>
                 </div>
 
                 <div class="highlight-box">
-                    <h3 style="color:#ef4444;"><i class="fa-solid fa-arrow-down-right-dots"></i> Maiores Reduções de Viagens</h3>
+                    <h3 style="color:#ef4444;"><i class="fa-solid fa-arrow-down-right-dots"></i> Maiores Reduções de
+                        Viagens</h3>
                     <div class="highlight-list" id="list-losers"></div>
                 </div>
             </div>
@@ -169,7 +186,8 @@
             <div class="controls-bar">
                 <div class="search-box-wrap">
                     <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <input type="text" id="line-search-input" class="search-input" placeholder="Buscar por número (ex: 826, 433, SP513) ou LECD (ex: LECD157)..." />
+                    <input type="text" id="line-search-input" class="search-input"
+                        placeholder="Buscar por número (ex: 826, 433, SP513) ou LECD (ex: LECD157)..." />
                 </div>
 
                 <div class="filter-group">
@@ -189,14 +207,16 @@
                 </div>
             </div>
 
-            <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;" id="lines-results-count">Carregando linhas...</div>
+            <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;" id="lines-results-count">
+                Carregando linhas...</div>
             <div class="lines-grid" id="obs-lines-grid"></div>
         </div>
 
         <!-- ABA 3: COMPARADOR DE PERÍODOS -->
         <div id="pane-comparador" class="obs-pane">
             <div class="diff-selector-card">
-                <h3 style="margin-bottom:14px;"><i class="fa-solid fa-code-compare" style="color:var(--primary); margin-right:8px;"></i> Comparar Alterações Entre Dois Planos</h3>
+                <h3 style="margin-bottom:14px;"><i class="fa-solid fa-code-compare"
+                        style="color:var(--primary); margin-right:8px;"></i> Comparar Alterações Entre Dois Planos</h3>
                 <div class="diff-selectors-row">
                     <div class="diff-field">
                         <label for="diff-select-1">Plano Base (Data Inicial):</label>
@@ -253,7 +273,8 @@
                 <div class="diff-actions-bar">
                     <div class="search-box-wrap diff-search-wrap">
                         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                        <input type="text" id="diff-search-input" class="search-input" placeholder="Filtrar por linha (ex: 665) ou itinerário..." />
+                        <input type="text" id="diff-search-input" class="search-input"
+                            placeholder="Filtrar por linha (ex: 665) ou itinerário..." />
                     </div>
 
                     <div class="diff-sort-wrapper">
@@ -275,9 +296,11 @@
                 </div>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:0.85rem; color:var(--text-muted);">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:0.85rem; color:var(--text-muted);">
                 <span id="diff-results-count">Carregando balanço...</span>
-                <span style="font-size:0.8rem;"><i class="fa-solid fa-circle-info"></i> Dica: Clique no cabeçalho das colunas para ordenar</span>
+                <span style="font-size:0.8rem;"><i class="fa-solid fa-circle-info"></i> Dica: Clique no cabeçalho das
+                    colunas para ordenar</span>
             </div>
 
             <!-- Tabela de Resultados do Diff -->
@@ -285,16 +308,25 @@
                 <table class="obs-table">
                     <thead>
                         <tr>
-                            <th class="sortable-th" data-sort-key="code">Linha <i class="fa-solid fa-sort sort-icon"></i></th>
-                            <th class="sortable-th" data-sort-key="name">Itinerário <i class="fa-solid fa-sort sort-icon"></i></th>
-                            <th class="sortable-th" data-sort-key="consortium">Consórcio <i class="fa-solid fa-sort sort-icon"></i></th>
-                            <th class="sortable-th" data-sort-key="trips1" id="th-diff-date-1">Data 1 <i class="fa-solid fa-sort sort-icon"></i></th>
-                            <th class="sortable-th" data-sort-key="trips2" id="th-diff-date-2">Data 2 <i class="fa-solid fa-sort sort-icon"></i></th>
-                            <th class="sortable-th" data-sort-key="delta">Variação <i class="fa-solid fa-sort sort-icon"></i></th>
+                            <th class="sortable-th" data-sort-key="code">Linha <i
+                                    class="fa-solid fa-sort sort-icon"></i></th>
+                            <th class="sortable-th" data-sort-key="name">Itinerário <i
+                                    class="fa-solid fa-sort sort-icon"></i></th>
+                            <th class="sortable-th" data-sort-key="consortium">Consórcio <i
+                                    class="fa-solid fa-sort sort-icon"></i></th>
+                            <th class="sortable-th" data-sort-key="trips1" id="th-diff-date-1">Data 1 <i
+                                    class="fa-solid fa-sort sort-icon"></i></th>
+                            <th class="sortable-th" data-sort-key="trips2" id="th-diff-date-2">Data 2 <i
+                                    class="fa-solid fa-sort sort-icon"></i></th>
+                            <th class="sortable-th" data-sort-key="delta">Variação <i
+                                    class="fa-solid fa-sort sort-icon"></i></th>
                         </tr>
                     </thead>
                     <tbody id="tbody-diff-results">
-                        <tr><td colspan="6" style="text-align:center; padding:24px; color:var(--text-muted);">Clique em Comparar para carregar o balanço.</td></tr>
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:24px; color:var(--text-muted);">Clique em
+                                Comparar para carregar o balanço.</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -314,7 +346,10 @@
                         </tr>
                     </thead>
                     <tbody id="tbody-extinct-lines">
-                        <tr><td colspan="5" style="text-align:center; padding:24px; color:var(--text-muted);">Carregando linhas extintas...</td></tr>
+                        <tr>
+                            <td colspan="5" style="text-align:center; padding:24px; color:var(--text-muted);">Carregando
+                                linhas extintas...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -333,7 +368,10 @@
                         </tr>
                     </thead>
                     <tbody id="tbody-plans-catalog">
-                        <tr><td colspan="4" style="text-align:center; padding:24px; color:var(--text-muted);">Carregando catálogo de planos...</td></tr>
+                        <tr>
+                            <td colspan="4" style="text-align:center; padding:24px; color:var(--text-muted);">Carregando
+                                catálogo de planos...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -346,7 +384,8 @@
             <div class="obs-modal-header">
                 <div>
                     <h2 id="modal-line-code" style="font-size:1.6rem; font-weight:800; color:var(--text);">-</h2>
-                    <div id="modal-line-name" style="font-size:0.95rem; color:var(--text-muted); margin-top:2px;">-</div>
+                    <div id="modal-line-name" style="font-size:0.95rem; color:var(--text-muted); margin-top:2px;">-
+                    </div>
                 </div>
                 <button class="obs-modal-close" id="obs-modal-close-btn">&times;</button>
             </div>
@@ -356,15 +395,22 @@
                     <span class="badge badge-status-gain" id="modal-line-trips">-</span>
                 </div>
 
-                <h3 style="font-size:1rem; font-weight:700; margin-bottom:12px;"><i class="fa-solid fa-chart-line" style="color:var(--primary); margin-right:6px;"></i> Histórico de Viagens Operacionais (2022–2026)</h3>
+                <h3 style="font-size:1rem; font-weight:700; margin-bottom:12px;"><i class="fa-solid fa-chart-line"
+                        style="color:var(--primary); margin-right:6px;"></i> Histórico de Viagens Operacionais
+                    (2022–2026)</h3>
                 <div class="chart-wrapper" style="height:220px; margin-bottom:24px;">
                     <canvas id="chart-modal-line"></canvas>
                 </div>
 
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
-                    <h3 style="font-size:1rem; font-weight:700; margin:0;"><i class="fa-solid fa-list-check" style="color:var(--primary); margin-right:6px;"></i> Tabela de Planos Operacionais & Comparações</h3>
-                    <button id="btn-toggle-modal-order" class="modal-order-toggle-btn" title="Alternar entre ordem cronológica e mais recente primeiro">
-                        <i class="fa-solid fa-arrow-down-short-wide"></i> <span id="modal-order-label">Mais Recentes Primeiro</span>
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                    <h3 style="font-size:1rem; font-weight:700; margin:0;"><i class="fa-solid fa-list-check"
+                            style="color:var(--primary); margin-right:6px;"></i> Tabela de Planos Operacionais &
+                        Comparações</h3>
+                    <button id="btn-toggle-modal-order" class="modal-order-toggle-btn"
+                        title="Alternar entre ordem cronológica e mais recente primeiro">
+                        <i class="fa-solid fa-arrow-down-short-wide"></i> <span id="modal-order-label">Mais Recentes
+                            Primeiro</span>
                     </button>
                 </div>
                 <div class="obs-table-wrap">
@@ -396,7 +442,7 @@
             </a>
             <div class="footer-links">
                 <a href="linhas.html">Linhas de Ônibus</a>
-                <a href="planos-operacionais.html">Planos Operacionais (Rio)</a>
+                <a href="planos-operacionais.html">Planos Operacionais</a>
                 <a href="termos-uso.html">Termos de Uso</a>
                 <a href="privacidade.html">Política de Privacidade</a>
                 <a href="suporte.html">Suporte</a>
@@ -410,4 +456,5 @@
     <script type="module" src="js/region-manager.js"></script>
     <script src="js/planos.js"></script>
 </body>
+
 </html>

@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Cadê o Ônibus? — O seu aplicativo de transporte público em tempo real</title>
-    <meta name="description" content="Acompanhe a localização dos ônibus em tempo real no mapa, confira horários, paradas e receba alertas de chegada. Grátis e sem anúncios para 26 regiões." />
-    <meta name="keywords" content="onibus em tempo real, rastreamento gps onibus, horarios de onibus, linhas de onibus, rio de janeiro, sao paulo, belo horizonte, curitiba, cade o onibus" />
+    <meta name="description"
+        content="Acompanhe a localização dos ônibus em tempo real no mapa, confira horários, paradas e receba alertas de chegada. Grátis e sem anúncios para 26 regiões." />
+    <meta name="keywords"
+        content="onibus em tempo real, rastreamento gps onibus, horarios de onibus, linhas de onibus, rio de janeiro, sao paulo, belo horizonte, curitiba, cade o onibus" />
 
     <!-- Open Graph / Redes Sociais -->
     <meta property="og:site_name" content="Cadê o Ônibus?" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Cadê o Ônibus? — Localização de Ônibus em Tempo Real" />
-    <meta property="og:description" content="Saiba exatamente onde está o seu ônibus pelo mapa em tempo real. 100% gratuito e sem anúncios." />
+    <meta property="og:description"
+        content="Saiba exatamente onde está o seu ônibus pelo mapa em tempo real. 100% gratuito e sem anúncios." />
     <meta property="og:url" content="https://cadeoonibus.com.br" />
     <meta property="og:image" content="https://web.cadeoonibus.api.br/og-image.jpg" />
     <meta property="og:locale" content="pt_BR" />
@@ -22,6 +26,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
+
 <body>
     <!-- Header Integrado com Identidade Visual Flutter -->
     <header class="site-header">
@@ -35,7 +40,8 @@
             </a>
 
             <!-- Seletor de Região Ativa Global (Pill M3) -->
-            <button class="header-region-pill" type="button" id="btn-header-region-selector" title="Trocar região / cidade">
+            <button class="header-region-pill" type="button" id="btn-header-region-selector"
+                title="Trocar região / cidade">
                 <span class="pill-dot"></span>
                 <span class="pill-flag" id="header-region-flag">🏖️</span>
                 <span class="pill-text" id="header-region-label">Rio de Janeiro (RJ)</span>
@@ -46,7 +52,7 @@
             <nav class="site-nav">
                 <a href="linhas.html">Linhas de Ônibus</a>
                 <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
-                <a href="planos-operacionais.html" id="nav-planos-link">Planos Operacionais (Rio)</a>
+                <a href="planos-operacionais.html" id="nav-planos-link">Planos Operacionais</a>
                 <a href="privacidade.html">Privacidade</a>
                 <a href="termos-uso.html">Termos</a>
                 <a href="suporte.html">Suporte</a>
@@ -70,7 +76,8 @@
                 </h1>
 
                 <p class="hero-desc">
-                    Chega de esperar no ponto às cegas. Acompanhe a localização exata dos ônibus em tempo real no mapa e receba alertas inteligentes antes dele passar.
+                    Chega de esperar no ponto às cegas. Acompanhe a localização exata dos ônibus em tempo real no mapa e
+                    receba alertas inteligentes antes dele passar.
                 </p>
 
                 <!-- Card de Região Ativa com troca rápida -->
@@ -89,7 +96,8 @@
 
                 <!-- Botões de Ação / Download -->
                 <div class="hero-actions">
-                    <a class="btn-primary" href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" target="_blank">
+                    <a class="btn-primary" href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus"
+                        target="_blank">
                         <i class="fa-brands fa-google-play"></i> Baixar no Google Play
                     </a>
                     <a class="btn-secondary" href="https://web.cadeoonibus.api.br" target="_blank">
@@ -133,7 +141,8 @@
                             <!-- Controles / Indicador de Slides -->
                             <div class="phone-slider-controls">
                                 <div class="phone-slider-pill" id="slider-dots-container">
-                                    <button class="phone-slider-dot active" data-slide="0" aria-label="Slide 1"></button>
+                                    <button class="phone-slider-dot active" data-slide="0"
+                                        aria-label="Slide 1"></button>
                                     <button class="phone-slider-dot" data-slide="1" aria-label="Slide 2"></button>
                                     <button class="phone-slider-dot" data-slide="2" aria-label="Slide 3"></button>
                                     <button class="phone-slider-dot" data-slide="3" aria-label="Slide 4"></button>
@@ -164,7 +173,8 @@
                     <i class="fa-solid fa-map-location-dot"></i>
                 </div>
                 <h3>Ônibus ao Vivo no Mapa</h3>
-                <p>Veja o deslocamento real de cada veículo segundo a segundo pelo sinal de GPS oficial, sabendo com precisão a distância até o seu ponto.</p>
+                <p>Veja o deslocamento real de cada veículo segundo a segundo pelo sinal de GPS oficial, sabendo com
+                    precisão a distância até o seu ponto.</p>
             </div>
 
             <div class="benefit-card">
@@ -172,7 +182,8 @@
                     <i class="fa-solid fa-bell-ring fa-bell"></i>
                 </div>
                 <h3>Alertas de Chegada</h3>
-                <p>Receba uma notificação no celular quando a sua linha estiver se aproximando. Não perca tempo esperando no ponto sem necessidade.</p>
+                <p>Receba uma notificação no celular quando a sua linha estiver se aproximando. Não perca tempo
+                    esperando no ponto sem necessidade.</p>
             </div>
 
             <div class="benefit-card">
@@ -180,7 +191,8 @@
                     <i class="fa-solid fa-route"></i>
                 </div>
                 <h3>Itinerários & Paradas</h3>
-                <p>Consulte o trajeto completo de ida e volta, a lista de todas as paradas e encontre com facilidade o melhor local para embarcar.</p>
+                <p>Consulte o trajeto completo de ida e volta, a lista de todas as paradas e encontre com facilidade o
+                    melhor local para embarcar.</p>
             </div>
 
             <div class="benefit-card">
@@ -188,7 +200,8 @@
                     <i class="fa-solid fa-shield-heart"></i>
                 </div>
                 <h3>100% Grátis e Zero Anúncios</h3>
-                <p>Nenhum anúncio em tela cheia, banners invasivos ou planos pagos. Feito de passageiro para passageiro com foco total na agilidade.</p>
+                <p>Nenhum anúncio em tela cheia, banners invasivos ou planos pagos. Feito de passageiro para passageiro
+                    com foco total na agilidade.</p>
             </div>
 
             <div class="benefit-card">
@@ -196,7 +209,8 @@
                     <i class="fa-solid fa-bolt"></i>
                 </div>
                 <h3>Sem Cadastro ou Burocracia</h3>
-                <p>Abriu o app, já está funcionando. Não exigimos cadastro, e-mail ou senhas para você começar a usar imediatamente.</p>
+                <p>Abriu o app, já está funcionando. Não exigimos cadastro, e-mail ou senhas para você começar a usar
+                    imediatamente.</p>
             </div>
 
             <div class="benefit-card">
@@ -204,7 +218,8 @@
                     <i class="fa-solid fa-city"></i>
                 </div>
                 <h3>Cobertura Ampla</h3>
-                <p>Presente em 14 estados e principais regiões metropolitanas pelo Brasil com integração contínua com os dados oficiais.</p>
+                <p>Presente em 14 estados e principais regiões metropolitanas pelo Brasil com integração contínua com os
+                    dados oficiais.</p>
             </div>
         </div>
     </section>
@@ -227,10 +242,12 @@
     <section class="section" style="padding-top: 0;">
         <div class="download-banner">
             <h2>Pronto para não perder mais seu ônibus?</h2>
-            <p>Experimente agora mesmo o app no seu celular Android ou acesse diretamente pelo navegador do seu computador ou iPhone.</p>
+            <p>Experimente agora mesmo o app no seu celular Android ou acesse diretamente pelo navegador do seu
+                computador ou iPhone.</p>
 
             <div class="cta-row">
-                <a class="btn-white" href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" target="_blank">
+                <a class="btn-white" href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus"
+                    target="_blank">
                     <i class="fa-brands fa-google-play"></i> Baixar Grátis no Google Play
                 </a>
                 <a class="btn-outline-white" href="https://web.cadeoonibus.api.br" target="_blank">
@@ -248,7 +265,7 @@
             </a>
             <div class="footer-links">
                 <a href="linhas.html">Linhas de Ônibus</a>
-                <a href="planos-operacionais.html">Planos Operacionais (Rio)</a>
+                <a href="planos-operacionais.html">Planos Operacionais</a>
                 <a href="termos-uso.html">Termos de Uso</a>
                 <a href="privacidade.html">Política de Privacidade</a>
                 <a href="suporte.html">Suporte</a>
@@ -402,4 +419,5 @@
         });
     </script>
 </body>
+
 </html>
