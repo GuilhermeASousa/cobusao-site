@@ -1,7 +1,7 @@
 /**
  * Cadê o Ônibus? — Detalhes da Linha, Trajeto no Mapa e Ônibus em Tempo Real
- * Design System idêntico ao App Flutter: Setas direcionais nos veículos,
- * paradas circulares, filtro de ônibus por sentido e quadro de horários oficial.
+ * Design System idêntico ao App Flutter: Setas direcionais com a cor da linha,
+ * balão de informações oficial, filtro rigoroso de trajeto e polling automático de 15s.
  */
 
 import {
@@ -34,8 +34,6 @@ const state = {
   vehiclesLayer: null,
   stopsVisible: true,
   refreshTimer: null,
-  countdownSecs: 8,
-  countdownInterval: null,
   isFetchingVehicles: false,
   vehicleMarkersMap: new Map(),
   stopSearchQuery: ''
@@ -59,7 +57,7 @@ function initParamsFromUrl() {
   let cityParam = params.get('cidade') || params.get('c');
   let lineParam = params.get('linha') || params.get('l');
 
-  // Fallback para sessionStorage caso o servidor web tenha limpado os query params no redirect
+  // Fallback para sessionStorage
   if (!lineParam) {
     const savedLine = sessionStorage.getItem('selected_line');
     const savedCity = sessionStorage.getItem('selected_city');
@@ -95,8 +93,19 @@ function initParamsFromUrl() {
   if (lineParam && lineParam.trim()) {
     state.lineCode = lineParam.trim();
   } else {
-    // Padrão apenas se não houver linha selecionada em nenhum lugar
-    state.lineCode = state.citySlug === 'sp' ? '107T-10' : (state.citySlug === 'bh' ? '104' : '472');
+    const defaultLines = {
+      rio: '472',
+      sp: '107T-10',
+      bh: '104',
+      curitiba: '010',
+      brasilia: '0.108',
+      porto_alegre: '110',
+      rio_intermunicipal: '100D',
+      emtu: '001',
+      campinas: '116',
+      florianopolis: '100'
+    };
+    state.lineCode = defaultLines[state.citySlug] || '472';
   }
 
   updateBreadcrumbs();
@@ -122,7 +131,7 @@ function updateBreadcrumbs() {
 }
 
 /**
- * Carrega a lista completa de linhas da cidade para o autocomplete da barra de busca rápida
+ * Carrega a lista completa de linhas da cidade para o autocomplete
  */
 async function loadAllCityLinesForSearch() {
   try {
@@ -187,7 +196,7 @@ export async function loadLineData(lineCodeToLoad) {
   updateBreadcrumbs();
   setLoadingState(true);
 
-  // Atualiza URL sem adicionar entradas duplicadas no histórico
+  // Atualiza URL sem poluir o histórico
   const currentUrl = new URL(window.location);
   currentUrl.searchParams.set('cidade', state.citySlug);
   currentUrl.searchParams.set('linha', state.lineCode);
@@ -211,6 +220,7 @@ export async function loadLineData(lineCodeToLoad) {
     state.lineInfo = info || {
       description: `Linha ${state.lineCode}`,
       consortiumName: 'Municipal',
+      consortiumColor: '#1C83E4',
       price: state.cityConfig.fare
     };
 
@@ -236,7 +246,7 @@ export async function loadLineData(lineCodeToLoad) {
     renderStopsTimeline();
     renderSchedulesTab();
 
-    // Inicia rastreamento ao vivo
+    // Inicia rastreamento ao vivo com polling de 15 segundos
     startRealtimeVehicleTracking();
 
   } catch (err) {
@@ -312,7 +322,7 @@ function renderLineHeader() {
 }
 
 /**
- * Renderiza o Seletor de Sentidos (Ida / Volta)
+ * Renderiza o Seletor de Sentidos (Ida / Volta) com espaçamento correto lado a lado
  */
 function renderDirectionSwitcher() {
   const container = document.getElementById('direction-switcher');
@@ -352,7 +362,6 @@ function renderDirectionSwitcher() {
         container.querySelectorAll('.direction-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         
-        // Atualiza trajeto, paradas, filtro de veículos por sentido e horários
         drawRouteAndStops();
         renderStopsTimeline();
         filterVehiclesByCurrentDirection();
@@ -363,7 +372,7 @@ function renderDirectionSwitcher() {
 }
 
 /**
- * Desenha a Polyline do Trajeto e os Marcadores de Paradas (Estilo Idêntico ao Flutter App)
+ * Desenha a Polyline do Trajeto e os Marcadores de Paradas
  */
 function drawRouteAndStops() {
   if (!state.map || !state.detailData || !state.detailData.trajetos) return;
@@ -378,7 +387,7 @@ function drawRouteAndStops() {
   if (pts.length === 0) return;
 
   const latLngs = pts.map(p => [p.lat, p.lon]);
-  const lineColor = state.lineInfo?.consortiumColor || '#FF2D55';
+  const lineColor = state.lineInfo?.consortiumColor || '#1C83E4';
 
   // 1. Casing externo para contraste idêntico ao Flutter
   L.polyline(latLngs, {
@@ -389,7 +398,7 @@ function drawRouteAndStops() {
     lineCap: 'round'
   }).addTo(state.routeLayer);
 
-  // 2. Linha principal do trajeto
+  // 2. Linha principal do trajeto com a cor da linha
   const mainLine = L.polyline(latLngs, {
     color: lineColor,
     weight: 4.5,
@@ -409,7 +418,7 @@ function drawRouteAndStops() {
       className: 'custom-stop-div-icon',
       html: `
         <div class="flutter-stop-marker" title="${index + 1}. ${parada.stopName}">
-          <div class="flutter-stop-marker-inner"></div>
+          <div class="flutter-stop-marker-inner" style="background: ${lineColor};"></div>
         </div>
       `,
       iconSize: [14, 14],
@@ -419,12 +428,12 @@ function drawRouteAndStops() {
     const marker = L.marker([lat, lon], { icon: stopIcon });
 
     const popupHtml = `
-      <div style="padding: 6px;">
+      <div style="padding: 10px 14px; font-family: var(--font-family);">
         <div style="font-size: 0.75rem; font-weight: 800; color: var(--primary); text-transform: uppercase;">
           Parada #${index + 1}
         </div>
-        <h4 style="font-size: 0.95rem; font-weight: 800; margin: 4px 0 6px;">${parada.stopName}</h4>
-        <div style="font-size: 0.8rem; color: var(--text-muted);">
+        <h4 style="font-size: 0.98rem; font-weight: 800; margin: 4px 0 6px;">${parada.stopName}</h4>
+        <div style="font-size: 0.82rem; color: var(--text-muted);">
           Linha ${state.lineCode} &bull; Sentido ${currentTrajeto.trip_headsign || ''}
         </div>
       </div>
@@ -452,33 +461,15 @@ function drawRouteAndStops() {
 }
 
 /**
- * Rastreamento de Ônibus em Tempo Real (Polling a cada 8s)
+ * Rastreamento de Ônibus em Tempo Real (Polling automático a cada 15s)
  */
 function startRealtimeVehicleTracking() {
   fetchRealtimeVehicles();
 
   if (state.refreshTimer) clearInterval(state.refreshTimer);
-  state.countdownSecs = 8;
-  updateCountdownUi();
-
   state.refreshTimer = setInterval(() => {
     fetchRealtimeVehicles();
-    state.countdownSecs = 8;
-  }, 8000);
-
-  if (state.countdownInterval) clearInterval(state.countdownInterval);
-  state.countdownInterval = setInterval(() => {
-    state.countdownSecs--;
-    if (state.countdownSecs < 0) state.countdownSecs = 8;
-    updateCountdownUi();
-  }, 1000);
-}
-
-function updateCountdownUi() {
-  const cdEl = document.getElementById('refresh-countdown');
-  if (cdEl) {
-    cdEl.textContent = `(${state.countdownSecs}s)`;
-  }
+  }, 15000); // 15 segundos
 }
 
 /**
@@ -487,9 +478,6 @@ function updateCountdownUi() {
 async function fetchRealtimeVehicles() {
   if (state.isFetchingVehicles) return;
   state.isFetchingVehicles = true;
-
-  const refreshBtn = document.getElementById('btn-manual-refresh');
-  if (refreshBtn) refreshBtn.classList.add('spinning');
 
   try {
     const url = `${BACKEND_BASE_URL}/vehicles?city=${state.citySlug}&lines=${encodeURIComponent(state.lineCode)}`;
@@ -522,12 +510,11 @@ async function fetchRealtimeVehicles() {
     renderActiveVehiclesTab();
   } finally {
     state.isFetchingVehicles = false;
-    if (refreshBtn) refreshBtn.classList.remove('spinning');
   }
 }
 
 /**
- * Filtra os ônibus para exibir SOMENTE os que estão no sentido selecionado (Item 3)
+ * Filtra os ônibus para exibir SOMENTE os que estão no trajeto e no sentido selecionado
  */
 function filterVehiclesByCurrentDirection() {
   if (!state.vehicles || state.vehicles.length === 0) {
@@ -543,31 +530,34 @@ function filterVehiclesByCurrentDirection() {
   const targetHeadsign = (currentTrajeto?.trip_headsign || '').toLowerCase().trim();
 
   state.filteredDirectionVehicles = state.vehicles.filter(v => {
-    // 1. Verificação por directionId numérico
+    // 1. Ocultar veículos fora de trajeto / garagem
+    if (v.isOnRoute === false) return false;
+    if (v.isActive === false) return false;
+
+    // 2. Verificação por directionId numérico
     if (typeof v.directionId === 'number' && v.directionId === targetDirId) return true;
     if (typeof v.activeDirectionId === 'number' && v.activeDirectionId === targetDirId) return true;
 
-    // 2. Verificação por string de sentido
+    // 3. Verificação por string de sentido
     if (v.sentido !== undefined && v.sentido !== null) {
       const s = String(v.sentido).trim();
       if (s === String(targetDirId)) return true;
     }
 
-    // 3. Verificação por nome do destino / trajeto
+    // 4. Verificação por nome do destino / trajeto
     if (targetHeadsign && v.trajeto) {
       const dest = String(v.trajeto).toLowerCase().trim();
       if (dest.includes(targetHeadsign) || targetHeadsign.includes(dest)) return true;
     }
 
-    // Se a linha só tiver 1 único sentido cadastrado, exibe todos os carros
     if (state.detailData?.trajetos?.length === 1) return true;
 
     return false;
   });
 
-  // Se nenhum veículo der match exato pelo sentido (ex: GPS antigo não preencheu direction_id), mostra todos
+  // Se nenhum veículo tiver flag de sentido específico mas estiver na rota, exibe os ativos na rota
   if (state.filteredDirectionVehicles.length === 0 && state.vehicles.length > 0) {
-    state.filteredDirectionVehicles = state.vehicles;
+    state.filteredDirectionVehicles = state.vehicles.filter(v => v.isOnRoute !== false);
   }
 
   updateVehicleMarkersOnMap();
@@ -576,14 +566,18 @@ function filterVehiclesByCurrentDirection() {
 }
 
 /**
- * Renderiza/Atualiza os Marcadores de Ônibus no Mapa Leaflet com Setas Direcionais (Item 4)
+ * Renderiza os Marcadores de Ônibus com a Cor da Linha e Balão Idêntico ao Flutter App
  */
 function updateVehicleMarkersOnMap() {
   if (!state.map || !state.vehiclesLayer) return;
 
   const currentIds = new Set();
   const vehiclesToRender = state.filteredDirectionVehicles;
-  const markerColor = '#FF2D55'; // Magenta / Pink vibrante oficial do Flutter App (Image 3 / 4)
+  
+  // A cor do ônibus é a cor oficial da linha
+  const lineColor = state.lineInfo?.consortiumColor || '#1C83E4';
+  const currentTrajeto = state.detailData?.trajetos?.[state.currentDirectionIdx] || {};
+  const currentHeadsign = currentTrajeto.trip_headsign || 'Em operação';
 
   vehiclesToRender.forEach(vehicle => {
     const lat = vehicle.latitude || vehicle.lat;
@@ -596,14 +590,15 @@ function updateVehicleMarkersOnMap() {
     const speed = Math.round(vehicle.velocidade || 0);
     const bearing = parseFloat(vehicle.direcao) || 0;
     const timeAgo = formatTimeAgo(vehicle.dataHora);
+    const dest = vehicle.trajeto || vehicle.sentido || currentHeadsign;
 
     let marker = state.vehicleMarkersMap.get(carId);
 
-    // SVG da seta direcional idêntica ao Material Icons.navigation / Flutter BusMarkersPainter
+    // SVG da seta direcional com a cor da linha
     const iconHtml = `
       <div class="bus-flutter-arrow-marker" style="transform: rotate(${bearing}deg);" title="Carro ${carId} &bull; ${speed} km/h">
         <svg viewBox="0 0 24 24" class="bus-arrow-svg">
-          <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" fill="${markerColor}" stroke="#ffffff" stroke-width="1.8" stroke-linejoin="round" />
+          <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" fill="${lineColor}" stroke="#ffffff" stroke-width="1.8" stroke-linejoin="round" />
         </svg>
       </div>
     `;
@@ -624,29 +619,33 @@ function updateVehicleMarkersOnMap() {
       state.vehicleMarkersMap.set(carId, marker);
     }
 
+    // Balão (Popup) idêntico ao app Flutter (sem botão colaborar)
     const popupHtml = `
-      <div style="padding: 6px; font-family: var(--font-family);">
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px;">
-          <h4 style="font-size: 1.05rem; font-weight: 800; margin: 0; color: var(--text);">
-            <i class="fa-solid fa-bus" style="color: ${markerColor};"></i> Carro ${carId}
-          </h4>
-          <span style="font-size: 0.75rem; font-weight: 800; background: var(--primary-container); color: var(--on-primary-container); padding: 2px 6px; border-radius: 6px;">
-            ${speed} km/h
-          </span>
+      <div class="flutter-bus-popup">
+        <div class="popup-top-banner" style="background: ${lineColor};">
+          <div class="popup-line-circle">${state.lineCode}</div>
+          <div class="popup-headsign">${dest}</div>
         </div>
-        <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 4px;">
-          <strong>Sentido:</strong> ${vehicle.trajeto || vehicle.sentido || 'Em rota'}
-        </div>
-        <div style="font-size: 0.78rem; color: var(--text-muted);">
-          <i class="fa-solid fa-clock"></i> Último GPS: <strong>${timeAgo}</strong>
+        <div class="popup-body">
+          <div class="popup-pill-row">
+            <span class="popup-pill pill-car"><i class="fa-solid fa-bus"></i> ${carId}</span>
+            <span class="popup-pill pill-speed"><i class="fa-solid fa-gauge-high"></i> ${speed} km/h</span>
+          </div>
+          <div class="popup-pill-row" style="justify-content: center; margin-top: 2px;">
+            <span class="popup-pill pill-time"><i class="fa-regular fa-clock"></i> ${timeAgo}</span>
+          </div>
         </div>
       </div>
     `;
 
-    marker.bindPopup(popupHtml);
+    marker.bindPopup(popupHtml, {
+      className: 'flutter-leaflet-popup',
+      closeButton: false,
+      offset: [0, -8]
+    });
   });
 
-  // Remove veículos que não estão no sentido atual
+  // Remove veículos que não estão mais na rota ou no sentido
   for (const [carId, marker] of state.vehicleMarkersMap.entries()) {
     if (!currentIds.has(carId)) {
       state.vehiclesLayer.removeLayer(marker);
@@ -674,11 +673,9 @@ function updateLiveBadge(count, isError = false) {
 
   if (isError && count === 0) {
     badge.className = 'meta-pill';
-    countSpan.textContent = 'Servidor GPS sincronizando...';
+    countSpan.textContent = 'Sincronizando GPS...';
     return;
   }
-
-  const currentHeadsign = state.detailData?.trajetos?.[state.currentDirectionIdx]?.trip_headsign || '';
 
   if (count > 0) {
     badge.className = 'meta-pill live-indicator';
@@ -708,7 +705,7 @@ export function focusOnVehicle(carId) {
 window.focusBus = focusOnVehicle;
 
 /**
- * Renderiza Aba de Veículos Ativos (filtrada por sentido)
+ * Renderiza Aba de Veículos Ativos
  */
 function renderActiveVehiclesTab() {
   const container = document.getElementById('pane-veiculos');
@@ -724,7 +721,7 @@ function renderActiveVehiclesTab() {
         <div style="font-size: 2.2rem; margin-bottom: 12px;">🛰️</div>
         <h4 style="font-size: 1.15rem; margin-bottom: 6px;">Nenhum ônibus transmitindo no Sentido ${headsign}</h4>
         <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto;">
-          Nenhum veículo desta linha está operando neste sentido no momento. Você pode alternar o sentido acima para verificar a volta.
+          Nenhum veículo desta linha está em rota neste sentido no momento. Você pode alternar o sentido acima para verificar o retorno.
         </p>
       </div>
     `;
@@ -744,7 +741,7 @@ function renderActiveVehiclesTab() {
         <div class="vehicle-live-info">
           <h4>Carro ${carId}</h4>
           <p><i class="fa-solid fa-gauge-high"></i> ${speed} km/h &bull; <i class="fa-solid fa-clock"></i> ${timeAgo}</p>
-          <p style="margin-top: 4px; font-size: 0.75rem; color: var(--primary);">
+          <p style="margin-top: 4px; font-size: 0.75rem; color: var(--primary); font-weight: 700;">
             <i class="fa-solid fa-location-arrow"></i> ${dest}
           </p>
         </div>
@@ -824,7 +821,12 @@ window.focusStop = (lat, lon, encodedName) => {
 
     L.popup()
       .setLatLng([lat, lon])
-      .setContent(`<strong>${name}</strong><br><span style="font-size:0.8rem; color:var(--text-muted);">Parada de ônibus da linha ${state.lineCode}</span>`)
+      .setContent(`
+        <div style="padding: 10px 14px; font-family: var(--font-family);">
+          <strong style="font-size: 1rem;">${name}</strong><br>
+          <span style="font-size: 0.82rem; color: var(--text-muted);">Parada de ônibus da linha ${state.lineCode}</span>
+        </div>
+      `)
       .openOn(state.map);
 
     const mapWrapper = document.getElementById('map-wrapper');
@@ -833,7 +835,7 @@ window.focusStop = (lat, lon, encodedName) => {
 };
 
 /**
- * Renderiza Aba de Horários Formatada Oficial (Item 2)
+ * Renderiza Aba de Horários Formatada Oficial
  */
 function renderSchedulesTab() {
   const container = document.getElementById('pane-horarios');
@@ -853,11 +855,9 @@ function renderSchedulesTab() {
     return;
   }
 
-  // Extrai as partidas do sentido atual
   const dirKey = String(state.currentDirectionIdx);
   let departuresList = [];
 
-  // Estrutura GTFS / Cobusão: { [tripId]: { "0": { weekday: [], saturday: [], sunday: [] }, "1": { ... } } }
   for (const tripData of Object.values(rawHorarios)) {
     if (typeof tripData === 'object' && tripData !== null) {
       const dirData = tripData[dirKey] || tripData['0'] || tripData['1'];
@@ -868,7 +868,6 @@ function renderSchedulesTab() {
     }
   }
 
-  // Se a lista estiver vazia para este dia, tenta qualquer outra chave disponível
   if (!departuresList || departuresList.length === 0) {
     for (const tripData of Object.values(rawHorarios)) {
       if (typeof tripData === 'object' && tripData !== null) {
@@ -883,7 +882,6 @@ function renderSchedulesTab() {
     }
   }
 
-  // Agrupa partidas por hora (00h, 01h, 02h... 23h)
   const hoursMap = {};
   (departuresList || []).forEach(timeStr => {
     if (!timeStr) return;
@@ -951,7 +949,6 @@ function renderSchedulesTab() {
   html += `</div>`;
   container.innerHTML = html;
 
-  // Listeners das abas de dia
   container.querySelectorAll('.schedule-day-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const day = btn.getAttribute('data-day');
@@ -1056,14 +1053,6 @@ function setupEventListeners() {
       if (!lineSearchInput.contains(e.target) && !lineSearchResults.contains(e.target)) {
         lineSearchResults.style.display = 'none';
       }
-    });
-  }
-
-  const refreshBtn = document.getElementById('btn-manual-refresh');
-  if (refreshBtn) {
-    refreshBtn.addEventListener('click', () => {
-      fetchRealtimeVehicles();
-      state.countdownSecs = 8;
     });
   }
 

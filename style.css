@@ -27,7 +27,7 @@
   --surface-hover: #F8FAFC;
   
   --text: #1A1C1E;
-  --text-muted: #43474E;
+  --text-muted: #64748B;
   --nav-bg: rgba(255, 255, 255, 0.85);
 
   --radius-sm: 8px;
@@ -61,7 +61,7 @@
     --surface-hover: #2A2F3A;
 
     --text: #E3E2E6;
-    --text-muted: #C3C7CF;
+    --text-muted: #94A3B8;
     --nav-bg: rgba(14, 17, 22, 0.85);
 
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -157,7 +157,6 @@ a:hover {
 }
 
 .site-nav a.active {
-  color: var(--primary);
   background: var(--primary-container);
   color: var(--on-primary-container);
   font-weight: 700;
@@ -207,6 +206,7 @@ a:hover {
   border-radius: var(--radius-md);
   border: 1px solid var(--surface-border);
   cursor: pointer;
+  box-shadow: var(--shadow-sm);
   transition: all 0.2s ease;
 }
 
@@ -216,55 +216,374 @@ a:hover {
   transform: translateY(-1px);
 }
 
-/* Hero Section */
-.hero {
+/* --------------------------------------------------------------------------
+   Home Hero Section (`index.html`)
+   -------------------------------------------------------------------------- */
+.home-hero {
   margin-top: 68px;
-  padding: 60px 20px 40px;
+  padding: 60px 20px 48px;
   text-align: center;
-  max-width: 900px;
+  max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.hero h1 {
-  font-size: 2.8rem;
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-  margin-bottom: 16px;
-  color: var(--text);
+.home-hero-icon {
+  margin-bottom: 24px;
 }
 
-.hero p.lede {
-  font-size: 1.15rem;
-  color: var(--text-muted);
-  max-width: 680px;
-  margin: 0 auto 24px;
-  font-weight: 500;
+.home-hero-icon img {
+  width: 100px;
+  height: 100px;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(28, 131, 228, 0.3);
 }
 
-/* Updated Badge */
-.updated-badge {
+.eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-muted);
   background: var(--surface);
   border: 1px solid var(--surface-border);
   padding: 6px 14px;
   border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 20px;
 }
 
-.updated-badge .dot {
+.eyebrow-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--success);
 }
 
-/* Layout Padrão de Documentos */
+.home-hero h1 {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.home-hero p.lede {
+  font-size: 1.18rem;
+  color: var(--text-muted);
+  max-width: 620px;
+  margin: 0 auto 28px;
+  font-weight: 500;
+}
+
+.cta-row {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.platform-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.platform-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.platform-chip .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+}
+
+/* --------------------------------------------------------------------------
+   Stats Section
+   -------------------------------------------------------------------------- */
+.stats-section {
+  border-top: 1px solid var(--surface-border);
+  border-bottom: 1px solid var(--surface-border);
+  background: var(--surface);
+  padding: 48px 20px;
+}
+
+.stats-grid {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  text-align: center;
+}
+
+.stat-item h3 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--primary);
+  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+}
+
+.stat-item p {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Sections & Features
+   -------------------------------------------------------------------------- */
+.section {
+  max-width: 1100px;
+  margin: 80px auto;
+  padding: 0 20px;
+}
+
+.section-head {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.section-eyebrow {
+  color: var(--primary);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+.section-head h2 {
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+  color: var(--text);
+}
+
+.section-head p {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  padding: 32px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+}
+
+.feature-icon {
+  width: 52px;
+  height: 52px;
+  background: var(--primary);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(28, 131, 228, 0.3);
+}
+
+.feature-card h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+
+.feature-card p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.premium-strip {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-xl);
+  padding: 48px 32px;
+  text-align: center;
+}
+
+.premium-strip h2 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  margin-bottom: 14px;
+}
+
+.premium-strip p {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  margin-bottom: 28px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Suporte Page (`suporte.html`)
+   -------------------------------------------------------------------------- */
+.support-wrap {
+  max-width: 680px;
+  margin: 0 auto 80px;
+  padding: 0 20px;
+}
+
+.hero {
+  margin-top: 68px;
+  padding: 60px 20px 32px;
+  text-align: center;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--primary-container);
+  color: var(--primary);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.hero h1 {
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.hero p.lede {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  max-width: 620px;
+  margin: 0 auto 20px;
+}
+
+.contact-card {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  padding: 36px 28px;
+  border-radius: var(--radius-lg);
+  text-align: center;
+  margin-bottom: 36px;
+  box-shadow: var(--shadow-md);
+}
+
+.contact-card-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+.contact-email {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--primary);
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+}
+
+.topics-intro {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.topics {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.topics a {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  padding: 18px 22px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.topics a:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.topics strong {
+  display: block;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.topics span {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   Layout Padrão de Documentos (Privacidade / Termos)
+   -------------------------------------------------------------------------- */
 .layout {
   max-width: 900px;
   margin: 0 auto 80px;
@@ -272,7 +591,7 @@ a:hover {
 }
 
 .doc {
-  background: var(--surface-card);
+  background: var(--surface);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
   padding: 40px;
@@ -292,7 +611,6 @@ a:hover {
   font-weight: 800;
   margin-bottom: 14px;
   color: var(--text);
-  letter-spacing: -0.01em;
 }
 
 .doc h3 {
@@ -317,7 +635,29 @@ a:hover {
   margin-bottom: 8px;
 }
 
-/* Footer Global */
+.updated-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+.updated-badge .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+}
+
+/* --------------------------------------------------------------------------
+   Footer Global
+   -------------------------------------------------------------------------- */
 .site-footer {
   background: var(--surface);
   border-top: 1px solid var(--surface-border);
@@ -364,14 +704,22 @@ a:hover {
   }
   
   .site-nav {
-    display: none; /* Em mobile, simplificado */
+    display: none;
+  }
+
+  .home-hero h1 {
+    font-size: 2.2rem;
   }
 
   .hero h1 {
-    font-size: 2.1rem;
+    font-size: 2rem;
   }
 
   .doc {
     padding: 24px 18px;
+  }
+
+  .contact-email {
+    font-size: 1.35rem;
   }
 }
