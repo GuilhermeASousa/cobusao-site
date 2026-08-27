@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Linhas de Ônibus — Cadê o Ônibus?</title>
+    <meta name="description" content="Consulte o catálogo completo de linhas de ônibus municipais e intermunicipais do Rio de Janeiro, São Paulo, BH, Curitiba, Brasília e mais 20 cidades. Trajeto no mapa e rastreamento em tempo real." />
+    <meta name="keywords" content="linhas de onibus, itinerario onibus, onibus tempo real, mapa de onibus, rio de janeiro, sao paulo, curitiba, belo horizonte, cade o onibus" />
+
+    <meta property="og:site_name" content="Cadê o Ônibus?" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Linhas de Ônibus e Trajetos em Tempo Real — Cadê o Ônibus?" />
+    <meta property="og:description" content="Veja todas as linhas de ônibus da sua cidade, itinerários, pontos de parada e onde os ônibus estão agora pelo GPS." />
+    <meta property="og:url" content="https://cadeoonibus.com.br/linhas.html" />
+    <meta property="og:image" content="https://web.cadeoonibus.api.br/og-image.jpg" />
+    <meta property="og:locale" content="pt_BR" />
+
+    <link rel="icon" type="image/png" href="app-logo.png" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/linhas.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+    <!-- Header Integrado -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="index.html">
+                <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Início</a>
+                <a class="active" href="linhas.html">Linhas de Ônibus</a>
+                <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
+                <a href="planos-operacionais.html">Planos Operacionais (Rio)</a>
+                <a href="privacidade.html">Privacidade</a>
+                <a href="suporte.html">Suporte</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="linhas-container">
+        <!-- Hero Section com Seletor de Cidades -->
+        <section class="linhas-hero">
+            <div class="linhas-hero-eyebrow">
+                <span class="dot"></span>
+                <span id="total-lines-badge">Monitoramento em Tempo Real</span>
+            </div>
+            <h1 id="hero-title">Linhas de Ônibus</h1>
+            <p id="hero-desc">Consulte o trajeto, paradas, tabela de horários e rastreamento em tempo real dos ônibus.</p>
+
+            <div class="city-selector-bar">
+                <button class="city-select-btn" id="btn-open-city-modal" type="button">
+                    <i class="fa-solid fa-location-dot" style="color: var(--primary);"></i>
+                    <span id="current-city-name">Rio de Janeiro (RJ)</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.8rem; color: var(--text-muted);"></i>
+                </button>
+
+                <div class="city-quick-pills" id="city-quick-pills">
+                    <!-- Gerado via JS: Rio, SP, BH, Curitiba, BSB... -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Barra Sticky de Pesquisa e Filtros -->
+        <section class="filter-sticky-panel">
+            <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass fa-search"></i>
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="Buscar por número (ex: 685, 472, 107T) ou destino (ex: Méier, Alvorada, Paulista)..." 
+                    autocomplete="off" 
+                    spellcheck="false"
+                />
+                <button type="button" class="search-clear-btn" id="search-clear-btn" title="Limpar busca">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="filters-row">
+                <div class="consortium-filter-pills" id="consortium-pills">
+                    <!-- Gerado via JS: Intersul, Internorte, Transcarioca, SPTrans Noroeste... -->
+                </div>
+            </div>
+
+            <div class="results-meta-bar">
+                <span id="results-count">Carregando linhas...</span>
+                <span><i class="fa-solid fa-satellite-dish" style="color: var(--line-live-green);"></i> GPS ao vivo disponível</span>
+            </div>
+        </section>
+
+        <!-- Grid de Linhas -->
+        <section class="lines-grid" id="lines-grid">
+            <!-- Cards gerados dinamicamente via JS -->
+        </section>
+
+        <!-- Estado Vazio (Nenhum resultado) -->
+        <div id="lines-empty" style="display: none; text-align: center; padding: 60px 20px; background: var(--line-card-bg); border-radius: 16px; border: 1px solid var(--surface-border); margin-bottom: 40px;">
+            <div style="font-size: 2.5rem; margin-bottom: 12px;">🔍</div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 8px;">Nenhuma linha encontrada</h3>
+            <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 16px;">
+                Não encontramos nenhuma linha com o termo digitado. Tente pesquisar pelo número exato da linha ou pelo nome do bairro.
+            </p>
+        </div>
+
+        <!-- Botão Carregar Mais -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <button class="btn-primary" id="btn-load-more" style="display: none; padding: 12px 28px; font-size: 0.95rem;">
+                Carregar mais linhas
+            </button>
+        </div>
+
+        <!-- Banner Promocional do App Mobile -->
+        <section class="app-promo-card">
+            <div class="app-promo-content">
+                <h3>Leve o Cadê o Ônibus? no seu bolso</h3>
+                <p>Receba alertas quando seu ônibus estiver chegando no ponto, consulte o mapa sem gastar dados e saiba exatamente quanto tempo vai esperar. 100% grátis e sem anúncios.</p>
+            </div>
+            <div class="app-promo-cta-row">
+                <a class="btn-primary" href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" target="_blank">
+                    <i class="fa-brands fa-google-play"></i> Baixar no Google Play
+                </a>
+                <a class="btn-secondary" href="https://web.cadeoonibus.api.br" target="_blank">
+                    <i class="fa-solid fa-globe"></i> Abrir Versão Web
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Seleção de Cidades -->
+    <div class="city-modal-backdrop" id="city-modal">
+        <div class="city-modal">
+            <div class="city-modal-header">
+                <h3><i class="fa-solid fa-map-location-dot" style="color: var(--primary);"></i> Selecionar Cidade ou Região</h3>
+                <button type="button" class="city-modal-close" id="btn-close-city-modal" aria-label="Fechar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="city-modal-body">
+                <input type="text" class="city-modal-search" id="modal-city-search" placeholder="Buscar cidade ou estado (ex: Rio, São Paulo, Curitiba, MG)..." />
+                <div id="city-modal-groups">
+                    <!-- Gerado dinamicamente via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a class="brand" href="index.html">
+                <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
+            </a>
+            <div class="footer-links">
+                <a href="linhas.html">Linhas de Ônibus</a>
+                <a href="planos-operacionais.html">Planos Operacionais (Rio)</a>
+                <a href="termos-uso.html">Termos de Uso</a>
+                <a href="privacidade.html">Política de Privacidade</a>
+                <a href="suporte.html">Suporte</a>
+                <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
+            </div>
+            <div class="copyright">© 2026 Cadê o Ônibus? (Guialshy). Todos os direitos reservados.</div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module" src="js/linhas.js"></script>
+</body>
+</html>

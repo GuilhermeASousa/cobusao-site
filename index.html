@@ -26,6 +26,7 @@
             </a>
             <nav class="site-nav">
                 <a class="active" href="index.html">Início</a>
+                <a href="linhas.html">Linhas de Ônibus</a>
                 <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
                 <a href="planos-operacionais.html">Planos Operacionais (Rio)</a>
                 <a href="privacidade.html">Privacidade</a>
@@ -62,21 +63,71 @@
     <section class="stats-section">
         <div class="stats-grid">
             <div class="stat-item">
-                <h3>3</h3>
-                <p>Grandes Capitais</p>
+                <h3>26</h3>
+                <p>Cidades e Regiões</p>
             </div>
             <div class="stat-item">
                 <h3>+19.000</h3>
                 <p>Ônibus Monitorados</p>
             </div>
             <div class="stat-item">
-                <h3>+2.000</h3>
+                <h3>+10.000</h3>
                 <p>Linhas de Ônibus</p>
             </div>
             <div class="stat-item">
                 <h3>100%</h3>
                 <p>Gratuito</p>
             </div>
+        </div>
+    </section>
+
+    <!-- Seção de Cidades e Linhas em Tempo Real -->
+    <section class="section" style="background: var(--surface); border-top: 1px solid var(--surface-border); border-bottom: 1px solid var(--surface-border); padding: 60px 20px;">
+        <div class="section-head" style="max-width: 800px; margin: 0 auto 36px; text-align: center;">
+            <p class="section-eyebrow" style="background: var(--line-card-bg);">Catálogo Completo</p>
+            <h2>Explore as Linhas por Cidade</h2>
+            <p>Selecione sua cidade para ver o mapa com o trajeto detalhado, paradas e a localização dos ônibus em tempo real.</p>
+        </div>
+
+        <div style="max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;">
+            <a href="linhas.html?cidade=rio" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                <span>🏖️ Rio de Janeiro</span>
+                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">495 linhas</span>
+            </a>
+            <a href="linhas.html?cidade=sp" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                <span>🏙️ São Paulo</span>
+                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">1.361 linhas</span>
+            </a>
+            <a href="linhas.html?cidade=bh" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                <span>⛰️ Belo Horizonte</span>
+                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">326 linhas</span>
+            </a>
+            <a href="linhas.html?cidade=curitiba" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                <span>🌲 Curitiba</span>
+                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">261 linhas</span>
+            </a>
+            <a href="linhas.html?cidade=brasilia" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                <span>🏛️ Brasília</span>
+                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">1.069 linhas</span>
+            </a>
+            <a href="linhas.html?cidade=porto_alegre" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                <span>🧉 Porto Alegre</span>
+                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">728 linhas</span>
+            </a>
+            <a href="linhas.html?cidade=rio_intermunicipal" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                <span>🚌 Rio Intermunicipal</span>
+                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">1.238 linhas</span>
+            </a>
+            <a href="linhas.html?cidade=emtu" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                <span>🚎 São Paulo (EMTU)</span>
+                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">827 linhas</span>
+            </a>
+        </div>
+
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="linhas.html" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
+                Ver todas as 26 cidades disponíveis <i class="fa-solid fa-arrow-right"></i>
+            </a>
         </div>
     </section>
 
@@ -157,6 +208,7 @@
                 <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
             </a>
             <div class="footer-links">
+                <a href="linhas.html">Linhas de Ônibus</a>
                 <a href="planos-operacionais.html">Planos Operacionais (Rio)</a>
                 <a href="termos-uso.html">Termos de Uso</a>
                 <a href="privacidade.html">Política de Privacidade</a>

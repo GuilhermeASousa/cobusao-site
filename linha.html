@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Detalhes da Linha — Cadê o Ônibus?</title>
+    <meta name="description" content="Acompanhe o trajeto no mapa, paradas e a localização dos ônibus em tempo real pelo GPS no Cadê o Ônibus?" />
+    <meta name="keywords" content="onibus tempo real, itinerario da linha, mapa de onibus, paradas de onibus, gps onibus, cade o onibus" />
+
+    <meta property="og:site_name" content="Cadê o Ônibus?" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Trajeto e Ônibus em Tempo Real — Cadê o Ônibus?" />
+    <meta property="og:description" content="Veja o trajeto detalhado e a posição dos ônibus em tempo real agora." />
+    <meta property="og:url" content="https://cadeoonibus.com.br/linha.html" />
+    <meta property="og:image" content="https://web.cadeoonibus.api.br/og-image.jpg" />
+    <meta property="og:locale" content="pt_BR" />
+
+    <link rel="icon" type="image/png" href="app-logo.png" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/linhas.css" />
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+    <!-- Header Integrado -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="index.html">
+                <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Início</a>
+                <a class="active" href="linhas.html">Linhas de Ônibus</a>
+                <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
+                <a href="planos-operacionais.html">Planos Operacionais (Rio)</a>
+                <a href="privacidade.html">Privacidade</a>
+                <a href="suporte.html">Suporte</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="linhas-container">
+        <!-- Skeleton de Carregamento Inicial -->
+        <div id="detail-loading-skeleton" style="text-align: center; padding: 100px 20px; color: var(--text-muted);">
+            <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 16px;"></i>
+            <h3>Carregando trajeto e satélite GPS...</h3>
+            <p>Conectando ao sistema de rastreamento em tempo real.</p>
+        </div>
+
+        <div id="detail-main-content" style="display: none;">
+            <!-- Barra Superior com Breadcrumbs e Busca Rápida de Linha -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;">
+                <nav class="breadcrumb-nav" style="margin-bottom: 0;">
+                    <a href="index.html"><i class="fa-solid fa-house"></i> Início</a>
+                    <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+                    <a id="breadcrumb-city" href="linhas.html">Cidades</a>
+                    <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+                    <span id="breadcrumb-line" style="font-weight: 700; color: var(--text);">Linha</span>
+                </nav>
+
+                <!-- Input de Busca Rápida de Linhas com Autocomplete -->
+                <div style="position: relative; width: 100%; max-width: 320px;">
+                    <div style="position: relative;">
+                        <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.9rem;"></i>
+                        <input 
+                            type="text" 
+                            id="line-quick-search-input" 
+                            placeholder="Buscar outra linha (ex: 472, 804, 107T)..." 
+                            style="width: 100%; height: 38px; padding: 0 12px 0 34px; border-radius: 10px; border: 1.5px solid var(--surface-border); background: var(--line-card-bg); color: var(--text); font-size: 0.88rem; outline: none;" 
+                            autocomplete="off"
+                        />
+                    </div>
+                    <div id="line-quick-search-results" class="line-search-dropdown" style="display: none;">
+                        <!-- Resultados gerados dinamicamente via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card de Cabeçalho da Linha -->
+            <section class="line-detail-header">
+                <div class="line-detail-hero">
+                    <div class="line-detail-title-group">
+                        <span class="line-detail-badge-large" id="line-badge">---</span>
+                        <div class="line-detail-info">
+                            <h1 id="line-title">Carregando linha...</h1>
+                            <div class="line-detail-meta-tags">
+                                <span class="meta-pill" id="line-consortium"><i class="fa-solid fa-bus"></i> Consórcio</span>
+                                <span class="meta-pill"><i class="fa-solid fa-ticket"></i> Tarifa: <strong id="line-fare" style="margin-left: 3px;">-</strong></span>
+                                <span class="meta-pill" id="line-agency"><i class="fa-solid fa-building-columns"></i> Prefeitura</span>
+                                <span class="meta-pill live-indicator" id="live-vehicles-badge">
+                                    <span class="pulse-dot"></span>
+                                    <span id="live-count-text">Buscando ônibus ao vivo...</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="line-detail-actions">
+                        <span id="last-sync-time" style="font-size: 0.8rem; color: var(--text-muted);">Sincronizando...</span>
+                        <button type="button" class="btn-refresh" id="btn-manual-refresh" title="Atualizar posições GPS agora">
+                            <i class="fa-solid fa-rotate-right"></i> Atualizar <span id="refresh-countdown">(8s)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alternador de Sentidos (Ida / Volta) -->
+                <div class="direction-switch-container" id="direction-switcher">
+                    <!-- Gerado via JS: Sentido Ida vs Volta -->
+                </div>
+            </section>
+
+            <!-- Mapa Interativo com Trajeto e Ônibus ao Vivo -->
+            <section class="map-wrapper" id="map-wrapper">
+                <div id="line-map"></div>
+
+                <!-- Controles Flutuantes do Mapa -->
+                <div class="map-floating-controls">
+                    <button type="button" class="map-control-btn" id="btn-map-center" title="Centralizar no Trajeto">
+                        <i class="fa-solid fa-arrows-to-eye"></i>
+                    </button>
+                    <button type="button" class="map-control-btn" id="btn-map-toggle-stops" title="Ocultar/Exibir Pontos de Parada" style="color: var(--primary);">
+                        <i class="fa-solid fa-map-pin"></i>
+                    </button>
+                    <button type="button" class="map-control-btn" id="btn-map-fullscreen" title="Tela Cheia">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
+                </div>
+
+                <!-- Legenda Sobreposta -->
+                <div class="map-legend-overlay">
+                    <div class="legend-item">
+                        <span class="legend-color-bar" style="background: var(--primary);"></span>
+                        <span>Trajeto da Linha</span>
+                    </div>
+                    <div class="legend-item">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #2563eb; border: 2px solid #fff; display: inline-block;"></span>
+                        <span>Ônibus ao Vivo (GPS)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #fff; border: 2px solid #4b5563; display: inline-block;"></span>
+                        <span>Paradas</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Abas de Informações Abaixo do Mapa -->
+            <section>
+                <nav class="line-tabs-nav">
+                    <button type="button" class="line-tab-btn active" data-tab="veiculos">
+                        <i class="fa-solid fa-satellite-dish"></i> Ônibus em Tempo Real
+                    </button>
+                    <button type="button" class="line-tab-btn" data-tab="paradas">
+                        <i class="fa-solid fa-list-ol"></i> Itinerário & Paradas <span id="stops-tab-count" style="font-size: 0.8rem; opacity: 0.7;"></span>
+                    </button>
+                    <button type="button" class="line-tab-btn" data-tab="horarios">
+                        <i class="fa-regular fa-calendar-days"></i> Quadro de Horários
+                    </button>
+                </nav>
+
+                <!-- Aba 1: Veículos em Tempo Real -->
+                <div id="pane-veiculos" class="line-tab-pane active">
+                    <!-- Gerado dinamicamente via JS -->
+                </div>
+
+                <!-- Aba 2: Itinerário & Paradas -->
+                <div id="pane-paradas" class="line-tab-pane">
+                    <div class="search-input-wrapper stops-search-bar">
+                        <i class="fa-solid fa-magnifying-glass fa-search"></i>
+                        <input type="text" id="stops-search-input" placeholder="Buscar parada ou rua no itinerário..." />
+                    </div>
+                    <div id="stops-list-container">
+                        <!-- Gerado dinamicamente via JS -->
+                    </div>
+                </div>
+
+                <!-- Aba 3: Horários -->
+                <div id="pane-horarios" class="line-tab-pane">
+                    <!-- Gerado dinamicamente via JS -->
+                </div>
+            </section>
+
+            <!-- Banner Promocional do App Mobile -->
+            <section class="app-promo-card">
+                <div class="app-promo-content">
+                    <h3>Não perca mais seu ônibus</h3>
+                    <p>Defina alarmes de aproximação, saiba quando o ônibus está a 500m do seu ponto e consulte dados economizando 80% mais internet no app oficial <strong>Cadê o Ônibus?</strong>.</p>
+                </div>
+                <div class="app-promo-cta-row">
+                    <a class="btn-primary" href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" target="_blank">
+                        <i class="fa-brands fa-google-play"></i> Baixar no Google Play
+                    </a>
+                    <a class="btn-secondary" href="https://web.cadeoonibus.api.br" target="_blank">
+                        <i class="fa-solid fa-globe"></i> Abrir Versão Web
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a class="brand" href="index.html">
+                <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
+            </a>
+            <div class="footer-links">
+                <a href="linhas.html">Linhas de Ônibus</a>
+                <a href="planos-operacionais.html">Planos Operacionais (Rio)</a>
+                <a href="termos-uso.html">Termos de Uso</a>
+                <a href="privacidade.html">Política de Privacidade</a>
+                <a href="suporte.html">Suporte</a>
+                <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
+            </div>
+            <div class="copyright">© 2026 Cadê o Ônibus? (Guialshy). Todos os direitos reservados.</div>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Script da Página -->
+    <script type="module" src="js/linha-detalhe.js"></script>
+</body>
+</html>
