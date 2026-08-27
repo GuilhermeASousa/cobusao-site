@@ -1,18 +1,17 @@
 /**
- * Cadê o Ônibus? — Catálogo de Linhas de Ônibus por Cidade
- * Lógica client-side para busca instantânea, filtros por consórcio e paginação fluida.
+ * Cadê o Ônibus? — Catálogo de Linhas por Cidade/Região
+ * Client-Side Explorer com pesquisa instantânea, filtros por consórcio,
+ * modal de troca de cidade e integração direta com as 26 regiões GTFS.
  */
 
 import {
   CITIES_CONFIG,
   CDN_BASE_URL,
   getCityConfig,
-  normalizeCitySlug,
-  getAllCities,
-  getCitiesGrouped
+  normalizeCitySlug
 } from './cities-config.js';
 
-// Estado da Página
+// Estado global da listagem
 const state = {
   currentCitySlug: 'rio',
   cityConfig: null,
@@ -21,7 +20,6 @@ const state = {
   filteredLines: [],
   activeConsortium: 'ALL',
   searchQuery: '',
-  sortBy: 'code_asc',
   renderedCount: 48,
   batchSize: 48
 };
@@ -81,39 +79,37 @@ function updatePageMeta(city) {
  * Renderiza atalhos rápidos das capitais mais populares
  */
 function renderQuickCityPills() {
-  const container = document.getElementById('city-quick-pills');
+  const container = document.getElementById('quick-cities-pills');
   if (!container) return;
 
-  const popular = ['rio', 'sp', 'bh', 'curitiba', 'brasilia', 'porto_alegre', 'rio_intermunicipal', 'emtu'];
+  const popularKeys = ['rio', 'sp', 'bh', 'curitiba', 'brasilia', 'porto_alegre', 'rio_intermunicipal', 'emtu'];
   
-  container.innerHTML = popular.map(key => {
+  container.innerHTML = popularKeys.map(key => {
     const c = CITIES_CONFIG[key];
     if (!c) return '';
     const isActive = c.key === state.currentCitySlug;
     return `
-      <a href="linhas.html?cidade=${c.key}" class="city-pill ${isActive ? 'active' : ''}" data-city="${c.key}">
+      <button class="quick-city-pill ${isActive ? 'active' : ''}" data-city="${c.key}">
         ${c.name}
-      </a>
+      </button>
     `;
   }).join('');
 
-  // Intercepta cliques nos pills para navegação sem reload completo
-  container.querySelectorAll('.city-pill').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const city = btn.getAttribute('data-city');
-      if (city && city !== state.currentCitySlug) {
-        switchCity(city);
+  container.querySelectorAll('.quick-city-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetSlug = btn.getAttribute('data-city');
+      if (targetSlug && targetSlug !== state.currentCitySlug) {
+        switchCity(targetSlug);
       }
     });
   });
 }
 
 /**
- * Troca de cidade dinamicamente sem recarregar a página
+ * Alterna a cidade atual dinamicamente
  */
-export function switchCity(newSlug) {
-  const norm = normalizeCitySlug(newSlug);
+export function switchCity(newCitySlug) {
+  const norm = normalizeCitySlug(newCitySlug);
   if (norm === state.currentCitySlug && state.linesList.length > 0) return;
 
   state.currentCitySlug = norm;
@@ -188,22 +184,20 @@ async function loadCityLines(citySlug) {
       countBadge.textContent = `${state.linesList.length} linhas cadastradas`;
     }
 
-    renderConsortiumFilterPills();
+    renderConsortiumFilters();
     applyFilters();
 
   } catch (err) {
-    console.error('Erro ao carregar linhas:', err);
+    console.error('Erro ao carregar linhas da cidade:', err);
     if (grid) {
       grid.innerHTML = `
         <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: var(--line-card-bg); border-radius: 16px; border: 1px solid var(--surface-border);">
           <div style="font-size: 2.5rem; margin-bottom: 12px;">⚠️</div>
-          <h3 style="font-size: 1.3rem; margin-bottom: 8px;">Dados temporariamente indisponíveis</h3>
-          <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 16px;">
-            Não conseguimos carregar a lista de linhas de ${state.cityConfig.name}. Tente novamente em instantes.
+          <h3 style="margin-bottom: 8px;">Erro ao carregar linhas de ${state.cityConfig.name}</h3>
+          <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 16px;">
+            Não conseguimos buscar a base de dados desta cidade no momento. Verifique sua conexão.
           </p>
-          <button class="btn-primary" onclick="window.location.reload()">
-            <i class="fa-solid fa-rotate-right"></i> Tentar Novamente
-          </button>
+          <button class="btn-primary" onclick="location.reload()">Tentar novamente</button>
         </div>
       `;
     }
@@ -211,52 +205,50 @@ async function loadCityLines(citySlug) {
 }
 
 /**
- * Ordena a lista de linhas
+ * Ordenação Alfanumérica Natural das Linhas
  */
 function sortLinesList() {
-  state.linesList.sort((a, b) => {
-    return a.codigo.localeCompare(b.codigo, undefined, { numeric: true, sensitivity: 'base' });
-  });
+  const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+  state.linesList.sort((a, b) => collator.compare(a.codigo, b.codigo));
 }
 
 /**
- * Extrai consórcios únicos e cria pills de filtro
+ * Renderiza os Filtros por Consórcio
  */
-function renderConsortiumFilterPills() {
+function renderConsortiumFilters() {
   const container = document.getElementById('consortium-pills');
   if (!container) return;
 
-  const counts = { ALL: state.linesList.length };
+  const countsMap = {};
   state.linesList.forEach(line => {
-    const c = line.consortiumName || 'Outros';
-    counts[c] = (counts[c] || 0) + 1;
+    const c = line.consortiumName;
+    countsMap[c] = (countsMap[c] || 0) + 1;
   });
 
-  const consortiums = Object.keys(counts).filter(c => c !== 'ALL');
-  // Ordena por quantidade de linhas
-  consortiums.sort((a, b) => counts[b] - counts[a]);
+  const sortedConsortiums = Object.entries(countsMap).sort((a, b) => b[1] - a[1]);
 
   let html = `
-    <button class="consortium-pill ${state.activeConsortium === 'ALL' ? 'active' : ''}" data-consortium="ALL">
-      Todos <span class="badge-count">${counts.ALL}</span>
+    <button class="filter-pill ${state.activeConsortium === 'ALL' ? 'active' : ''}" data-consortium="ALL">
+      Todos <span class="count-tag">${state.linesList.length}</span>
     </button>
   `;
 
-  html += consortiums.map(c => {
-    const isActive = state.activeConsortium === c;
+  html += sortedConsortiums.map(([name, count]) => {
+    const isActive = state.activeConsortium === name;
     return `
-      <button class="consortium-pill ${isActive ? 'active' : ''}" data-consortium="${c}">
-        ${c} <span class="badge-count">${counts[c]}</span>
+      <button class="filter-pill ${isActive ? 'active' : ''}" data-consortium="${name}">
+        ${name} <span class="count-tag">${count}</span>
       </button>
     `;
   }).join('');
 
   container.innerHTML = html;
 
-  container.querySelectorAll('.consortium-pill').forEach(btn => {
+  container.querySelectorAll('.filter-pill').forEach(btn => {
     btn.addEventListener('click', () => {
-      state.activeConsortium = btn.getAttribute('data-consortium') || 'ALL';
-      container.querySelectorAll('.consortium-pill').forEach(p => p.classList.remove('active'));
+      const c = btn.getAttribute('data-consortium');
+      state.activeConsortium = c;
+      container.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       applyFilters();
     });
@@ -264,35 +256,35 @@ function renderConsortiumFilterPills() {
 }
 
 /**
- * Aplica os filtros de busca e consórcio
+ * Aplica Filtro de Busca e Consórcio
  */
 function applyFilters() {
   const q = state.searchQuery.toLowerCase().trim();
+  const activeC = state.activeConsortium;
 
   state.filteredLines = state.linesList.filter(line => {
-    // Filtro por consórcio
-    if (state.activeConsortium !== 'ALL' && line.consortiumName !== state.activeConsortium) {
+    // 1. Filtro de Consórcio
+    if (activeC !== 'ALL' && line.consortiumName !== activeC) {
       return false;
     }
 
-    // Filtro por termo de busca (número da linha ou itinerário)
+    // 2. Filtro de Texto
     if (q) {
       const codeMatch = line.codigo.toLowerCase().includes(q);
       const descMatch = line.description.toLowerCase().includes(q);
-      const consortiumMatch = line.consortiumName.toLowerCase().includes(q);
-      return codeMatch || descMatch || consortiumMatch;
+      const consMatch = line.consortiumName.toLowerCase().includes(q);
+      if (!codeMatch && !descMatch && !consMatch) return false;
     }
 
     return true;
   });
 
-  // Reseta contador para paginação
   state.renderedCount = state.batchSize;
   renderLinesGrid();
 }
 
 /**
- * Renderiza os cards das linhas no grid
+ * Renderiza o Grid de Cards de Linhas
  */
 function renderLinesGrid() {
   const grid = document.getElementById('lines-grid');
@@ -323,7 +315,7 @@ function renderLinesGrid() {
     const badgeColor = getContrastColor(badgeBg);
 
     return `
-      <a href="${detailUrl}" class="line-card">
+      <a href="${detailUrl}" class="line-card" data-city="${state.currentCitySlug}" data-code="${line.codigo}">
         <div class="line-card-header">
           <span class="line-badge" style="background: ${badgeBg}; color: ${badgeColor};">
             ${line.codigo}
@@ -367,6 +359,22 @@ function setupEventListeners() {
   const searchInput = document.getElementById('search-input');
   const clearBtn = document.getElementById('search-clear-btn');
   const loadMoreBtn = document.getElementById('btn-load-more');
+  const grid = document.getElementById('lines-grid');
+
+  // Grava linha selecionada em sessionStorage ao clicar no card
+  if (grid) {
+    grid.addEventListener('click', (e) => {
+      const card = e.target.closest('.line-card');
+      if (card) {
+        const city = card.getAttribute('data-city');
+        const code = card.getAttribute('data-code');
+        if (city && code) {
+          sessionStorage.setItem('selected_city', city);
+          sessionStorage.setItem('selected_line', code);
+        }
+      }
+    });
+  }
 
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
@@ -382,6 +390,8 @@ function setupEventListeners() {
         e.preventDefault();
         if (state.filteredLines.length > 0) {
           const top = state.filteredLines[0];
+          sessionStorage.setItem('selected_city', state.currentCitySlug);
+          sessionStorage.setItem('selected_line', top.codigo);
           window.location.href = `linha.html?cidade=${state.currentCitySlug}&linha=${encodeURIComponent(top.codigo)}`;
         }
       }
@@ -422,7 +432,6 @@ function setupCityModal() {
   const modal = document.getElementById('city-modal');
   const closeBtn = document.getElementById('btn-close-city-modal');
   const searchInput = document.getElementById('modal-city-search');
-  const container = document.getElementById('city-modal-groups');
 
   if (openBtn) {
     openBtn.addEventListener('click', openCityModal);
@@ -449,13 +458,13 @@ function setupCityModal() {
 
 function openCityModal() {
   const modal = document.getElementById('city-modal');
-  const searchInput = document.getElementById('modal-city-search');
   if (modal) {
     modal.classList.add('open');
-    if (searchInput) {
-      searchInput.value = '';
-      searchInput.focus();
+    const input = document.getElementById('modal-city-search');
+    if (input) {
+      input.value = '';
       renderCityModalList('');
+      setTimeout(() => input.focus(), 50);
     }
   }
 }
@@ -470,69 +479,74 @@ function renderCityModalList(query) {
   if (!container) return;
 
   const q = (query || '').toLowerCase().trim();
-  const grouped = getCitiesGrouped();
+
+  const groups = {
+    capitais: { title: 'Grandes Capitais', items: [] },
+    metropolitana: { title: 'Regiões Metropolitanas', items: [] },
+    interior: { title: 'Cidades do Interior', items: [] }
+  };
+
+  Object.values(CITIES_CONFIG).forEach(city => {
+    if (q) {
+      const matchName = city.name.toLowerCase().includes(q);
+      const matchState = city.state.toLowerCase().includes(q);
+      const matchFull = city.fullName.toLowerCase().includes(q);
+      if (!matchName && !matchState && !matchFull) return;
+    }
+
+    const cat = city.category || 'interior';
+    if (groups[cat]) {
+      groups[cat].items.push(city);
+    } else {
+      groups.interior.items.push(city);
+    }
+  });
 
   let html = '';
 
-  for (const [key, group] of Object.entries(grouped)) {
-    const matchingItems = group.items.filter(c => {
-      if (!q) return true;
-      return c.name.toLowerCase().includes(q) ||
-             c.state.toLowerCase().includes(q) ||
-             c.fullName.toLowerCase().includes(q);
-    });
+  Object.values(groups).forEach(grp => {
+    if (grp.items.length === 0) return;
 
-    if (matchingItems.length > 0) {
-      html += `<div class="city-group-title">${group.title}</div>`;
-      html += '<div class="city-modal-grid">';
-      html += matchingItems.map(c => `
-        <a href="linhas.html?cidade=${c.key}" class="city-modal-item" data-city="${c.key}">
-          <span>${c.flag || '📍'}</span>
-          <span>${c.name}</span>
-          <span class="uf-tag">${c.state}</span>
-        </a>
-      `).join('');
-      html += '</div>';
-    }
-  }
-
-  if (!html) {
-    html = `
-      <div style="text-align:center; padding: 30px; color: var(--text-muted);">
-        Nenhuma cidade encontrada para "<strong>${query}</strong>".
+    html += `
+      <div class="city-modal-category-title">${grp.title}</div>
+      <div class="city-modal-grid">
+        ${grp.items.map(city => {
+          const isActive = city.key === state.currentCitySlug;
+          return `
+            <div class="city-modal-item ${isActive ? 'active' : ''}" data-city="${city.key}">
+              <span style="font-size: 1.2rem;">${city.flag || '📍'}</span>
+              <span>${city.name}</span>
+              <span class="uf-tag" style="font-size:0.75rem; margin-left:auto; color:var(--text-muted);">${city.state}</span>
+            </div>
+          `;
+        }).join('')}
       </div>
     `;
+  });
+
+  if (!html) {
+    html = `<div style="text-align: center; padding: 30px; color: var(--text-muted);">Nenhuma cidade encontrada para "${query}"</div>`;
   }
 
   container.innerHTML = html;
 
   container.querySelectorAll('.city-modal-item').forEach(item => {
-    item.addEventListener('click', (e) => {
-      e.preventDefault();
-      const city = item.getAttribute('data-city');
-      if (city) switchCity(city);
+    item.addEventListener('click', () => {
+      const slug = item.getAttribute('data-city');
+      if (slug) switchCity(slug);
     });
   });
 }
 
-/**
- * Utilitário: Cor do Consórcio padrão
- */
 function getConsortiumColor(name) {
-  const lower = (name || '').toLowerCase();
-  if (lower.includes('intersul') || lower.includes('amarelo')) return '#f59e0b';
-  if (lower.includes('internorte') || lower.includes('verde')) return '#10b981';
-  if (lower.includes('transcarioca') || lower.includes('azul')) return '#3b82f6';
-  if (lower.includes('santa cruz') || lower.includes('vermelho')) return '#ef4444';
-  if (lower.includes('mobi') || lower.includes('brt')) return '#8b5cf6';
-  if (lower.includes('noroeste')) return '#509E2F';
-  if (lower.includes('leste')) return '#D0021B';
-  return '#2563eb';
+  if (!state.cityConfig || !state.cityConfig.consortiums) return 'var(--primary)';
+  const n = (name || '').toUpperCase();
+  for (const [k, v] of Object.entries(state.cityConfig.consortiums)) {
+    if (n.includes(k)) return v.color;
+  }
+  return 'var(--primary)';
 }
 
-/**
- * Utilitário: Garante alto contraste de texto (preto ou branco) para badges
- */
 function getContrastColor(hexColor) {
   if (!hexColor || !hexColor.startsWith('#')) return '#ffffff';
   const c = hexColor.replace('#', '');

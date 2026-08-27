@@ -1,303 +1,303 @@
 /* ==========================================================================
-   Cadê o Ônibus? — Estilos de Linhas de Ônibus e Mapa em Tempo Real
-   Design System moderno, responsivo e com suporte a Dark Mode
+   Cadê o Ônibus? — Linhas & Mapa em Tempo Real (Design Oficial Flutter App)
+   Fonte: Red Hat Display | Paleta: AppTheme | Marcadores: Setas Direcionais
    ========================================================================== */
 
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&display=swap');
+
 :root {
-  --line-primary: #2563eb;
-  --line-primary-hover: #1d4ed8;
-  --line-live-green: #10b981;
-  --line-live-pulse: rgba(16, 185, 129, 0.4);
-  --line-card-bg: #ffffff;
-  --line-card-border: #e5e7eb;
-  --line-card-hover-border: #3b82f6;
-  --line-card-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-  --line-card-shadow-hover: 0 10px 25px rgba(37, 99, 235, 0.12);
-  --line-pill-bg: #f3f4f6;
-  --line-pill-text: #4b5563;
-  --line-timeline-line: #e5e7eb;
-  --line-map-height: 480px;
+  --primary: #1C83E4;
+  --primary-hover: #156fc4;
+  --primary-light: #6FA4EC;
+  --primary-container: #D0E2F8;
+  --on-primary-container: #001D35;
+
+  --accent-pink: #FF2D55;
+  --accent-magenta: #E91E63;
+  --success: #28a745;
+  --warning: #ffc107;
+  --error: #dc3545;
+
+  --bg: #F0F2F5;
+  --surface: #FFFFFF;
+  --surface-border: #DFE2EB;
+  --surface-hover: #F8FAFC;
+
+  --line-card-bg: #FFFFFF;
+  --line-card-border: #DFE2EB;
+  --line-card-hover-border: #1C83E4;
+  --line-card-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  --line-card-hover-shadow: 0 10px 24px rgba(28, 131, 228, 0.12);
+
+  --line-live-green: #10B981;
+  --line-map-height: 520px;
+
+  --font-family: 'Red Hat Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --line-primary: #3b82f6;
-    --line-primary-hover: #2563eb;
-    --line-live-green: #34d399;
-    --line-live-pulse: rgba(52, 211, 153, 0.35);
-    --line-card-bg: #111827;
-    --line-card-border: #1f2937;
-    --line-card-hover-border: #3b82f6;
-    --line-card-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-    --line-card-shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.2);
-    --line-pill-bg: #1f2937;
-    --line-pill-text: #9ca3af;
-    --line-timeline-line: #374151;
+    --primary: #6FA4EC;
+    --primary-hover: #519CEC;
+    --primary-light: #ADC6FF;
+    --primary-container: #00497D;
+    --on-primary-container: #D8E2FF;
+
+    --bg: #0E1116;
+    --surface: #1A1C1E;
+    --surface-border: #333842;
+    --surface-hover: #2A2F3A;
+
+    --line-card-bg: #1A1C1E;
+    --line-card-border: #2E333D;
+    --line-card-hover-border: #6FA4EC;
+    --line-card-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --line-card-hover-shadow: 0 10px 28px rgba(111, 164, 236, 0.18);
+
+    --text: #E3E2E6;
+    --text-muted: #C3C7CF;
   }
 }
 
 /* --------------------------------------------------------------------------
-   Container & Hero Principal das Linhas
+   Container Geral
    -------------------------------------------------------------------------- */
 .linhas-container {
   max-width: 1200px;
-  margin: 80px auto 60px;
+  margin: 88px auto 60px;
   padding: 0 20px;
-}
-
-.linhas-hero {
-  text-align: center;
-  margin-bottom: 32px;
-  position: relative;
-}
-
-.linhas-hero-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--surface);
-  border: 1px solid var(--surface-border);
-  padding: 6px 16px;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 16px;
-}
-
-.linhas-hero-eyebrow .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--line-live-green);
-  box-shadow: 0 0 8px var(--line-live-green);
-}
-
-.linhas-hero h1 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.2;
-  margin-bottom: 12px;
-  background: linear-gradient(135deg, var(--text) 0%, var(--primary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.linhas-hero p {
-  color: var(--text-muted);
-  font-size: 1.1rem;
-  max-width: 720px;
-  margin: 0 auto 20px;
-}
-
-/* Seletor de Cidades no Hero */
-.city-selector-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.city-select-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  background: var(--surface);
-  border: 1px solid var(--surface-border);
-  border-radius: 12px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text);
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--line-card-shadow);
-}
-
-.city-select-btn:hover {
-  border-color: var(--primary);
-  background: var(--line-card-bg);
-  transform: translateY(-1px);
-}
-
-.city-quick-pills {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.city-pill {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  background: var(--surface);
-  border: 1px solid var(--surface-border);
-  color: var(--text-muted);
-  text-decoration: none;
-  transition: all 0.2s;
-  cursor: pointer;
-}
-
-.city-pill:hover,
-.city-pill.active {
-  background: var(--primary);
-  color: #ffffff;
-  border-color: var(--primary);
-  text-decoration: none;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  font-family: var(--font-family);
 }
 
 /* --------------------------------------------------------------------------
-   Barra de Filtros & Pesquisa
+   Hero & Seletor de Cidades
    -------------------------------------------------------------------------- */
-.filter-sticky-panel {
-  position: sticky;
-  top: 70px;
-  z-index: 50;
-  background: var(--nav-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+.linhas-hero {
+  text-align: center;
+  max-width: 860px;
+  margin: 0 auto 32px;
+}
+
+.linhas-hero .badge-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
   border: 1px solid var(--surface-border);
-  border-radius: 16px;
-  padding: 16px;
+  padding: 6px 16px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.linhas-hero h1 {
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.linhas-hero p.hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  font-weight: 500;
   margin-bottom: 24px;
+}
+
+.city-switcher-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.btn-city-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--surface-border);
+  padding: 10px 20px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
   box-shadow: var(--line-card-shadow);
+  transition: all 0.2s ease;
+}
+
+.btn-city-switcher:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* Atalhos de Cidades */
+.quick-cities-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.quick-city-pill {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.quick-city-pill:hover {
+  color: var(--text);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.quick-city-pill.active {
+  background: var(--primary);
+  color: #ffffff !important;
+  border-color: var(--primary);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   Barra de Busca e Filtros
+   -------------------------------------------------------------------------- */
+.search-filter-section {
+  position: sticky;
+  top: 76px;
+  z-index: 900;
+  background: var(--bg);
+  padding: 12px 0;
+  margin-bottom: 24px;
+  border-radius: 16px;
 }
 
 .search-input-wrapper {
   position: relative;
   width: 100%;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
-.search-input-wrapper i.fa-search {
+.search-input-wrapper i.search-icon {
   position: absolute;
-  left: 16px;
+  left: 18px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
   font-size: 1.1rem;
+  pointer-events: none;
 }
 
 .search-input-wrapper input {
   width: 100%;
-  height: 48px;
-  padding: 0 48px 0 46px;
-  border-radius: 12px;
+  height: 52px;
+  padding: 0 48px 0 50px;
+  font-size: 1.05rem;
+  font-family: var(--font-family);
+  font-weight: 600;
+  border-radius: 14px;
   border: 1.5px solid var(--surface-border);
-  background: var(--line-card-bg);
+  background: var(--surface);
   color: var(--text);
-  font-size: 1rem;
-  font-family: inherit;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
   outline: none;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .search-input-wrapper input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 4px rgba(28, 131, 228, 0.15);
 }
 
 .search-clear-btn {
   position: absolute;
-  right: 12px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   color: var(--text-muted);
+  font-size: 1.1rem;
   cursor: pointer;
   padding: 6px;
-  font-size: 1rem;
-  border-radius: 50%;
   display: none;
-}
-
-.search-clear-btn:hover {
-  color: var(--text);
-}
-
-.filters-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
 }
 
 .consortium-filter-pills {
   display: flex;
-  align-items: center;
   gap: 8px;
   overflow-x: auto;
-  padding-bottom: 4px;
-  max-width: 100%;
+  padding-bottom: 6px;
   scrollbar-width: thin;
 }
 
-.consortium-pill {
+.filter-pill {
   white-space: nowrap;
-  padding: 6px 14px;
-  border-radius: 8px;
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 10px;
   background: var(--surface);
-  color: var(--text-muted);
   border: 1px solid var(--surface-border);
+  color: var(--text-muted);
   cursor: pointer;
   transition: all 0.15s ease;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.consortium-pill .badge-count {
-  font-size: 0.72rem;
-  background: rgba(0, 0, 0, 0.08);
-  padding: 1px 6px;
-  border-radius: 10px;
+.filter-pill:hover {
+  border-color: var(--primary);
+  color: var(--text);
 }
 
-@media (prefers-color-scheme: dark) {
-  .consortium-pill .badge-count {
-    background: rgba(255, 255, 255, 0.12);
-  }
-}
-
-.consortium-pill:hover,
-.consortium-pill.active {
+.filter-pill.active {
   background: var(--primary);
-  color: #fff;
+  color: #ffffff;
   border-color: var(--primary);
 }
 
-.consortium-pill.active .badge-count {
+.filter-pill .count-tag {
+  font-size: 0.72rem;
+  background: rgba(0, 0, 0, 0.12);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.filter-pill.active .count-tag {
   background: rgba(255, 255, 255, 0.25);
-  color: #fff;
+  color: #ffffff;
 }
 
 .results-meta-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--surface-border);
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 10px;
 }
 
 /* --------------------------------------------------------------------------
-   Grid de Cards das Linhas
+   Grid de Linhas (Cards de Linha)
    -------------------------------------------------------------------------- */
 .lines-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
   margin-bottom: 40px;
 }
@@ -307,68 +307,64 @@
   border: 1px solid var(--line-card-border);
   border-radius: 16px;
   padding: 18px 20px;
-  text-decoration: none;
-  color: var(--text);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 14px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--line-card-shadow);
-  position: relative;
-  overflow: hidden;
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .line-card:hover {
-  text-decoration: none;
   border-color: var(--line-card-hover-border);
-  transform: translateY(-3px);
-  box-shadow: var(--line-card-shadow-hover);
+  box-shadow: var(--line-card-hover-shadow);
+  transform: translateY(-2px);
+  text-decoration: none;
 }
 
 .line-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .line-badge {
+  font-size: 1.15rem;
+  font-weight: 900;
+  padding: 4px 12px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  font-size: 1.15rem;
-  font-weight: 800;
-  padding: 6px 14px;
-  border-radius: 10px;
-  letter-spacing: -0.02em;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  letter-spacing: -0.01em;
 }
 
 .line-consortium-tag {
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 4px 8px;
-  border-radius: 6px;
-  background: var(--surface);
   color: var(--text-muted);
+  background: var(--bg);
+  padding: 3px 8px;
+  border-radius: 6px;
   border: 1px solid var(--surface-border);
   max-width: 140px;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .line-card-body {
+  margin-bottom: 14px;
   flex-grow: 1;
 }
 
 .line-description {
-  font-size: 0.98rem;
-  font-weight: 600;
-  line-height: 1.4;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.35;
   color: var(--text);
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -380,23 +376,22 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 10px;
-  border-top: 1px dashed var(--surface-border);
-  font-size: 0.82rem;
-  color: var(--text-muted);
+  padding-top: 12px;
+  border-top: 1px solid var(--surface-border);
+  font-size: 0.85rem;
 }
 
 .line-fare {
-  font-weight: 700;
+  font-weight: 800;
   color: var(--primary);
 }
 
 .line-view-action {
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--primary);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  color: var(--primary);
+  gap: 5px;
   transition: transform 0.15s;
 }
 
@@ -407,33 +402,32 @@
 /* --------------------------------------------------------------------------
    Página de Detalhes da Linha (`linha.html`)
    -------------------------------------------------------------------------- */
-.line-detail-header {
-  background: var(--line-card-bg);
-  border: 1px solid var(--line-card-border);
-  border-radius: 20px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: var(--line-card-shadow);
-}
-
 .breadcrumb-nav {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 0.85rem;
+  font-weight: 600;
   color: var(--text-muted);
   margin-bottom: 16px;
-  flex-wrap: wrap;
 }
 
 .breadcrumb-nav a {
   color: var(--text-muted);
-  text-decoration: none;
 }
 
 .breadcrumb-nav a:hover {
   color: var(--primary);
-  text-decoration: underline;
+}
+
+/* Header da Linha */
+.line-detail-header {
+  background: var(--line-card-bg);
+  border: 1px solid var(--line-card-border);
+  border-radius: 20px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  box-shadow: var(--line-card-shadow);
 }
 
 .line-detail-hero {
@@ -447,7 +441,7 @@
 .line-detail-title-group {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
   flex-wrap: wrap;
 }
 
@@ -455,108 +449,79 @@
   font-size: 2rem;
   font-weight: 900;
   padding: 10px 22px;
-  border-radius: 16px;
-  letter-spacing: -0.03em;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  letter-spacing: -0.02em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .line-detail-info h1 {
   font-size: 1.6rem;
-  font-weight: 800;
-  line-height: 1.25;
-  margin-bottom: 6px;
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  color: var(--text);
 }
 
 .line-detail-meta-tags {
   display: flex;
-  align-items: center;
-  gap: 8px;
   flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
 }
 
 .meta-pill {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--surface-border);
+  color: var(--text-muted);
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  background: var(--surface);
-  color: var(--text-muted);
-  border: 1px solid var(--surface-border);
 }
 
 .meta-pill.live-indicator {
   background: rgba(16, 185, 129, 0.12);
-  color: var(--line-live-green);
   border-color: rgba(16, 185, 129, 0.3);
+  color: var(--line-live-green);
 }
 
-.meta-pill.live-indicator .pulse-dot {
+.pulse-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--line-live-green);
-  animation: live-pulse 1.8s infinite cubic-bezier(0.4, 0, 0.6, 1);
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: live-pulse 1.8s infinite;
 }
 
 @keyframes live-pulse {
-  0%, 100% {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
     transform: scale(1);
-    opacity: 1;
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
   }
-  50% {
-    transform: scale(1.6);
-    opacity: 0.4;
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
   }
 }
 
-.line-detail-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.btn-refresh {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: var(--surface);
-  border: 1px solid var(--surface-border);
-  border-radius: 12px;
-  color: var(--text);
-  font-weight: 600;
-  font-size: 0.88rem;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.btn-refresh:hover {
-  background: var(--line-card-bg);
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-.btn-refresh.spinning i {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  100% { transform: rotate(360deg); }
-}
-
-/* Alternador de Sentidos (Ida / Volta) */
-.direction-switch-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 20px;
-  padding-top: 16px;
+/* Seletor de Sentidos (Ida / Volta) */
+.direction-switcher-row {
+  margin-top: 18px;
+  padding-top: 18px;
   border-top: 1px solid var(--surface-border);
-  overflow-x: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .direction-btn {
@@ -565,16 +530,17 @@
   padding: 12px 18px;
   border-radius: 12px;
   border: 1.5px solid var(--surface-border);
-  background: var(--surface);
+  background: var(--bg);
   color: var(--text-muted);
-  font-weight: 600;
+  font-family: var(--font-family);
+  font-weight: 700;
   font-size: 0.92rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .direction-btn:hover {
@@ -583,28 +549,27 @@
 }
 
 .direction-btn.active {
-  background: var(--line-card-bg);
+  background: var(--primary);
   border-color: var(--primary);
-  color: var(--primary);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(28, 131, 228, 0.25);
 }
 
 .direction-btn .stop-count {
   font-size: 0.75rem;
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.1);
   padding: 3px 8px;
   border-radius: 6px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
-@media (prefers-color-scheme: dark) {
-  .direction-btn .stop-count {
-    background: rgba(255, 255, 255, 0.1);
-  }
+.direction-btn.active .stop-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
 }
 
 /* --------------------------------------------------------------------------
-   Mapa Interativo Leaflet
+   Mapa Interativo Leaflet (Idêntico ao App Flutter)
    -------------------------------------------------------------------------- */
 .map-wrapper {
   position: relative;
@@ -620,20 +585,15 @@
 #line-map {
   width: 100%;
   height: 100%;
-  background: #e5e7eb;
+  background: var(--bg);
 }
 
-@media (prefers-color-scheme: dark) {
-  #line-map {
-    background: #1f2937;
-  }
-}
-
+/* Controles Flutuantes do Mapa */
 .map-floating-controls {
   position: absolute;
   top: 14px;
   right: 14px;
-  z-index: 1000;
+  z-index: 800;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -643,20 +603,21 @@
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: var(--line-card-bg);
+  background: var(--surface);
   border: 1px solid var(--surface-border);
   color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
-  cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.15s;
+  transition: all 0.15s ease;
 }
 
 .map-control-btn:hover {
-  color: var(--primary);
+  background: var(--primary);
+  color: #ffffff;
   transform: scale(1.05);
 }
 
@@ -664,20 +625,18 @@
   position: absolute;
   bottom: 16px;
   left: 16px;
-  z-index: 1000;
-  background: var(--nav-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--surface-border);
-  border-radius: 12px;
+  z-index: 800;
+  background: rgba(26, 28, 30, 0.85);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
   padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 14px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
 }
 
 .legend-item {
@@ -686,143 +645,104 @@
   gap: 6px;
 }
 
-.legend-color-bar {
-  width: 14px;
-  height: 4px;
-  border-radius: 2px;
-}
-
-/* Marcadores Personalizados de Ônibus no Leaflet */
-.bus-live-marker {
-  position: relative;
+/* ==========================================================================
+   Marcador de Ônibus (Seta Direcional Oficial Flutter)
+   ========================================================================== */
+.bus-flutter-arrow-marker {
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #2563eb;
-  color: #ffffff;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  border: 2.5px solid #ffffff;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-  font-size: 0.85rem;
-  font-weight: 800;
   cursor: pointer;
-  transition: transform 0.2s ease-out;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.4));
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.bus-live-marker:hover {
-  transform: scale(1.15);
-  z-index: 9999 !important;
+.bus-arrow-svg {
+  width: 26px;
+  height: 26px;
+  transform-origin: center center;
 }
 
-.bus-live-marker .bus-pulse {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: rgba(37, 99, 235, 0.5);
-  animation: marker-pulse 2s infinite ease-out;
-  pointer-events: none;
+/* ==========================================================================
+   Marcador de Ponto de Parada (Node Circular Oficial Flutter)
+   ========================================================================== */
+.custom-stop-div-icon {
+  background: transparent !important;
+  border: none !important;
 }
 
-@keyframes marker-pulse {
-  0% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(2.2); opacity: 0; }
-}
-
-.bus-live-marker .speed-badge {
-  position: absolute;
-  bottom: -14px;
-  background: #111827;
-  color: #fff;
-  font-size: 0.65rem;
-  font-weight: 800;
-  padding: 1px 5px;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  white-space: nowrap;
-}
-
-/* Marcador de Parada */
-.stop-point-marker {
+.flutter-stop-marker {
   width: 14px;
   height: 14px;
-  background: #ffffff;
-  border: 3px solid #4b5563;
   border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  background: #1A1C1E;
+  border: 2px solid #4A90E2;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
   cursor: pointer;
-  transition: all 0.15s;
 }
 
-.stop-point-marker:hover {
+.flutter-stop-marker:hover {
   transform: scale(1.4);
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: #FFFFFF;
+  background: #1C83E4;
 }
 
-/* Popups do Leaflet */
+.flutter-stop-marker-inner {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #4A90E2;
+}
+
+.flutter-stop-marker:hover .flutter-stop-marker-inner {
+  background: #FFFFFF;
+}
+
+/* Popups Leaflet */
 .leaflet-popup-content-wrapper {
-  background: var(--line-card-bg) !important;
+  background: var(--surface) !important;
   color: var(--text) !important;
-  border: 1px solid var(--surface-border) !important;
   border-radius: 14px !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25) !important;
   padding: 6px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid var(--surface-border);
+  font-family: var(--font-family) !important;
 }
 
 .leaflet-popup-tip {
-  background: var(--line-card-bg) !important;
-}
-
-.bus-popup-content h4 {
-  font-size: 1.05rem;
-  font-weight: 800;
-  margin-bottom: 6px;
-  color: var(--text);
-}
-
-.bus-popup-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-}
-
-.bus-popup-row strong {
-  color: var(--text);
+  background: var(--surface) !important;
 }
 
 /* --------------------------------------------------------------------------
-   Abas de Conteúdo Abaixo do Mapa
+   Abas da Página de Detalhes
    -------------------------------------------------------------------------- */
 .line-tabs-nav {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  border-bottom: 1px solid var(--surface-border);
+  gap: 10px;
+  border-bottom: 2px solid var(--surface-border);
   margin-bottom: 24px;
-  overflow-x: auto;
 }
 
 .line-tab-btn {
-  padding: 12px 18px;
-  border: none;
   background: none;
-  color: var(--text-muted);
-  font-size: 0.95rem;
+  border: none;
+  padding: 12px 20px;
+  font-family: var(--font-family);
+  font-size: 1rem;
   font-weight: 700;
+  color: var(--text-muted);
   cursor: pointer;
-  border-bottom: 3px solid transparent;
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.15s;
-  white-space: nowrap;
+  transition: all 0.2s ease;
 }
 
 .line-tab-btn:hover {
@@ -831,7 +751,17 @@
 
 .line-tab-btn.active {
   color: var(--primary);
-  border-bottom-color: var(--primary);
+}
+
+.line-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 3px 3px 0 0;
 }
 
 .line-tab-pane {
@@ -840,7 +770,7 @@
 
 .line-tab-pane.active {
   display: block;
-  animation: fadeIn 0.2s ease-in-out;
+  animation: fadeIn 0.2s ease;
 }
 
 @keyframes fadeIn {
@@ -848,10 +778,12 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Lista de Veículos Ativos */
+/* --------------------------------------------------------------------------
+   Aba 1: Veículos em Tempo Real (Grid)
+   -------------------------------------------------------------------------- */
 .vehicles-live-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 14px;
 }
 
@@ -859,292 +791,194 @@
   background: var(--line-card-bg);
   border: 1px solid var(--line-card-border);
   border-radius: 14px;
-  padding: 16px;
+  padding: 16px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
   box-shadow: var(--line-card-shadow);
-  transition: all 0.15s;
+  transition: all 0.15s ease;
 }
 
 .vehicle-live-card:hover {
   border-color: var(--primary);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .vehicle-live-info h4 {
   font-size: 1.05rem;
   font-weight: 800;
+  margin-bottom: 4px;
   color: var(--text);
-  margin-bottom: 2px;
 }
 
 .vehicle-live-info p {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
+  margin: 0;
 }
 
 .btn-locate-vehicle {
-  padding: 8px 12px;
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border: none;
+  padding: 8px 14px;
   border-radius: 8px;
-  background: var(--surface);
-  border: 1px solid var(--surface-border);
-  color: var(--primary);
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   transition: all 0.15s;
 }
 
 .btn-locate-vehicle:hover {
   background: var(--primary);
-  color: #fff;
+  color: #ffffff;
 }
 
-/* Linha do Tempo / Lista de Paradas */
-.stops-search-bar {
-  margin-bottom: 16px;
-}
-
+/* --------------------------------------------------------------------------
+   Aba 2: Linha do Tempo de Paradas
+   -------------------------------------------------------------------------- */
 .stops-timeline {
-  position: relative;
-  padding-left: 28px;
-}
-
-.stops-timeline::before {
-  content: '';
-  position: absolute;
-  left: 9px;
-  top: 14px;
-  bottom: 14px;
-  width: 3px;
-  background: var(--line-timeline-line);
-  border-radius: 2px;
+  background: var(--line-card-bg);
+  border: 1px solid var(--line-card-border);
+  border-radius: 16px;
+  padding: 16px 20px;
 }
 
 .stop-item {
   position: relative;
-  padding: 12px 16px;
-  background: var(--line-card-bg);
-  border: 1px solid var(--line-card-border);
-  border-radius: 12px;
-  margin-bottom: 10px;
+  padding: 14px 14px 14px 34px;
+  border-bottom: 1px solid var(--surface-border);
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.15s ease;
 }
 
-.stop-item:hover {
-  border-color: var(--primary);
-  background: var(--surface);
-  transform: translateX(4px);
+.stop-item:last-child {
+  border-bottom: none;
 }
 
 .stop-item::before {
   content: '';
   position: absolute;
-  left: -24.5px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: var(--line-card-bg);
-  border: 3px solid var(--primary);
+  background: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-container);
+}
+
+.stop-item:hover {
+  background: var(--surface-hover);
+  padding-left: 38px;
 }
 
 .stop-item-title {
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text);
 }
 
 .stop-item-seq {
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-muted);
-  background: var(--surface);
+  background: var(--bg);
   padding: 3px 8px;
   border-radius: 6px;
 }
 
 /* --------------------------------------------------------------------------
-   Banner de Promoção do App
+   Aba 3: Quadro de Horários Formatado (Oficial)
    -------------------------------------------------------------------------- */
-.app-promo-card {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(59, 130, 246, 0.02) 100%);
-  border: 2px solid rgba(37, 99, 235, 0.2);
-  border-radius: 20px;
-  padding: 32px;
-  margin-top: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-.app-promo-content h3 {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--text);
-  margin-bottom: 8px;
-}
-
-.app-promo-content p {
-  color: var(--text-muted);
-  max-width: 540px;
-  font-size: 0.98rem;
-}
-
-.app-promo-cta-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-/* --------------------------------------------------------------------------
-   Modal de Seleção de Cidades
-   -------------------------------------------------------------------------- */
-.city-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 9999;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.city-modal-backdrop.open {
-  display: flex;
-  animation: modalFadeIn 0.2s ease-out;
-}
-
-@keyframes modalFadeIn {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.city-modal {
+.schedule-container {
   background: var(--line-card-bg);
   border: 1px solid var(--line-card-border);
-  border-radius: 24px;
-  width: 100%;
-  max-width: 760px;
-  max-height: 85vh;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.schedule-day-tabs {
   display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  gap: 10px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
 }
 
-.city-modal-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--surface-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.city-modal-header h3 {
-  font-size: 1.3rem;
-  font-weight: 800;
-}
-
-.city-modal-close {
-  background: none;
-  border: none;
-  font-size: 1.3rem;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 4px;
-}
-
-.city-modal-close:hover {
-  color: var(--text);
-}
-
-.city-modal-body {
-  padding: 20px 24px;
-  overflow-y: auto;
-}
-
-.city-modal-search {
-  width: 100%;
-  height: 44px;
+.schedule-day-btn {
+  padding: 10px 20px;
   border-radius: 10px;
   border: 1.5px solid var(--surface-border);
-  background: var(--surface);
-  padding: 0 16px;
-  font-size: 0.95rem;
-  color: var(--text);
-  margin-bottom: 20px;
-  outline: none;
-}
-
-.city-modal-search:focus {
-  border-color: var(--primary);
-}
-
-.city-group-title {
-  font-size: 0.85rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  background: var(--bg);
   color: var(--text-muted);
-  margin: 16px 0 10px;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.city-modal-grid {
+.schedule-day-btn:hover {
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.schedule-day-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(28, 131, 228, 0.25);
+}
+
+.schedule-grid-hours {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
 }
 
-.city-modal-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
+.schedule-hour-card {
   background: var(--surface);
   border: 1px solid var(--surface-border);
   border-radius: 12px;
-  text-decoration: none;
-  color: var(--text);
-  font-weight: 600;
-  font-size: 0.92rem;
-  transition: all 0.15s;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.city-modal-item:hover {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-  text-decoration: none;
+.schedule-hour-badge {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--primary);
+  min-width: 48px;
+  text-align: center;
+  padding: 6px 8px;
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border-radius: 8px;
 }
 
-.city-modal-item .uf-tag {
-  font-size: 0.72rem;
-  font-weight: 800;
-  background: rgba(0, 0, 0, 0.08);
-  padding: 2px 6px;
+.schedule-departures-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.departure-chip {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 3px 8px;
   border-radius: 6px;
-  margin-left: auto;
-}
-
-@media (prefers-color-scheme: dark) {
-  .city-modal-item .uf-tag {
-    background: rgba(255, 255, 255, 0.12);
-  }
+  background: var(--bg);
+  border: 1px solid var(--surface-border);
+  color: var(--text);
 }
 
 /* --------------------------------------------------------------------------
@@ -1179,16 +1013,16 @@
 }
 
 .line-search-result-item:hover {
-  background: var(--surface);
+  background: var(--surface-hover);
 }
 
 .line-search-result-item .result-badge {
   font-size: 0.85rem;
-  font-weight: 800;
+  font-weight: 900;
   padding: 3px 8px;
   border-radius: 6px;
   background: var(--primary);
-  color: #fff;
+  color: #ffffff;
   min-width: 44px;
   text-align: center;
 }
@@ -1200,6 +1034,176 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* --------------------------------------------------------------------------
+   Modal de Cidades
+   -------------------------------------------------------------------------- */
+.city-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.city-modal-backdrop.open {
+  display: flex;
+}
+
+.city-modal {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.city-modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--surface-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.city-modal-header h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.city-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.city-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+.city-modal-search {
+  width: 100%;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid var(--surface-border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-family);
+  font-weight: 600;
+  margin-bottom: 20px;
+  outline: none;
+}
+
+.city-modal-category-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin: 16px 0 10px;
+}
+
+.city-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.city-modal-item {
+  background: var(--bg);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text);
+  transition: all 0.15s ease;
+}
+
+.city-modal-item:hover {
+  border-color: var(--primary);
+  background: var(--surface-hover);
+  transform: translateY(-1px);
+}
+
+.city-modal-item.active {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border-color: var(--primary);
+}
+
+/* --------------------------------------------------------------------------
+   Banner Promocional do App Mobile
+   -------------------------------------------------------------------------- */
+.app-promo-card {
+  background: linear-gradient(135deg, var(--primary) 0%, #0052b4 100%);
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 36px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  box-shadow: 0 12px 30px rgba(28, 131, 228, 0.3);
+  margin: 40px 0;
+  flex-wrap: wrap;
+}
+
+.app-promo-content {
+  max-width: 600px;
+}
+
+.app-promo-content h3 {
+  font-size: 1.6rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+  color: #ffffff;
+}
+
+.app-promo-content p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.app-promo-cta-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.app-promo-cta-row .btn-primary {
+  background: #ffffff;
+  color: #0052b4 !important;
+  font-weight: 800;
+}
+
+.app-promo-cta-row .btn-secondary {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 /* --------------------------------------------------------------------------

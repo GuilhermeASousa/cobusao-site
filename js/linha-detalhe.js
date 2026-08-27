@@ -1,7 +1,7 @@
 /**
  * Cadê o Ônibus? — Detalhes da Linha, Trajeto no Mapa e Ônibus em Tempo Real
- * Integração Leaflet com CARTO Basemaps API oficial, renderização de trajeto/paradas
- * e conexão direta com a API de produção (https://api.cadeoonibus.api.br/api).
+ * Design System idêntico ao App Flutter: Setas direcionais nos veículos,
+ * paradas circulares, filtro de ônibus por sentido e quadro de horários oficial.
  */
 
 import {
@@ -24,7 +24,9 @@ const state = {
   detailData: null,
   currentDirectionIdx: 0,
   activeTab: 'veiculos',
+  activeScheduleDay: 'weekday',
   vehicles: [],
+  filteredDirectionVehicles: [],
   map: null,
   tileLayer: null,
   routeLayer: null,
@@ -50,33 +52,51 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Lê parâmetros da URL (?cidade=rio&linha=472 ou ?cidade=sp&linha=107T-10)
+ * Lê parâmetros da URL com suporte a query string, sessionStorage e hash
  */
 function initParamsFromUrl() {
   const params = new URLSearchParams(window.location.search);
-  const cityParam = params.get('cidade') || params.get('c') || 'rio';
-  const lineParam = params.get('linha') || params.get('l');
+  let cityParam = params.get('cidade') || params.get('c');
+  let lineParam = params.get('linha') || params.get('l');
 
-  state.citySlug = normalizeCitySlug(cityParam);
+  // Fallback para sessionStorage caso o servidor web tenha limpado os query params no redirect
+  if (!lineParam) {
+    const savedLine = sessionStorage.getItem('selected_line');
+    const savedCity = sessionStorage.getItem('selected_city');
+    if (savedLine) {
+      lineParam = savedLine;
+      sessionStorage.removeItem('selected_line');
+    }
+    if (savedCity && !cityParam) {
+      cityParam = savedCity;
+      sessionStorage.removeItem('selected_city');
+    }
+  }
+
+  // Fallback para hash (ex: #cidade=rio&linha=006 ou #rio/006)
+  if (!lineParam && window.location.hash) {
+    const hash = window.location.hash.replace('#', '');
+    if (hash.includes('linha=')) {
+      const hashParams = new URLSearchParams(hash);
+      lineParam = hashParams.get('linha');
+      if (!cityParam) cityParam = hashParams.get('cidade');
+    } else if (hash.includes('/')) {
+      const parts = hash.split('/');
+      if (parts.length >= 2) {
+        if (!cityParam) cityParam = parts[0];
+        lineParam = parts[1];
+      }
+    }
+  }
+
+  state.citySlug = normalizeCitySlug(cityParam || 'rio');
   state.cityConfig = getCityConfig(state.citySlug);
 
   if (lineParam && lineParam.trim()) {
     state.lineCode = lineParam.trim();
   } else {
-    // Linha padrão por cidade caso nenhuma seja especificada na URL
-    const defaultLines = {
-      rio: '472',
-      sp: '107T-10',
-      bh: '104',
-      curitiba: '010',
-      brasilia: '0.108',
-      porto_alegre: '110',
-      rio_intermunicipal: '100D',
-      emtu: '001',
-      campinas: '116',
-      florianopolis: '100'
-    };
-    state.lineCode = defaultLines[state.citySlug] || '472';
+    // Padrão apenas se não houver linha selecionada em nenhum lugar
+    state.lineCode = state.citySlug === 'sp' ? '107T-10' : (state.citySlug === 'bh' ? '104' : '472');
   }
 
   updateBreadcrumbs();
@@ -116,7 +136,7 @@ async function loadAllCityLinesForSearch() {
 }
 
 /**
- * Inicializa o Mapa Leaflet com CARTO Basemaps oficial e suporte a tema
+ * Inicializa o Mapa Leaflet com CARTO Basemaps oficial
  */
 function setupMap() {
   const mapContainer = document.getElementById('line-map');
@@ -124,7 +144,6 @@ function setupMap() {
 
   const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   
-  // URL oficial CARTO com API key
   const cartoUrl = isDarkMode
     ? `https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`
     : `https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`;
@@ -199,7 +218,6 @@ export async function loadLineData(lineCodeToLoad) {
     const detailUrl = `${CDN_BASE_URL}/${state.citySlug}/detalhes/${encodeURIComponent(state.lineCode)}.json`;
     let resDetail = await fetch(detailUrl);
 
-    // Fallback de maiúsculas/minúsculas caso o arquivo tenha nome com casing diferente
     if (!resDetail.ok) {
       const upperUrl = `${CDN_BASE_URL}/${state.citySlug}/detalhes/${encodeURIComponent(state.lineCode.toUpperCase())}.json`;
       resDetail = await fetch(upperUrl);
@@ -218,7 +236,7 @@ export async function loadLineData(lineCodeToLoad) {
     renderStopsTimeline();
     renderSchedulesTab();
 
-    // Inicia rastreamento ao vivo com conexão direta à API
+    // Inicia rastreamento ao vivo
     startRealtimeVehicleTracking();
 
   } catch (err) {
@@ -235,7 +253,7 @@ export async function loadLineData(lineCodeToLoad) {
 }
 
 /**
- * Busca flexível de metadados de linha no dicionário de linhas
+ * Busca flexível de metadados de linha no dicionário
  */
 function findLineInfoCanonical(code, linesDict) {
   if (!linesDict || !code) return null;
@@ -244,7 +262,6 @@ function findLineInfoCanonical(code, linesDict) {
   const upper = code.toUpperCase();
   if (linesDict[upper]) return linesDict[upper];
 
-  // Busca sem zeros à esquerda ou com zeros
   const withoutZeros = code.replace(/^0+/, '');
   for (const [k, v] of Object.entries(linesDict)) {
     if (k.toUpperCase() === upper || k.replace(/^0+/, '') === withoutZeros) {
@@ -265,7 +282,7 @@ function renderLineHeader() {
   const fareEl = document.getElementById('line-fare');
   const agencyEl = document.getElementById('line-agency');
 
-  const badgeBg = state.lineInfo.consortiumColor || '#2563eb';
+  const badgeBg = state.lineInfo.consortiumColor || '#1C83E4';
   const badgeColor = getContrastColor(badgeBg);
 
   if (badgeEl) {
@@ -334,15 +351,19 @@ function renderDirectionSwitcher() {
         state.currentDirectionIdx = idx;
         container.querySelectorAll('.direction-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        
+        // Atualiza trajeto, paradas, filtro de veículos por sentido e horários
         drawRouteAndStops();
         renderStopsTimeline();
+        filterVehiclesByCurrentDirection();
+        renderSchedulesTab();
       }
     });
   });
 }
 
 /**
- * Desenha a Polyline do Trajeto e os Marcadores de Paradas no Mapa Leaflet
+ * Desenha a Polyline do Trajeto e os Marcadores de Paradas (Estilo Idêntico ao Flutter App)
  */
 function drawRouteAndStops() {
   if (!state.map || !state.detailData || !state.detailData.trajetos) return;
@@ -357,27 +378,27 @@ function drawRouteAndStops() {
   if (pts.length === 0) return;
 
   const latLngs = pts.map(p => [p.lat, p.lon]);
-  const lineColor = state.lineInfo?.consortiumColor || '#2563eb';
+  const lineColor = state.lineInfo?.consortiumColor || '#FF2D55';
 
-  // 1. Linha de fundo (casing de alto contraste)
+  // 1. Casing externo para contraste idêntico ao Flutter
   L.polyline(latLngs, {
-    color: '#ffffff',
+    color: '#000000',
     weight: 7,
-    opacity: 0.95,
+    opacity: 0.6,
     lineJoin: 'round',
     lineCap: 'round'
   }).addTo(state.routeLayer);
 
-  // 2. Linha principal colorida
+  // 2. Linha principal do trajeto
   const mainLine = L.polyline(latLngs, {
     color: lineColor,
-    weight: 5,
+    weight: 4.5,
     opacity: 1.0,
     lineJoin: 'round',
     lineCap: 'round'
   }).addTo(state.routeLayer);
 
-  // 3. Renderiza Paradas
+  // 3. Renderiza Paradas Circulares (Idênticas ao BusStopMarkerIcon do Flutter)
   const paradas = currentTrajeto.paradas || [];
   paradas.forEach((parada, index) => {
     const lat = parada.position?.lat || parada.lat;
@@ -386,7 +407,11 @@ function drawRouteAndStops() {
 
     const stopIcon = L.divIcon({
       className: 'custom-stop-div-icon',
-      html: `<div class="stop-point-marker" title="${index + 1}. ${parada.stopName}"></div>`,
+      html: `
+        <div class="flutter-stop-marker" title="${index + 1}. ${parada.stopName}">
+          <div class="flutter-stop-marker-inner"></div>
+        </div>
+      `,
       iconSize: [14, 14],
       iconAnchor: [7, 7]
     });
@@ -395,10 +420,10 @@ function drawRouteAndStops() {
 
     const popupHtml = `
       <div style="padding: 6px;">
-        <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;">
+        <div style="font-size: 0.75rem; font-weight: 800; color: var(--primary); text-transform: uppercase;">
           Parada #${index + 1}
         </div>
-        <h4 style="font-size: 0.95rem; font-weight: 700; margin: 4px 0 6px;">${parada.stopName}</h4>
+        <h4 style="font-size: 0.95rem; font-weight: 800; margin: 4px 0 6px;">${parada.stopName}</h4>
         <div style="font-size: 0.8rem; color: var(--text-muted);">
           Linha ${state.lineCode} &bull; Sentido ${currentTrajeto.trip_headsign || ''}
         </div>
@@ -409,7 +434,7 @@ function drawRouteAndStops() {
     state.stopsLayer.addLayer(marker);
   });
 
-  // Ajusta visão do mapa com padding e garante redimensionamento
+  // Ajusta visão do mapa automaticamente com padding
   try {
     const bounds = mainLine.getBounds();
     if (bounds && bounds.isValid()) {
@@ -481,21 +506,152 @@ async function fetchRealtimeVehicles() {
     const vehicles = await res.json();
     if (Array.isArray(vehicles)) {
       state.vehicles = vehicles;
-      updateVehicleMarkersOnMap();
-      renderActiveVehiclesTab();
-      updateLiveBadge(vehicles.length);
+      filterVehiclesByCurrentDirection();
     } else {
+      state.vehicles = [];
+      state.filteredDirectionVehicles = [];
       updateLiveBadge(0);
       renderActiveVehiclesTab();
     }
 
   } catch (err) {
     console.warn('Veículos em tempo real offline ou indisponíveis no momento:', err.message);
+    state.vehicles = [];
+    state.filteredDirectionVehicles = [];
     updateLiveBadge(0, true);
     renderActiveVehiclesTab();
   } finally {
     state.isFetchingVehicles = false;
     if (refreshBtn) refreshBtn.classList.remove('spinning');
+  }
+}
+
+/**
+ * Filtra os ônibus para exibir SOMENTE os que estão no sentido selecionado (Item 3)
+ */
+function filterVehiclesByCurrentDirection() {
+  if (!state.vehicles || state.vehicles.length === 0) {
+    state.filteredDirectionVehicles = [];
+    updateVehicleMarkersOnMap();
+    renderActiveVehiclesTab();
+    updateLiveBadge(0);
+    return;
+  }
+
+  const currentTrajeto = state.detailData?.trajetos?.[state.currentDirectionIdx];
+  const targetDirId = currentTrajeto?.direction_id !== undefined ? currentTrajeto.direction_id : state.currentDirectionIdx;
+  const targetHeadsign = (currentTrajeto?.trip_headsign || '').toLowerCase().trim();
+
+  state.filteredDirectionVehicles = state.vehicles.filter(v => {
+    // 1. Verificação por directionId numérico
+    if (typeof v.directionId === 'number' && v.directionId === targetDirId) return true;
+    if (typeof v.activeDirectionId === 'number' && v.activeDirectionId === targetDirId) return true;
+
+    // 2. Verificação por string de sentido
+    if (v.sentido !== undefined && v.sentido !== null) {
+      const s = String(v.sentido).trim();
+      if (s === String(targetDirId)) return true;
+    }
+
+    // 3. Verificação por nome do destino / trajeto
+    if (targetHeadsign && v.trajeto) {
+      const dest = String(v.trajeto).toLowerCase().trim();
+      if (dest.includes(targetHeadsign) || targetHeadsign.includes(dest)) return true;
+    }
+
+    // Se a linha só tiver 1 único sentido cadastrado, exibe todos os carros
+    if (state.detailData?.trajetos?.length === 1) return true;
+
+    return false;
+  });
+
+  // Se nenhum veículo der match exato pelo sentido (ex: GPS antigo não preencheu direction_id), mostra todos
+  if (state.filteredDirectionVehicles.length === 0 && state.vehicles.length > 0) {
+    state.filteredDirectionVehicles = state.vehicles;
+  }
+
+  updateVehicleMarkersOnMap();
+  renderActiveVehiclesTab();
+  updateLiveBadge(state.filteredDirectionVehicles.length);
+}
+
+/**
+ * Renderiza/Atualiza os Marcadores de Ônibus no Mapa Leaflet com Setas Direcionais (Item 4)
+ */
+function updateVehicleMarkersOnMap() {
+  if (!state.map || !state.vehiclesLayer) return;
+
+  const currentIds = new Set();
+  const vehiclesToRender = state.filteredDirectionVehicles;
+  const markerColor = '#FF2D55'; // Magenta / Pink vibrante oficial do Flutter App (Image 3 / 4)
+
+  vehiclesToRender.forEach(vehicle => {
+    const lat = vehicle.latitude || vehicle.lat;
+    const lon = vehicle.longitude || vehicle.lon;
+    if (!lat || !lon) return;
+
+    const carId = vehicle.codigoOriginal || vehicle.codigo || 'Ônibus';
+    currentIds.add(carId);
+
+    const speed = Math.round(vehicle.velocidade || 0);
+    const bearing = parseFloat(vehicle.direcao) || 0;
+    const timeAgo = formatTimeAgo(vehicle.dataHora);
+
+    let marker = state.vehicleMarkersMap.get(carId);
+
+    // SVG da seta direcional idêntica ao Material Icons.navigation / Flutter BusMarkersPainter
+    const iconHtml = `
+      <div class="bus-flutter-arrow-marker" style="transform: rotate(${bearing}deg);" title="Carro ${carId} &bull; ${speed} km/h">
+        <svg viewBox="0 0 24 24" class="bus-arrow-svg">
+          <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" fill="${markerColor}" stroke="#ffffff" stroke-width="1.8" stroke-linejoin="round" />
+        </svg>
+      </div>
+    `;
+
+    const busIcon = L.divIcon({
+      className: 'custom-bus-arrow-icon',
+      html: iconHtml,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16]
+    });
+
+    if (marker) {
+      marker.setLatLng([lat, lon]);
+      marker.setIcon(busIcon);
+    } else {
+      marker = L.marker([lat, lon], { icon: busIcon });
+      state.vehiclesLayer.addLayer(marker);
+      state.vehicleMarkersMap.set(carId, marker);
+    }
+
+    const popupHtml = `
+      <div style="padding: 6px; font-family: var(--font-family);">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px;">
+          <h4 style="font-size: 1.05rem; font-weight: 800; margin: 0; color: var(--text);">
+            <i class="fa-solid fa-bus" style="color: ${markerColor};"></i> Carro ${carId}
+          </h4>
+          <span style="font-size: 0.75rem; font-weight: 800; background: var(--primary-container); color: var(--on-primary-container); padding: 2px 6px; border-radius: 6px;">
+            ${speed} km/h
+          </span>
+        </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 4px;">
+          <strong>Sentido:</strong> ${vehicle.trajeto || vehicle.sentido || 'Em rota'}
+        </div>
+        <div style="font-size: 0.78rem; color: var(--text-muted);">
+          <i class="fa-solid fa-clock"></i> Último GPS: <strong>${timeAgo}</strong>
+        </div>
+      </div>
+    `;
+
+    marker.bindPopup(popupHtml);
+  });
+
+  // Remove veículos que não estão no sentido atual
+  for (const [carId, marker] of state.vehicleMarkersMap.entries()) {
+    if (!currentIds.has(carId)) {
+      state.vehiclesLayer.removeLayer(marker);
+      state.vehicleMarkersMap.delete(carId);
+    }
   }
 }
 
@@ -522,90 +678,14 @@ function updateLiveBadge(count, isError = false) {
     return;
   }
 
+  const currentHeadsign = state.detailData?.trajetos?.[state.currentDirectionIdx]?.trip_headsign || '';
+
   if (count > 0) {
     badge.className = 'meta-pill live-indicator';
-    countSpan.textContent = `${count} ${count === 1 ? 'ônibus em circulação' : 'ônibus em circulação'}`;
+    countSpan.textContent = `${count} ${count === 1 ? 'ônibus no sentido selecionado' : 'ônibus no sentido selecionado'}`;
   } else {
     badge.className = 'meta-pill';
-    countSpan.textContent = 'Nenhum ônibus em circulação agora';
-  }
-}
-
-/**
- * Renderiza/Atualiza os Marcadores de Ônibus no Mapa Leaflet
- */
-function updateVehicleMarkersOnMap() {
-  if (!state.map || !state.vehiclesLayer) return;
-
-  const currentIds = new Set();
-
-  state.vehicles.forEach(vehicle => {
-    const lat = vehicle.latitude || vehicle.lat;
-    const lon = vehicle.longitude || vehicle.lon;
-    if (!lat || !lon) return;
-
-    const carId = vehicle.codigoOriginal || vehicle.codigo || 'Ônibus';
-    currentIds.add(carId);
-
-    const speed = Math.round(vehicle.velocidade || 0);
-    const timeAgo = formatTimeAgo(vehicle.dataHora);
-
-    let marker = state.vehicleMarkersMap.get(carId);
-
-    if (marker) {
-      marker.setLatLng([lat, lon]);
-    } else {
-      const iconHtml = `
-        <div class="bus-live-marker" id="marker-${carId}">
-          <div class="bus-pulse"></div>
-          <i class="fa-solid fa-bus"></i>
-          <span class="speed-badge">${speed} km/h</span>
-        </div>
-      `;
-
-      const busIcon = L.divIcon({
-        className: 'bus-div-icon',
-        html: iconHtml,
-        iconSize: [38, 38],
-        iconAnchor: [19, 19]
-      });
-
-      marker = L.marker([lat, lon], { icon: busIcon });
-      state.vehiclesLayer.addLayer(marker);
-      state.vehicleMarkersMap.set(carId, marker);
-    }
-
-    const popupHtml = `
-      <div class="bus-popup-content">
-        <h4><i class="fa-solid fa-bus" style="color: var(--primary);"></i> Ônibus ${carId}</h4>
-        <div class="bus-popup-row">
-          <span>Velocidade:</span>
-          <strong>${speed} km/h</strong>
-        </div>
-        <div class="bus-popup-row">
-          <span>Linha:</span>
-          <strong>${state.lineCode}</strong>
-        </div>
-        <div class="bus-popup-row">
-          <span>Destino / Sentido:</span>
-          <strong>${vehicle.trajeto || vehicle.sentido || 'Em operação'}</strong>
-        </div>
-        <div class="bus-popup-row">
-          <span>Último sinal GPS:</span>
-          <strong>${timeAgo}</strong>
-        </div>
-      </div>
-    `;
-
-    marker.bindPopup(popupHtml);
-  });
-
-  // Remove veículos que saíram de circulação
-  for (const [carId, marker] of state.vehicleMarkersMap.entries()) {
-    if (!currentIds.has(carId)) {
-      state.vehiclesLayer.removeLayer(marker);
-      state.vehicleMarkersMap.delete(carId);
-    }
+    countSpan.textContent = 'Nenhum ônibus neste sentido agora';
   }
 }
 
@@ -628,19 +708,23 @@ export function focusOnVehicle(carId) {
 window.focusBus = focusOnVehicle;
 
 /**
- * Renderiza Aba de Veículos Ativos
+ * Renderiza Aba de Veículos Ativos (filtrada por sentido)
  */
 function renderActiveVehiclesTab() {
   const container = document.getElementById('pane-veiculos');
   if (!container) return;
 
-  if (state.vehicles.length === 0) {
+  const currentTrajeto = state.detailData?.trajetos?.[state.currentDirectionIdx];
+  const headsign = currentTrajeto?.trip_headsign || 'Sentido Atual';
+  const vehicles = state.filteredDirectionVehicles;
+
+  if (vehicles.length === 0) {
     container.innerHTML = `
       <div style="text-align: center; padding: 48px 20px; background: var(--line-card-bg); border-radius: 16px; border: 1px solid var(--surface-border);">
         <div style="font-size: 2.2rem; margin-bottom: 12px;">🛰️</div>
-        <h4 style="font-size: 1.15rem; margin-bottom: 6px;">Nenhum ônibus transmitindo agora</h4>
+        <h4 style="font-size: 1.15rem; margin-bottom: 6px;">Nenhum ônibus transmitindo no Sentido ${headsign}</h4>
         <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto;">
-          Nenhum veículo da linha <strong>${state.lineCode}</strong> transmitiu posição GPS nos últimos minutos. A página continua monitorando automaticamente a cada 8 segundos.
+          Nenhum veículo desta linha está operando neste sentido no momento. Você pode alternar o sentido acima para verificar a volta.
         </p>
       </div>
     `;
@@ -649,11 +733,11 @@ function renderActiveVehiclesTab() {
 
   let html = `<div class="vehicles-live-grid">`;
 
-  html += state.vehicles.map(v => {
+  html += vehicles.map(v => {
     const carId = v.codigoOriginal || v.codigo || 'Ônibus';
     const speed = Math.round(v.velocidade || 0);
     const timeAgo = formatTimeAgo(v.dataHora);
-    const dest = v.trajeto || v.sentido || 'Em rota';
+    const dest = v.trajeto || v.sentido || headsign;
 
     return `
       <div class="vehicle-live-card">
@@ -749,14 +833,14 @@ window.focusStop = (lat, lon, encodedName) => {
 };
 
 /**
- * Renderiza Aba de Horários se disponíveis
+ * Renderiza Aba de Horários Formatada Oficial (Item 2)
  */
 function renderSchedulesTab() {
   const container = document.getElementById('pane-horarios');
   if (!container) return;
 
-  const horarios = state.detailData?.horarios;
-  if (!horarios || Object.keys(horarios).length === 0) {
+  const rawHorarios = state.detailData?.horarios;
+  if (!rawHorarios || Object.keys(rawHorarios).length === 0) {
     container.innerHTML = `
       <div style="text-align: center; padding: 48px 20px; background: var(--line-card-bg); border-radius: 16px; border: 1px solid var(--surface-border);">
         <div style="font-size: 2.2rem; margin-bottom: 12px;">📅</div>
@@ -769,17 +853,114 @@ function renderSchedulesTab() {
     return;
   }
 
-  container.innerHTML = `
-    <div style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 16px; padding: 24px;">
-      <h4 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 16px;">Partidas Oficiais Registradas</h4>
-      <p style="color: var(--text-muted); margin-bottom: 20px;">
-        Horários programados no planejamento operacional do sistema. Os horários reais podem variar conforme o trânsito.
-      </p>
-      <div style="font-family: monospace; font-size: 0.9rem; color: var(--text-muted); background: var(--surface); padding: 16px; border-radius: 12px; max-height: 300px; overflow-y: auto;">
-        ${JSON.stringify(horarios, null, 2)}
+  // Extrai as partidas do sentido atual
+  const dirKey = String(state.currentDirectionIdx);
+  let departuresList = [];
+
+  // Estrutura GTFS / Cobusão: { [tripId]: { "0": { weekday: [], saturday: [], sunday: [] }, "1": { ... } } }
+  for (const tripData of Object.values(rawHorarios)) {
+    if (typeof tripData === 'object' && tripData !== null) {
+      const dirData = tripData[dirKey] || tripData['0'] || tripData['1'];
+      if (dirData && dirData[state.activeScheduleDay]) {
+        departuresList = dirData[state.activeScheduleDay];
+        break;
+      }
+    }
+  }
+
+  // Se a lista estiver vazia para este dia, tenta qualquer outra chave disponível
+  if (!departuresList || departuresList.length === 0) {
+    for (const tripData of Object.values(rawHorarios)) {
+      if (typeof tripData === 'object' && tripData !== null) {
+        for (const dirObj of Object.values(tripData)) {
+          if (dirObj && Array.isArray(dirObj[state.activeScheduleDay]) && dirObj[state.activeScheduleDay].length > 0) {
+            departuresList = dirObj[state.activeScheduleDay];
+            break;
+          }
+        }
+      }
+      if (departuresList && departuresList.length > 0) break;
+    }
+  }
+
+  // Agrupa partidas por hora (00h, 01h, 02h... 23h)
+  const hoursMap = {};
+  (departuresList || []).forEach(timeStr => {
+    if (!timeStr) return;
+    const parts = timeStr.split(':');
+    const hour = parts[0] ? `${parts[0].padStart(2, '0')}h` : '00h';
+    const min = parts[1] || '00';
+    if (!hoursMap[hour]) hoursMap[hour] = [];
+    hoursMap[hour].push(min);
+  });
+
+  const sortedHours = Object.keys(hoursMap).sort();
+  const totalDepartures = departuresList ? departuresList.length : 0;
+
+  const currentTrajeto = state.detailData?.trajetos?.[state.currentDirectionIdx];
+  const headsign = currentTrajeto?.trip_headsign || 'Itinerário';
+
+  let html = `
+    <div class="schedule-container">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 20px;">
+        <div>
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text); margin-bottom: 4px;">
+            Partidas Programadas — Sentido ${headsign}
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0;">
+            Total de <strong>${totalDepartures} partidas registradas</strong> no planejamento operacional.
+          </p>
+        </div>
+
+        <div class="schedule-day-tabs">
+          <button class="schedule-day-btn ${state.activeScheduleDay === 'weekday' ? 'active' : ''}" data-day="weekday">
+            <i class="fa-solid fa-calendar-day"></i> Dias Úteis
+          </button>
+          <button class="schedule-day-btn ${state.activeScheduleDay === 'saturday' ? 'active' : ''}" data-day="saturday">
+            <i class="fa-solid fa-calendar-check"></i> Sábado
+          </button>
+          <button class="schedule-day-btn ${state.activeScheduleDay === 'sunday' ? 'active' : ''}" data-day="sunday">
+            <i class="fa-solid fa-umbrella-beach"></i> Domingo e Feriados
+          </button>
+        </div>
       </div>
-    </div>
   `;
+
+  if (sortedHours.length === 0) {
+    html += `
+      <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+        Nenhum horário programado para este dia da semana neste sentido.
+      </div>
+    `;
+  } else {
+    html += `<div class="schedule-grid-hours">`;
+    sortedHours.forEach(hour => {
+      const minutes = hoursMap[hour];
+      html += `
+        <div class="schedule-hour-card">
+          <div class="schedule-hour-badge">${hour}</div>
+          <div class="schedule-departures-list">
+            ${minutes.map(m => `<span class="departure-chip">${hour.replace('h', '')}:${m}</span>`).join('')}
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  html += `</div>`;
+  container.innerHTML = html;
+
+  // Listeners das abas de dia
+  container.querySelectorAll('.schedule-day-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const day = btn.getAttribute('data-day');
+      if (day && day !== state.activeScheduleDay) {
+        state.activeScheduleDay = day;
+        renderSchedulesTab();
+      }
+    });
+  });
 }
 
 /**
