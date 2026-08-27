@@ -3,16 +3,16 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cadê o Ônibus? — Chega de esperar no ponto às cegas</title>
-    <meta name="description" content="Acompanhe seu ônibus em tempo real pelo GPS oficial. Saiba exatamente a hora que ele vai chegar no ponto. 100% gratuito e sem anúncios." />
-    <meta name="keywords" content="ônibus em tempo real, cadê o ônibus, app de ônibus, rastreador de ônibus, gps ônibus, rio de janeiro, são paulo, belo horizonte, curitiba" />
+    <title>Cadê o Ônibus? — O seu aplicativo de transporte público em tempo real</title>
+    <meta name="description" content="Acompanhe a localização dos ônibus em tempo real no mapa, confira horários, paradas e receba alertas de chegada. Grátis e sem anúncios para 26 regiões." />
+    <meta name="keywords" content="onibus em tempo real, rastreamento gps onibus, horarios de onibus, linhas de onibus, rio de janeiro, sao paulo, belo horizonte, curitiba, cade o onibus" />
 
-    <!-- Open Graph & Social -->
+    <!-- Open Graph / Redes Sociais -->
     <meta property="og:site_name" content="Cadê o Ônibus?" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Cadê o Ônibus? — O app inteligente de transporte público" />
-    <meta property="og:description" content="Veja onde seu ônibus está agora no mapa em tempo real. Rápido, leve, sem cadastro e 100% grátis." />
-    <meta property="og:url" content="https://cadeoonibus.com.br/" />
+    <meta property="og:title" content="Cadê o Ônibus? — Localização de Ônibus em Tempo Real" />
+    <meta property="og:description" content="Saiba exatamente onde está o seu ônibus pelo mapa em tempo real. 100% gratuito e sem anúncios." />
+    <meta property="og:url" content="https://cadeoonibus.com.br" />
     <meta property="og:image" content="https://web.cadeoonibus.api.br/og-image.jpg" />
     <meta property="og:locale" content="pt_BR" />
 
@@ -23,15 +23,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body>
-    <!-- Cabeçalho Integrado com Seletor de Região -->
+    <!-- Header Integrado com Identidade Visual Flutter -->
     <header class="site-header">
         <div class="header-inner">
-            <a class="brand" href="index.html">
+            <a class="brand" href="index.html" title="Página Inicial do Cadê o Ônibus?">
                 <img src="app-logo.png" alt="Cadê o Ônibus?" />
                 <span>Cadê o Ônibus?</span>
             </a>
 
-            <!-- Botão do Seletor de Região (gerenciado dinamicamente por region-manager.js) -->
+            <!-- Seletor de Região Ativa Global (Pill M3) -->
             <button class="header-region-pill" type="button" id="btn-header-region-selector" title="Trocar região / cidade">
                 <span class="pill-dot"></span>
                 <span class="pill-flag" id="header-region-flag">🏖️</span>
@@ -39,9 +39,8 @@
                 <i class="fa-solid fa-chevron-down pill-chevron"></i>
             </button>
 
-            <!-- Menu de Navegação -->
+            <!-- Menu de Navegação (Sem botão de início redundante) -->
             <nav class="site-nav">
-                <a class="active" href="index.html">Início</a>
                 <a href="linhas.html">Linhas de Ônibus</a>
                 <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
                 <a href="planos-operacionais.html" id="nav-planos-link">Planos Operacionais (Rio)</a>
@@ -96,23 +95,51 @@
                 </div>
             </div>
 
-            <!-- Moldura do Smartphone com Captura Real do App -->
+            <!-- Moldura do Smartphone com Slider Automático de Todos os Prints -->
             <div class="hero-visual">
-                <div class="phone-mockup-wrapper">
-                    <!-- Badges flutuantes no mockup -->
-                    <div class="floating-badge badge-top-right">
-                        <div class="badge-icon"><i class="fa-solid fa-bus"></i></div>
-                        <span>GPS em Tempo Real</span>
-                    </div>
-
-                    <div class="floating-badge badge-bottom-left">
-                        <div class="badge-icon"><i class="fa-solid fa-bell"></i></div>
-                        <span>Alerta de Chegada</span>
-                    </div>
-
+                <div class="phone-mockup-wrapper" id="hero-phone-mockup">
                     <div class="phone-frame">
                         <div class="phone-screen">
-                            <img src="img/screen-1.webp" alt="Tela do aplicativo Cadê o Ônibus em tempo real" />
+                            <div class="phone-screen-slider" id="phone-slider">
+                                <div class="phone-screen-slide active">
+                                    <img src="img/screen-1.webp" alt="Tela 1 do aplicativo Cadê o Ônibus" />
+                                </div>
+                                <div class="phone-screen-slide">
+                                    <img src="img/screen-2.webp" alt="Tela 2 do aplicativo Cadê o Ônibus" />
+                                </div>
+                                <div class="phone-screen-slide">
+                                    <img src="img/screen-3.webp" alt="Tela 3 do aplicativo Cadê o Ônibus" />
+                                </div>
+                                <div class="phone-screen-slide">
+                                    <img src="img/screen-4.webp" alt="Tela 4 do aplicativo Cadê o Ônibus" />
+                                </div>
+                                <div class="phone-screen-slide">
+                                    <img src="img/screen-5.webp" alt="Tela 5 do aplicativo Cadê o Ônibus" />
+                                </div>
+                                <div class="phone-screen-slide">
+                                    <img src="img/screen-6.webp" alt="Tela 6 do aplicativo Cadê o Ônibus" />
+                                </div>
+                                <div class="phone-screen-slide">
+                                    <img src="img/screen-7.webp" alt="Tela 7 do aplicativo Cadê o Ônibus" />
+                                </div>
+                                <div class="phone-screen-slide">
+                                    <img src="img/screen-8.webp" alt="Tela 8 do aplicativo Cadê o Ônibus" />
+                                </div>
+                            </div>
+
+                            <!-- Controles / Indicador de Slides -->
+                            <div class="phone-slider-controls">
+                                <div class="phone-slider-pill" id="slider-dots-container">
+                                    <button class="phone-slider-dot active" data-slide="0" aria-label="Slide 1"></button>
+                                    <button class="phone-slider-dot" data-slide="1" aria-label="Slide 2"></button>
+                                    <button class="phone-slider-dot" data-slide="2" aria-label="Slide 3"></button>
+                                    <button class="phone-slider-dot" data-slide="3" aria-label="Slide 4"></button>
+                                    <button class="phone-slider-dot" data-slide="4" aria-label="Slide 5"></button>
+                                    <button class="phone-slider-dot" data-slide="5" aria-label="Slide 6"></button>
+                                    <button class="phone-slider-dot" data-slide="6" aria-label="Slide 7"></button>
+                                    <button class="phone-slider-dot" data-slide="7" aria-label="Slide 8"></button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -178,57 +205,6 @@
             </div>
         </div>
     </section>
-
-    <!-- Vitrine Visual / Screenshots do Aplicativo -->
-    <div class="showcase-strip-wrap">
-        <div class="section-head" style="margin-bottom: 36px;">
-            <span class="section-eyebrow">Conheça as Telas</span>
-            <h2>Design Moderno & Intuitivo</h2>
-            <p>Interface limpa, moderna e pensada para quem precisa de respostas rápidas na rua.</p>
-        </div>
-
-        <div class="showcase-cards-grid">
-            <div class="showcase-item">
-                <div class="showcase-item-img">
-                    <img src="img/screen-2.webp" alt="Visualização de mapa e rotas" loading="lazy" />
-                </div>
-                <div class="showcase-item-text">
-                    <h4>Mapa Interativo</h4>
-                    <p>Posicionamento em tempo real dos veículos da linha selecionada.</p>
-                </div>
-            </div>
-
-            <div class="showcase-item">
-                <div class="showcase-item-img">
-                    <img src="img/screen-3.webp" alt="Catálogo de linhas de ônibus" loading="lazy" />
-                </div>
-                <div class="showcase-item-text">
-                    <h4>Consulta de Linhas</h4>
-                    <p>Busca instantânea por número ou nome com filtros rápidos.</p>
-                </div>
-            </div>
-
-            <div class="showcase-item">
-                <div class="showcase-item-img">
-                    <img src="img/screen-4.webp" alt="Detalhes do trajeto e paradas" loading="lazy" />
-                </div>
-                <div class="showcase-item-text">
-                    <h4>Pontos e Paradas</h4>
-                    <p>Todos os pontos do trajeto mapeados detalhadamente.</p>
-                </div>
-            </div>
-
-            <div class="showcase-item">
-                <div class="showcase-item-img">
-                    <img src="img/screen-5.webp" alt="Alertas e avisos em tempo real" loading="lazy" />
-                </div>
-                <div class="showcase-item-text">
-                    <h4>Alertas e Notificações</h4>
-                    <p>Avisos na tela para você sair no momento exato.</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Seção de Estados e Cidades Atendidas (Idêntico ao App Flutter) -->
     <section class="coverage-section">
@@ -323,6 +299,69 @@
             });
         }
 
+        // Slider automático do mockup do smartphone
+        function setupPhoneSlider() {
+            const slides = document.querySelectorAll('.phone-screen-slide');
+            const dots = document.querySelectorAll('.phone-slider-dot');
+            const mockup = document.getElementById('hero-phone-mockup');
+            if (slides.length === 0) return;
+
+            let currentIdx = 0;
+            let timer = null;
+
+            function goToSlide(idx) {
+                currentIdx = (idx + slides.length) % slides.length;
+                slides.forEach((s, i) => {
+                    if (i === currentIdx) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+                dots.forEach((d, i) => {
+                    if (i === currentIdx) {
+                        d.classList.add('active');
+                    } else {
+                        d.classList.remove('active');
+                    }
+                });
+            }
+
+            function startTimer() {
+                if (timer) clearInterval(timer);
+                timer = setInterval(() => {
+                    goToSlide(currentIdx + 1);
+                }, 3500); // 3.5 segundos por slide
+            }
+
+            function stopTimer() {
+                if (timer) clearInterval(timer);
+            }
+
+            dots.forEach(dot => {
+                dot.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(dot.getAttribute('data-slide'), 10);
+                    if (!isNaN(idx)) {
+                        goToSlide(idx);
+                        startTimer();
+                    }
+                });
+            });
+
+            if (mockup) {
+                mockup.addEventListener('mouseenter', stopTimer);
+                mockup.addEventListener('mouseleave', startTimer);
+                // Toque em dispositivos mobile avança
+                mockup.addEventListener('click', () => {
+                    goToSlide(currentIdx + 1);
+                    startTimer();
+                });
+            }
+
+            startTimer();
+        }
+
         // Atualiza a interface quando a região muda
         window.addEventListener('cobusao-region-changed', (e) => {
             const config = e.detail.config;
@@ -335,6 +374,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             renderHomeStateHubs();
+            setupPhoneSlider();
             const config = regionManager.getActiveConfig();
             const flagEl = document.getElementById('home-hero-flag');
             const cityEl = document.getElementById('home-current-city-name');
