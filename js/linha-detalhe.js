@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupMap();
   setupTabs();
   setupEventListeners();
+  startLiveTimeTicker();
   loadLineData(state.lineCode);
   loadAllCityLinesForSearch();
 });
@@ -808,6 +809,8 @@ function updateVehicleMarkersOnMap() {
   
   // A cor do ônibus é a cor oficial da linha
   const lineColor = state.lineInfo?.consortiumColor || '#1C83E4';
+  const textColor = getContrastColor(lineColor);
+  const badgeBg = textColor === '#000000' ? 'rgba(0, 0, 0, 0.14)' : 'rgba(255, 255, 255, 0.22)';
   const currentTrajeto = state.detailData?.trajetos?.[state.currentDirectionIdx] || {};
   const currentHeadsign = currentTrajeto.trip_headsign || 'Em operação';
 
@@ -821,7 +824,8 @@ function updateVehicleMarkersOnMap() {
 
     const speed = Math.round(vehicle.velocidade || 0);
     const bearing = parseFloat(vehicle.direcao) || 0;
-    const timeAgo = formatTimeAgo(vehicle.dataHora);
+    const speedInfo = getSpeedDetails(speed);
+    const timeInfo = getTimeAgoDetails(vehicle.dataHora);
     const dest = vehicle.trajeto || vehicle.sentido || currentHeadsign;
 
     let marker = state.vehicleMarkersMap.get(carId);
@@ -851,30 +855,48 @@ function updateVehicleMarkersOnMap() {
       state.vehicleMarkersMap.set(carId, marker);
     }
 
-    // Balão (Popup) idêntico ao app Flutter (sem botão colaborar)
+    // Balão (Popup) Compacto Idêntico ao app Flutter (sem botão colaborar)
     const popupHtml = `
       <div class="flutter-bus-popup">
         <div class="popup-top-banner" style="background: ${lineColor};">
-          <div class="popup-line-circle">${state.lineCode}</div>
-          <div class="popup-headsign">${dest}</div>
+          <div class="popup-line-circle" style="color: ${textColor}; background: ${badgeBg};">${state.lineCode}</div>
+          <div class="popup-headsign" style="color: ${textColor};">${dest}</div>
         </div>
         <div class="popup-body">
-          <div class="popup-pill-row">
-            <span class="popup-pill pill-car"><i class="fa-solid fa-bus"></i> ${carId}</span>
-            <span class="popup-pill pill-speed"><i class="fa-solid fa-gauge-high"></i> ${speed} km/h</span>
+          ${vehicle.isOnRoute === false && !state.isVirtualLine ? `
+            <div class="popup-out-of-route-badge">
+              <i class="fa-solid fa-triangle-exclamation"></i> Fora do itinerário
+            </div>
+          ` : ''}
+          <div class="popup-pills-row">
+            <span class="popup-pill pill-car" title="Número de ordem do carro">
+              <i class="fa-solid fa-bus"></i> ${carId}
+            </span>
+            <span class="popup-pill pill-speed" style="color: ${speedInfo.color}; background: ${speedInfo.bg};" title="Velocidade atual">
+              <i class="${speedInfo.icon}" style="color: ${speedInfo.color};"></i> ${speedInfo.text}
+            </span>
           </div>
-          <div class="popup-pill-row" style="justify-content: center; margin-top: 2px;">
-            <span class="popup-pill pill-time"><i class="fa-regular fa-clock"></i> ${timeAgo}</span>
+          <div class="popup-pills-row centered">
+            <span class="popup-pill pill-time" data-gps-time="${vehicle.dataHora}" style="color: ${timeInfo.color}; background: ${timeInfo.bg};" title="Último sinal GPS">
+              <i class="fa-regular fa-clock" style="color: ${timeInfo.color};"></i> <span class="live-seconds-text">${timeInfo.text}</span>
+            </span>
           </div>
         </div>
       </div>
     `;
 
-    marker.bindPopup(popupHtml, {
-      className: 'flutter-leaflet-popup',
-      closeButton: false,
-      offset: [0, -8]
-    });
+    if (marker.getPopup() && marker.isPopupOpen()) {
+      marker.setPopupContent(popupHtml);
+    } else {
+      marker.bindPopup(popupHtml, {
+        className: 'flutter-leaflet-popup',
+        closeButton: false,
+        offset: [0, -8],
+        maxWidth: 220,
+        minWidth: 165,
+        autoPanPadding: [15, 15]
+      });
+    }
   });
 
   // Remove veículos que não estão mais na rota ou no sentido
@@ -972,7 +994,7 @@ function renderActiveVehiclesTab() {
       <div class="vehicle-live-card">
         <div class="vehicle-live-info">
           <h4>Carro ${carId}</h4>
-          <p><i class="fa-solid fa-gauge-high"></i> ${speed} km/h &bull; <i class="fa-solid fa-clock"></i> ${timeAgo}</p>
+          <p><i class="fa-solid fa-gauge-high"></i> ${speed} km/h &bull; <span data-gps-time="${v.dataHora}"><i class="fa-solid fa-clock"></i> <span class="live-seconds-text">${timeAgo}</span></span></p>
           <p style="margin-top: 4px; font-size: 0.75rem; color: var(--primary); font-weight: 700;">
             <i class="fa-solid fa-location-arrow"></i> ${dest}
           </p>
@@ -1343,11 +1365,50 @@ function setupEventListeners() {
     });
   }
 
+  // Listeners do Modal de Colaboração
+  const btnCloseColab = document.getElementById('btn-close-colab-modal');
+  const colabModal = document.getElementById('colab-modal');
+  if (btnCloseColab) {
+    btnCloseColab.addEventListener('click', window.closeColaborarModal);
+  }
+  if (colabModal) {
+    colabModal.addEventListener('click', (e) => {
+      if (e.target === colabModal) {
+        window.closeColaborarModal();
+      }
+    });
+  }
+
   window.addEventListener('popstate', () => {
     initParamsFromUrl();
     loadLineData(state.lineCode);
   });
 }
+
+/**
+ * Funções Globais para o Modal de Colaboração
+ */
+window.openColaborarModal = function(carId, lineCode) {
+  const modal = document.getElementById('colab-modal');
+  const infoEl = document.getElementById('colab-modal-bus-info');
+  if (infoEl) {
+    const line = lineCode || state.lineCode || '';
+    const car = carId ? ` • Ônibus ${carId}` : '';
+    infoEl.textContent = `Linha ${line}${car}`;
+  }
+  if (modal) {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+};
+
+window.closeColaborarModal = function() {
+  const modal = document.getElementById('colab-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+};
 
 /**
  * Exibe tela de carregamento ou erro
@@ -1382,18 +1443,63 @@ function renderErrorState(msg) {
 }
 
 /**
- * Utilitário: Formata tempo relativo ("há 15 seg", "há 2 min")
+ * Utilitário: Formata tempo relativo dinamicamente com cores de frescor
+ */
+function getTimeAgoDetails(timestamp) {
+  if (!timestamp) return { text: 'há 0s', color: '#4ADE80', bg: 'rgba(34, 197, 94, 0.14)' };
+  const diffMs = Date.now() - Number(timestamp);
+  const diffSecs = Math.max(0, Math.floor(diffMs / 1000));
+
+  let text = 'há 0s';
+  if (diffSecs < 60) {
+    text = `há ${diffSecs}s`;
+  } else if (diffSecs < 3600) {
+    text = `há ${Math.floor(diffSecs / 60)}m`;
+  } else if (diffSecs < 86400) {
+    text = `há ${Math.floor(diffSecs / 3600)}h`;
+  } else {
+    text = `há ${Math.floor(diffSecs / 86400)}d`;
+  }
+
+  let color = '#4ADE80';
+  let bg = 'rgba(34, 197, 94, 0.14)';
+  if (diffSecs > 300) {
+    color = '#F87171';
+    bg = 'rgba(239, 68, 68, 0.14)';
+  } else if (diffSecs > 120) {
+    color = '#FBBF24';
+    bg = 'rgba(245, 158, 11, 0.14)';
+  }
+
+  return { text, color, bg };
+}
+
+/**
+ * Utilitário: Formata velocidade com ícones e status
+ */
+function getSpeedDetails(speed) {
+  const isStopped = !speed || speed <= 0;
+  if (isStopped) {
+    return {
+      text: 'Parado',
+      color: '#94A3B8',
+      bg: 'rgba(255, 255, 255, 0.08)',
+      icon: 'fa-solid fa-gauge-simple'
+    };
+  }
+  return {
+    text: `${speed} km/h`,
+    color: '#38BDF8',
+    bg: 'rgba(14, 165, 233, 0.14)',
+    icon: 'fa-solid fa-gauge-high'
+  };
+}
+
+/**
+ * Utilitário: Formata tempo relativo simples
  */
 function formatTimeAgo(timestamp) {
-  if (!timestamp) return 'Agora';
-  const diffMs = Date.now() - Number(timestamp);
-  const diffSecs = Math.floor(diffMs / 1000);
-
-  if (diffSecs < 10) return 'Agora mesmo';
-  if (diffSecs < 60) return `Há ${diffSecs} seg`;
-  const diffMins = Math.floor(diffSecs / 60);
-  if (diffMins < 60) return `Há ${diffMins} min`;
-  return 'Há mais de 1h';
+  return getTimeAgoDetails(timestamp).text;
 }
 
 /**
@@ -1408,4 +1514,33 @@ function getContrastColor(hexColor) {
   const b = parseInt(c.substr(4, 2), 16);
   const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
   return (yiq >= 150) ? '#000000' : '#ffffff';
+}
+
+let liveTimeTickerInterval = null;
+
+/**
+ * Ticker em tempo real: atualiza os segundos de transmissão GPS a cada 1 segundo
+ */
+function startLiveTimeTicker() {
+  if (liveTimeTickerInterval) clearInterval(liveTimeTickerInterval);
+  liveTimeTickerInterval = setInterval(() => {
+    const elements = document.querySelectorAll('[data-gps-time]');
+    if (!elements || elements.length === 0) return;
+
+    elements.forEach(el => {
+      const ts = Number(el.getAttribute('data-gps-time'));
+      if (!ts) return;
+      const timeInfo = getTimeAgoDetails(ts);
+      const textEl = el.querySelector('.live-seconds-text');
+      if (textEl) {
+        textEl.textContent = timeInfo.text;
+      }
+      if (el.classList.contains('pill-time')) {
+        el.style.color = timeInfo.color;
+        el.style.background = timeInfo.bg;
+        const icon = el.querySelector('i');
+        if (icon) icon.style.color = timeInfo.color;
+      }
+    });
+  }, 1000);
 }

@@ -147,24 +147,6 @@
                         <i class="fa-solid fa-expand"></i>
                     </button>
                 </div>
-
-                <!-- Legenda Sobreposta -->
-                <div class="map-legend-overlay">
-                    <div class="legend-item">
-                        <span class="legend-color-bar" style="background: var(--primary);"></span>
-                        <span>Trajeto</span>
-                    </div>
-                    <div class="legend-item">
-                        <span
-                            style="width: 10px; height: 10px; border-radius: 50%; background: #2563eb; border: 2px solid #fff; display: inline-block;"></span>
-                        <span>Ao Vivo</span>
-                    </div>
-                    <div class="legend-item">
-                        <span
-                            style="width: 8px; height: 8px; border-radius: 50%; background: #fff; border: 2px solid #4b5563; display: inline-block;"></span>
-                        <span>Paradas</span>
-                    </div>
-                </div>
             </section>
 
             <!-- Abas de Informações Abaixo do Mapa -->
@@ -248,6 +230,56 @@
             <div class="copyright">© 2026 Cadê o Ônibus? (Guialshy). Todos os direitos reservados.</div>
         </div>
     </footer>
+
+    <!-- Modal de Colaboração (Idêntico ao app Cadê o Ônibus?) -->
+    <div class="colab-modal-backdrop" id="colab-modal" style="display: none;">
+        <div class="colab-modal-card">
+            <div class="colab-modal-header">
+                <div class="colab-modal-icon-badge">
+                    <svg viewBox="0 0 24 24" class="colab-svg-icon" fill="currentColor">
+                        <path d="M9 9m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
+                        <path d="M9 15c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        <path d="M16.76 5.34a6 6 0 0 1 0 8.49l1.42 1.42a8 8 0 0 0 0-11.33l-1.42 1.42zm2.83-2.83a10 10 0 0 1 0 14.14l1.42 1.42a12 12 0 0 0 0-16.98l-1.42 1.42z"/>
+                    </svg>
+                </div>
+                <div class="colab-modal-title-wrap">
+                    <h3>Colaborar em Tempo Real</h3>
+                    <p id="colab-modal-bus-info">Linha &bull; Ônibus</p>
+                </div>
+                <button type="button" class="colab-modal-close" id="btn-close-colab-modal" aria-label="Fechar">&times;</button>
+            </div>
+            <div class="colab-modal-body">
+                <p class="colab-desc">
+                    Você é os olhos do <strong>Cadê o Ônibus?</strong>! No aplicativo móvel, você pode colaborar em tempo real informando:
+                </p>
+                <div class="colab-features-list">
+                    <div class="colab-feature-item">
+                        <div class="colab-feature-icon" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div class="colab-feature-text">
+                            <strong>Lotação do Ônibus</strong>
+                            <span>Vazio, Normal ou Cheio</span>
+                        </div>
+                    </div>
+                    <div class="colab-feature-item">
+                        <div class="colab-feature-icon" style="background: rgba(96, 165, 250, 0.15); color: #60a5fa;">
+                            <i class="fa-solid fa-snowflake"></i>
+                        </div>
+                        <div class="colab-feature-text">
+                            <strong>Ar-Condicionado</strong>
+                            <span>Funcionando ou Desligado</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="colab-modal-actions">
+                    <a class="btn-primary" style="width: 100%; justify-content: center; padding: 14px;" href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" target="_blank" rel="noopener">
+                        <i class="fa-brands fa-google-play"></i> Baixar App Grátis no Google Play
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Leaflet JS & Socket.IO -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

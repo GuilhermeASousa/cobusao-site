@@ -686,30 +686,6 @@
   transform: scale(1.05);
 }
 
-.map-legend-overlay {
-  position: absolute;
-  bottom: 16px;
-  left: 16px;
-  z-index: 800;
-  background: rgba(26, 28, 30, 0.85);
-  backdrop-filter: blur(8px);
-  color: #ffffff;
-  padding: 8px 14px;
-  border-radius: 10px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
 /* ==========================================================================
    Marcador de Ônibus (Seta Direcional Oficial Flutter)
    ========================================================================== */
@@ -769,18 +745,332 @@
   background: #FFFFFF;
 }
 
-/* Popups Leaflet */
-.leaflet-popup-content-wrapper {
+/* ==========================================================================
+   Popups Leaflet & Balão de Ônibus Oficial (Compacto e Idêntico ao Flutter)
+   ========================================================================== */
+.leaflet-popup.flutter-leaflet-popup {
+  margin-bottom: 6px;
+}
+
+.flutter-leaflet-popup .leaflet-popup-content-wrapper {
+  background: #1E2228 !important;
+  color: #FFFFFF !important;
+  border-radius: 12px !important;
+  padding: 0 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  overflow: hidden !important;
+  font-family: var(--font-family) !important;
+}
+
+.flutter-leaflet-popup .leaflet-popup-content {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: normal !important;
+  min-width: 165px !important;
+  max-width: 215px !important;
+}
+
+.flutter-leaflet-popup .leaflet-popup-tip-container {
+  overflow: visible;
+  height: 8px;
+}
+
+.flutter-leaflet-popup .leaflet-popup-tip {
+  background: #1E2228 !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4) !important;
+  width: 10px;
+  height: 10px;
+  margin: -5px auto 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Card Popup Container */
+.flutter-bus-popup {
+  display: flex;
+  flex-direction: column;
+  background: #1E2228;
+  border-radius: 12px;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Top Banner Header */
+.popup-top-banner {
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.popup-line-circle {
+  background: rgba(255, 255, 255, 0.22);
+  color: #FFFFFF;
+  font-weight: 900;
+  font-size: 0.85rem;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: -0.3px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.popup-headsign {
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 0.82rem;
+  line-height: 1.15;
+  text-align: center;
+  flex: 1;
+  word-break: break-word;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Card Body */
+.popup-body {
+  padding: 7px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  background: #1E2228;
+}
+
+.popup-pills-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.popup-pills-row.centered {
+  justify-content: center;
+}
+
+.popup-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 14px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.popup-pill.pill-car {
+  background: rgba(255, 255, 255, 0.08);
+  color: #E2E8F0;
+}
+
+.popup-pill.pill-car i {
+  color: #94A3B8;
+  font-size: 0.72rem;
+}
+
+.popup-pill.pill-speed {
+  background: rgba(14, 165, 233, 0.14);
+  color: #38BDF8;
+}
+
+.popup-pill.pill-speed i {
+  color: #38BDF8;
+  font-size: 0.72rem;
+}
+
+.popup-pill.pill-time {
+  background: rgba(34, 197, 94, 0.14);
+  color: #4ADE80;
+  font-size: 0.74rem;
+  padding: 2px 9px;
+}
+
+.popup-pill.pill-time i {
+  color: #4ADE80;
+  font-size: 0.72rem;
+}
+
+.popup-out-of-route-badge {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #F59E0B;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Modal de Colaboração */
+.colab-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.colab-modal-card {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.colab-modal-header {
+  padding: 20px 22px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--surface-border);
+  position: relative;
+}
+
+.colab-modal-icon-badge {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: rgba(0, 90, 156, 0.15);
+  color: #0084FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.colab-modal-title-wrap {
+  flex: 1;
+}
+
+.colab-modal-title-wrap h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text);
+}
+
+.colab-modal-title-wrap p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 2px 0 0;
+  font-weight: 600;
+}
+
+.colab-modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.6rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.colab-modal-close:hover {
+  color: var(--text);
+}
+
+.colab-modal-body {
+  padding: 20px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.colab-desc {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text);
+  margin: 0;
+}
+
+.colab-features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.colab-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface-alt, rgba(255, 255, 255, 0.04));
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--surface-border);
+}
+
+.colab-feature-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.colab-feature-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.colab-feature-text strong {
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.colab-feature-text span {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.colab-modal-actions {
+  margin-top: 6px;
+}
+
+/* Default Popups Leaflet (para paradas e outros pontos) */
+.leaflet-popup:not(.flutter-leaflet-popup) .leaflet-popup-content-wrapper {
   background: var(--surface) !important;
   color: var(--text) !important;
   border-radius: 14px !important;
   padding: 6px !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
   border: 1px solid var(--surface-border);
   font-family: var(--font-family) !important;
 }
 
-.leaflet-popup-tip {
+.leaflet-popup:not(.flutter-leaflet-popup) .leaflet-popup-tip {
   background: var(--surface) !important;
 }
 
