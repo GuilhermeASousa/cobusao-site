@@ -9,6 +9,7 @@ import {
   STATE_HUBS,
   CDN_BASE_URL,
   BACKEND_BASE_URL,
+  SOCKET_BASE_URL,
   getCityConfig,
   normalizeCitySlug
 } from './cities-config.js';
@@ -204,13 +205,64 @@ function setupMap() {
   });
 }
 
+// Cliente Socket.IO global
+let socketClient = null;
+
 /**
- * Carrega os dados de uma linha específica (itinerário, paradas, horários)
+ * Calcula a menor distância perpendicular (em metros) de um ponto (lat, lon) à polyline do trajeto
  */
-export async function loadLineData(lineCodeToLoad) {
+function minDistanceToPolyline(lat, lon, polylinePts) {
+  if (!polylinePts || polylinePts.length === 0) return 0;
+  
+  let minDist = Infinity;
+  const cosLat = Math.cos(lat * Math.PI / 180);
+  const px = lon * 111320 * cosLat;
+  const py = lat * 110540;
+
+  for (let i = 0; i < polylinePts.length - 1; i++) {
+    const p1 = polylinePts[i];
+    const p2 = polylinePts[i + 1];
+
+    const x1 = p1.lon * 111320 * cosLat;
+    const y1 = p1.lat * 110540;
+    const x2 = p2.lon * 111320 * cosLat;
+    const y2 = p2.lat * 110540;
+
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const lenSq = dx * dx + dy * dy;
+
+    let dist;
+    if (lenSq === 0) {
+      dist = Math.hypot(px - x1, py - y1);
+    } else {
+      const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / lenSq));
+      const projX = x1 + t * dx;
+      const projY = y1 + t * dy;
+      dist = Math.hypot(px - projX, py - projY);
+    }
+
+    if (dist < minDist) {
+      minDist = dist;
+      if (minDist <= 30) break; // Sai cedo se estiver muito perto
+    }
+  }
+
+  return minDist;
+}
+
+/**
+ * Carrega os dados de uma linha específica (itinerário, paradas, horários) com suporte a busca multi-subsistema
+ */
+export async function loadLineData(lineCodeToLoad, targetCitySlug) {
   state.lineCode = (lineCodeToLoad || state.lineCode).trim();
   state.currentDirectionIdx = 0;
   state.vehicleMarkersMap.clear();
+
+  if (targetCitySlug && CITIES_CONFIG[targetCitySlug]) {
+    state.citySlug = targetCitySlug;
+    state.cityConfig = CITIES_CONFIG[targetCitySlug];
+  }
 
   if (state.vehiclesLayer) state.vehiclesLayer.clearLayers();
   if (state.routeLayer) state.routeLayer.clearLayers();
@@ -226,50 +278,60 @@ export async function loadLineData(lineCodeToLoad) {
   window.history.replaceState({}, '', currentUrl);
 
   try {
-    // 1. Busca line_info para metadados
+    // 1. Determina as subcidades candidatas no polo regional
+    const normHub = normalizeCitySlug(state.citySlug);
+    const hub = STATE_HUBS.find(h => h.key === normHub) || { citiesKeys: [state.citySlug] };
+    const searchCities = [state.citySlug, ...(hub.citiesKeys || []).filter(k => k !== state.citySlug)];
+
+    let foundCitySlug = state.citySlug;
+    let detailData = null;
     let info = state.allCityLines[state.lineCode] || null;
-    if (!info) {
+
+    // Tenta carregar o trajeto na cidade atual ou nas outras subcidades do polo
+    for (const cityCandidate of searchCities) {
+      const detailUrl = `${CDN_BASE_URL}/${cityCandidate}/detalhes/${encodeURIComponent(state.lineCode)}.json`;
       try {
-        const resInfo = await fetch(`${CDN_BASE_URL}/${state.citySlug}/line_info.json`);
-        if (resInfo.ok) {
-          state.allCityLines = await resInfo.json();
-          info = findLineInfoCanonical(state.lineCode, state.allCityLines);
+        let resDetail = await fetch(detailUrl);
+        if (!resDetail.ok) {
+          const upperUrl = `${CDN_BASE_URL}/${cityCandidate}/detalhes/${encodeURIComponent(state.lineCode.toUpperCase())}.json`;
+          resDetail = await fetch(upperUrl);
         }
-      } catch (e) {
-        console.warn('Erro ao buscar line_info:', e);
-      }
+        if (resDetail.ok) {
+          detailData = await resDetail.json();
+          foundCitySlug = cityCandidate;
+          break;
+        }
+      } catch (e) {}
     }
 
+    if (!detailData) {
+      throw new Error(`Não encontramos o trajeto digitalizado para a linha ${state.lineCode} na região de ${state.cityConfig.stateFullName || state.cityConfig.name}.`);
+    }
+
+    state.citySlug = foundCitySlug;
+    state.cityConfig = CITIES_CONFIG[foundCitySlug] || getCityConfig(foundCitySlug);
+    state.detailData = detailData;
+
+    // Atualiza metadados
+    if (!info) {
+      info = state.allCityLines[state.lineCode];
+    }
     state.lineInfo = info || {
       description: `Linha ${state.lineCode}`,
-      consortiumName: 'Municipal',
+      consortiumName: state.cityConfig.name,
       consortiumColor: '#1C83E4',
       price: state.cityConfig.fare
     };
 
-    // 2. Busca o JSON detalhado do trajeto
-    const detailUrl = `${CDN_BASE_URL}/${state.citySlug}/detalhes/${encodeURIComponent(state.lineCode)}.json`;
-    let resDetail = await fetch(detailUrl);
-
-    if (!resDetail.ok) {
-      const upperUrl = `${CDN_BASE_URL}/${state.citySlug}/detalhes/${encodeURIComponent(state.lineCode.toUpperCase())}.json`;
-      resDetail = await fetch(upperUrl);
-    }
-
-    if (!resDetail.ok) {
-      throw new Error(`Arquivo de trajeto não encontrado para a linha ${state.lineCode} (${resDetail.status})`);
-    }
-
-    const detailData = await resDetail.json();
-    state.detailData = detailData;
-
+    updateBreadcrumbs();
     renderLineHeader();
     renderDirectionSwitcher();
     drawRouteAndStops();
     renderStopsTimeline();
     renderSchedulesTab();
 
-    // Inicia rastreamento ao vivo com polling de 15 segundos
+    // Inicia rastreamento ao vivo com Socket.IO e Polling HTTP
+    initSocketConnection();
     startRealtimeVehicleTracking();
 
   } catch (err) {
@@ -345,7 +407,7 @@ function renderLineHeader() {
 }
 
 /**
- * Renderiza o Seletor de Sentidos (Ida / Volta) com espaçamento correto lado a lado
+ * Renderiza o Seletor de Sentidos (Ida / Volta) com contagem precisa de paradas daquele sentido
  */
 function renderDirectionSwitcher() {
   const container = document.getElementById('direction-switcher');
@@ -354,7 +416,17 @@ function renderDirectionSwitcher() {
   const trajetos = state.detailData.trajetos;
   if (trajetos.length <= 1) {
     const headsign = trajetos[0]?.trip_headsign || 'Itinerário Completo';
-    const stopsCount = trajetos[0]?.paradas?.length || 0;
+    const pts = trajetos[0]?.trajeto || [];
+    const allStops = trajetos[0]?.paradas || [];
+    const validStops = allStops.filter(p => {
+      const lat = p.position?.lat || p.lat;
+      const lon = p.position?.lon || p.lon;
+      if (!lat || !lon) return false;
+      if (pts.length > 1) return minDistanceToPolyline(lat, lon, pts) <= 150;
+      return true;
+    });
+    const stopsCount = validStops.length > 0 ? validStops.length : allStops.length;
+
     container.innerHTML = `
       <div class="direction-btn active" style="cursor: default;">
         <span><i class="fa-solid fa-route"></i> Sentido: <strong>${headsign}</strong></span>
@@ -367,7 +439,16 @@ function renderDirectionSwitcher() {
   container.innerHTML = trajetos.map((t, idx) => {
     const isActive = idx === state.currentDirectionIdx;
     const headsign = t.trip_headsign || `Sentido ${idx + 1}`;
-    const stopsCount = t.paradas?.length || 0;
+    const pts = t.trajeto || [];
+    const allStops = t.paradas || [];
+    const validStops = allStops.filter(p => {
+      const lat = p.position?.lat || p.lat;
+      const lon = p.position?.lon || p.lon;
+      if (!lat || !lon) return false;
+      if (pts.length > 1) return minDistanceToPolyline(lat, lon, pts) <= 150;
+      return true;
+    });
+    const stopsCount = validStops.length > 0 ? validStops.length : allStops.length;
 
     return `
       <button class="direction-btn ${isActive ? 'active' : ''}" data-idx="${idx}">
@@ -395,7 +476,7 @@ function renderDirectionSwitcher() {
 }
 
 /**
- * Desenha a Polyline do Trajeto e os Marcadores de Paradas
+ * Desenha a Polyline do Trajeto e os Marcadores de Paradas (filtrando rigorosamente apenas paradas no sentido ativo)
  */
 function drawRouteAndStops() {
   if (!state.map || !state.detailData || !state.detailData.trajetos) return;
@@ -430,12 +511,21 @@ function drawRouteAndStops() {
     lineCap: 'round'
   }).addTo(state.routeLayer);
 
-  // 3. Renderiza Paradas Circulares (Idênticas ao BusStopMarkerIcon do Flutter)
-  const paradas = currentTrajeto.paradas || [];
+  // 3. Renderiza Paradas Circulares filtradas por proximidade do trajeto ativo (<= 150m)
+  const allParadas = currentTrajeto.paradas || [];
+  const paradas = allParadas.filter(parada => {
+    const lat = parada.position?.lat || parada.lat;
+    const lon = parada.position?.lon || parada.lon;
+    if (!lat || !lon) return false;
+    if (pts.length > 1) {
+      return minDistanceToPolyline(lat, lon, pts) <= 150;
+    }
+    return true;
+  });
+
   paradas.forEach((parada, index) => {
     const lat = parada.position?.lat || parada.lat;
     const lon = parada.position?.lon || parada.lon;
-    if (!lat || !lon) return;
 
     const stopIcon = L.divIcon({
       className: 'custom-stop-div-icon',
@@ -484,6 +574,64 @@ function drawRouteAndStops() {
 }
 
 /**
+ * Conexão Socket.IO em Tempo Real (igual ao app Flutter)
+ */
+function initSocketConnection() {
+  if (typeof io === 'undefined') return;
+
+  if (!socketClient) {
+    try {
+      socketClient = io(SOCKET_BASE_URL, {
+        transports: ['websocket', 'polling'],
+        reconnection: true,
+        reconnectionDelay: 2000
+      });
+
+      socketClient.on('connect', () => {
+        subscribeLineOnSocket();
+      });
+
+      socketClient.on('vehicle_update', (data) => {
+        handleSocketVehicleUpdate(data);
+      });
+
+      socketClient.on('vehicles_update', (data) => {
+        handleSocketVehicleUpdate(data);
+      });
+
+      socketClient.on('vehicle_delta', (data) => {
+        handleSocketVehicleUpdate(data);
+      });
+    } catch (e) {
+      console.warn('[Socket] Erro ao conectar:', e);
+    }
+  } else if (socketClient.connected) {
+    subscribeLineOnSocket();
+  }
+}
+
+function subscribeLineOnSocket() {
+  if (!socketClient || !socketClient.connected) return;
+  const parentHub = normalizeCitySlug(state.citySlug);
+  socketClient.emit('subscribe', {
+    city: parentHub,
+    lines: [state.lineCode]
+  });
+}
+
+function handleSocketVehicleUpdate(data) {
+  if (!data) return;
+  const list = Array.isArray(data) ? data : (data.vehicles || [data]);
+  const matching = list.filter(v => v.linha === state.lineCode || v.linhaOriginal === state.lineCode);
+  if (matching.length > 0) {
+    const map = new Map(state.vehicles.map(v => [v.codigo || v.vehicleId, v]));
+    matching.forEach(v => map.set(v.codigo || v.vehicleId, v));
+    state.vehicles = Array.from(map.values());
+    filterVehiclesByCurrentDirection();
+  }
+}
+
+/**
  * Rastreamento de Ônibus em Tempo Real (Polling automático a cada 15s)
  */
 function startRealtimeVehicleTracking() {
@@ -503,7 +651,8 @@ async function fetchRealtimeVehicles() {
   state.isFetchingVehicles = true;
 
   try {
-    const url = `${BACKEND_BASE_URL}/vehicles?city=${state.citySlug}&lines=${encodeURIComponent(state.lineCode)}`;
+    const parentHub = normalizeCitySlug(state.citySlug);
+    const url = `${BACKEND_BASE_URL}/vehicles?city=${parentHub}&lines=${encodeURIComponent(state.lineCode)}`;
     const res = await fetch(url, {
       headers: {
         'Accept': 'application/json'
@@ -780,7 +929,7 @@ function renderActiveVehiclesTab() {
 }
 
 /**
- * Renderiza Linha do Tempo de Paradas / Itinerário
+ * Renderiza Linha do Tempo de Paradas / Itinerário (filtradas no sentido ativo)
  */
 function renderStopsTimeline() {
   const container = document.getElementById('stops-list-container');
@@ -788,7 +937,19 @@ function renderStopsTimeline() {
   if (!container || !state.detailData || !state.detailData.trajetos) return;
 
   const currentTrajeto = state.detailData.trajetos[state.currentDirectionIdx] || state.detailData.trajetos[0];
-  const paradas = currentTrajeto?.paradas || [];
+  const allParadas = currentTrajeto?.paradas || [];
+  const pts = currentTrajeto?.trajeto || [];
+
+  // Filtra paradas para garantir que pertencem ao itinerário deste sentido (distância máx 150m)
+  const paradas = allParadas.filter(parada => {
+    const lat = parada.position?.lat || parada.lat;
+    const lon = parada.position?.lon || parada.lon;
+    if (!lat || !lon) return false;
+    if (pts.length > 1) {
+      return minDistanceToPolyline(lat, lon, pts) <= 150;
+    }
+    return true;
+  });
 
   if (countEl) countEl.textContent = `(${paradas.length})`;
 
@@ -865,23 +1026,11 @@ function renderSchedulesTab() {
   if (!container) return;
 
   const rawHorarios = state.detailData?.horarios;
-  if (!rawHorarios || Object.keys(rawHorarios).length === 0) {
-    container.innerHTML = `
-      <div style="text-align: center; padding: 48px 20px; background: var(--line-card-bg); border-radius: 16px; border: 1px solid var(--surface-border);">
-        <div style="font-size: 2.2rem; margin-bottom: 12px;">📅</div>
-        <h4 style="font-size: 1.15rem; margin-bottom: 6px;">Quadro de Horários Estimado</h4>
-        <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 16px;">
-          Esta linha opera com frequência contínua baseada em intervalos no transporte público de ${state.cityConfig.name}. Acompanhe os ônibus no mapa acima para saber o momento exato de chegada.
-        </p>
-      </div>
-    `;
-    return;
-  }
-
+  
   const dirKey = String(state.currentDirectionIdx);
   let departuresList = [];
 
-  for (const tripData of Object.values(rawHorarios)) {
+  for (const tripData of Object.values(rawHorarios || {})) {
     if (typeof tripData === 'object' && tripData !== null) {
       const dirData = tripData[dirKey] || tripData['0'] || tripData['1'];
       if (dirData && dirData[state.activeScheduleDay]) {
@@ -892,7 +1041,7 @@ function renderSchedulesTab() {
   }
 
   if (!departuresList || departuresList.length === 0) {
-    for (const tripData of Object.values(rawHorarios)) {
+    for (const tripData of Object.values(rawHorarios || {})) {
       if (typeof tripData === 'object' && tripData !== null) {
         for (const dirObj of Object.values(tripData)) {
           if (dirObj && Array.isArray(dirObj[state.activeScheduleDay]) && dirObj[state.activeScheduleDay].length > 0) {
@@ -905,68 +1054,64 @@ function renderSchedulesTab() {
     }
   }
 
-  const hoursMap = {};
-  (departuresList || []).forEach(timeStr => {
-    if (!timeStr) return;
-    const parts = timeStr.split(':');
-    const hour = parts[0] ? `${parts[0].padStart(2, '0')}h` : '00h';
-    const min = parts[1] || '00';
-    if (!hoursMap[hour]) hoursMap[hour] = [];
-    hoursMap[hour].push(min);
-  });
-
-  const sortedHours = Object.keys(hoursMap).sort();
-  const totalDepartures = departuresList ? departuresList.length : 0;
-
-  const currentTrajeto = state.detailData?.trajetos?.[state.currentDirectionIdx];
-  const headsign = currentTrajeto?.trip_headsign || 'Itinerário';
+  const dayLabels = {
+    weekday: 'Dias Úteis',
+    saturday: 'Sábados',
+    sunday: 'Domingos e Feriados'
+  };
 
   let html = `
-    <div class="schedule-container">
-      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 20px;">
-        <div>
-          <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text); margin-bottom: 4px;">
-            Partidas Programadas — Sentido ${headsign}
-          </h3>
-          <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0;">
-            Total de <strong>${totalDepartures} partidas registradas</strong> no planejamento operacional.
-          </p>
-        </div>
-
-        <div class="schedule-day-tabs">
-          <button class="schedule-day-btn ${state.activeScheduleDay === 'weekday' ? 'active' : ''}" data-day="weekday">
-            <i class="fa-solid fa-calendar-day"></i> Dias Úteis
-          </button>
-          <button class="schedule-day-btn ${state.activeScheduleDay === 'saturday' ? 'active' : ''}" data-day="saturday">
-            <i class="fa-solid fa-calendar-check"></i> Sábado
-          </button>
-          <button class="schedule-day-btn ${state.activeScheduleDay === 'sunday' ? 'active' : ''}" data-day="sunday">
-            <i class="fa-solid fa-umbrella-beach"></i> Domingo e Feriados
-          </button>
-        </div>
+    <div class="schedule-tab-header">
+      <div class="schedule-day-switcher">
+        <button class="schedule-day-btn ${state.activeScheduleDay === 'weekday' ? 'active' : ''}" data-day="weekday">Dias Úteis</button>
+        <button class="schedule-day-btn ${state.activeScheduleDay === 'saturday' ? 'active' : ''}" data-day="saturday">Sábados</button>
+        <button class="schedule-day-btn ${state.activeScheduleDay === 'sunday' ? 'active' : ''}" data-day="sunday">Domingos/Feriados</button>
       </div>
+    </div>
+    <div class="schedule-body">
   `;
 
-  if (sortedHours.length === 0) {
+  if (!departuresList || departuresList.length === 0) {
     html += `
       <div style="text-align: center; padding: 40px; color: var(--text-muted);">
         Nenhum horário programado para este dia da semana neste sentido.
       </div>
     `;
   } else {
-    html += `<div class="schedule-grid-hours">`;
-    sortedHours.forEach(hour => {
-      const minutes = hoursMap[hour];
+    const hoursMap = {};
+    departuresList.forEach(timeStr => {
+      const parts = timeStr.split(':');
+      if (parts.length >= 2) {
+        const hour = `${parts[0]}h`;
+        const min = parts[1];
+        if (!hoursMap[hour]) hoursMap[hour] = [];
+        hoursMap[hour].push(min);
+      }
+    });
+
+    const sortedHours = Object.keys(hoursMap).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+
+    if (sortedHours.length === 0) {
       html += `
-        <div class="schedule-hour-card">
-          <div class="schedule-hour-badge">${hour}</div>
-          <div class="schedule-departures-list">
-            ${minutes.map(m => `<span class="departure-chip">${hour.replace('h', '')}:${m}</span>`).join('')}
-          </div>
+        <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+          Nenhum horário programado para este dia da semana neste sentido.
         </div>
       `;
-    });
-    html += `</div>`;
+    } else {
+      html += `<div class="schedule-grid-hours">`;
+      sortedHours.forEach(hour => {
+        const minutes = hoursMap[hour];
+        html += `
+          <div class="schedule-hour-card">
+            <div class="schedule-hour-badge">${hour}</div>
+            <div class="schedule-departures-list">
+              ${minutes.map(m => `<span class="departure-chip">${hour.replace('h', '')}:${m}</span>`).join('')}
+            </div>
+          </div>
+        `;
+      });
+      html += `</div>`;
+    }
   }
 
   html += `</div>`;
@@ -1034,8 +1179,9 @@ function setupEventListeners() {
 
       lineSearchResults.innerHTML = matches.map(([code, info]) => {
         const desc = info.description || '';
+        const cityKey = info.cityKey || '';
         return `
-          <div class="line-search-result-item" data-code="${code}">
+          <div class="line-search-result-item" data-code="${code}" data-city="${cityKey}">
             <span class="result-badge">${code}</span>
             <span class="result-desc">${desc}</span>
           </div>
@@ -1047,10 +1193,11 @@ function setupEventListeners() {
       lineSearchResults.querySelectorAll('.line-search-result-item').forEach(item => {
         item.addEventListener('click', () => {
           const code = item.getAttribute('data-code');
+          const cityKey = item.getAttribute('data-city');
           if (code) {
             lineSearchInput.value = '';
             lineSearchResults.style.display = 'none';
-            loadLineData(code);
+            loadLineData(code, cityKey);
           }
         });
       });
@@ -1067,7 +1214,7 @@ function setupEventListeners() {
         if (match) {
           lineSearchInput.value = '';
           lineSearchResults.style.display = 'none';
-          loadLineData(match[0]);
+          loadLineData(match[0], match[1]?.cityKey);
         }
       }
     });
