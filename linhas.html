@@ -26,9 +26,12 @@
     <!-- Header Integrado -->
     <header class="site-header">
         <div class="header-inner">
-            <a class="brand" href="index.html">
+            <a class="brand" href="index.html" title="Página Inicial do Cadê o Ônibus?">
                 <img src="app-logo.png" alt="Cadê o Ônibus?" />
-                <span>Cadê o Ônibus?</span>
+                <div class="brand-text">
+                    <span class="brand-pre">Cadê o</span>
+                    <span class="brand-main">Ônibus?</span>
+                </div>
             </a>
 
             <button class="header-region-pill" type="button" id="btn-header-region-selector" title="Trocar região / cidade">
@@ -61,15 +64,11 @@
             <p id="hero-desc">Consulte o trajeto, paradas, tabela de horários e rastreamento em tempo real dos ônibus.</p>
 
             <div class="city-selector-bar">
-                <button class="city-select-btn" id="btn-open-city-modal" type="button">
-                    <i class="fa-solid fa-location-dot" style="color: var(--primary);"></i>
+                <button class="city-select-btn" id="btn-open-city-modal" type="button" data-open-region-modal>
+                    <span class="city-flag-icon" id="hero-city-flag">📍</span>
                     <span id="current-city-name">Rio de Janeiro (RJ)</span>
-                    <i class="fa-solid fa-chevron-down" style="font-size: 0.8rem; color: var(--text-muted);"></i>
+                    <i class="fa-solid fa-chevron-down chevron-icon"></i>
                 </button>
-
-                <div class="city-quick-pills" id="city-quick-pills">
-                    <!-- Gerado via JS: Rio, SP, BH, Curitiba, BSB... -->
-                </div>
             </div>
         </section>
 

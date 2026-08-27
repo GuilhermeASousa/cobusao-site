@@ -148,36 +148,58 @@ button {
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-weight: 800;
-  font-size: 1.22rem;
+  gap: 10px;
   color: var(--text);
   letter-spacing: -0.02em;
   flex-shrink: 0;
+  text-decoration: none;
 }
 
 .brand img {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(28, 131, 228, 0.25);
+  flex-shrink: 0;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.brand-pre {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.brand-main {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: -0.03em;
 }
 
 /* Header Region Pill (Botão Seletor de Região no Cabeçalho) */
 .header-region-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   background: var(--surface-container-low);
   border: 1px solid var(--surface-border);
-  padding: 7px 14px;
+  padding: 6px 12px;
   border-radius: var(--radius-pill);
   color: var(--text);
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 700;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow-sm);
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .header-region-pill:hover {
@@ -188,19 +210,29 @@ button {
 }
 
 .header-region-pill .pill-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--success);
   box-shadow: 0 0 6px rgba(40, 167, 69, 0.6);
+  flex-shrink: 0;
 }
 
 .header-region-pill .pill-flag {
-  font-size: 1.05rem;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.header-region-pill .pill-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-region-pill .pill-chevron {
+  font-size: 0.75rem;
   opacity: 0.6;
+  flex-shrink: 0;
   transition: transform 0.2s;
 }
 
@@ -854,9 +886,11 @@ button {
   font-size: 0.82rem;
   color: var(--text-muted);
   line-height: 1.35;
-  white-space: nowrap;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .state-hub-card.active-selected .state-hub-subtitle {
@@ -1695,30 +1729,53 @@ body.mobile-drawer-open {
 
 @media (max-width: 600px) {
   .header-inner {
-    padding: 0 12px;
+    padding: 0 10px;
+    gap: 6px;
+  }
+
+  .brand {
     gap: 8px;
   }
 
-  .brand span {
-    display: inline;
-    font-size: 1.05rem;
+  .brand img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .brand-pre {
+    font-size: 0.62rem;
+  }
+
+  .brand-main {
+    font-size: 0.98rem;
   }
 
   .header-region-pill {
     padding: 6px 10px;
     font-size: 0.82rem;
     gap: 6px;
+    max-width: none;
   }
 
   .header-region-pill .pill-text {
-    max-width: 110px;
+    max-width: none;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .header-region-pill .pill-dot {
+    display: none;
+  }
+
+  .btn-mobile-menu {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
   }
 
   .hero-wrap {
-    padding-top: 78px;
+    padding-top: 76px;
   }
 
   .hero-title {

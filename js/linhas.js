@@ -80,11 +80,13 @@ function updatePageMeta(city) {
   }
 
   const currentCityBtnText = document.getElementById('current-city-name');
-  if (currentCityBtnText) {
-    currentCityBtnText.textContent = `${city.flag || '🚌'} ${city.name} (${city.state})`;
+  const heroCityFlag = document.getElementById('hero-city-flag');
+  if (heroCityFlag) {
+    heroCityFlag.textContent = city.flag || '📍';
   }
-
-  renderQuickCityPills();
+  if (currentCityBtnText) {
+    currentCityBtnText.textContent = `${city.name} (${city.state})`;
+  }
 }
 
 /**
@@ -223,8 +225,31 @@ async function loadCityLines(citySlug) {
       });
     });
 
+    // Deduplicação inteligente de linhas com mesma descrição e código variante no mesmo subsistema
+    const deduplicatedMap = new Map();
+
+    mergedList.forEach(item => {
+      const normDesc = item.description.toLowerCase().replace(/\s+/g, ' ').trim();
+      const code = item.codigo.trim().toUpperCase();
+      const groupKey = `${item.cityKey}_${normDesc}`;
+
+      if (deduplicatedMap.has(groupKey)) {
+        const existing = deduplicatedMap.get(groupKey);
+        const existingCode = existing.codigo.trim().toUpperCase();
+
+        // Prefere o código oficial mais completo/canônico (ex: '01DC' em vez de '01' genérico)
+        if (code.startsWith(existingCode) || (code.replace(/^0+/, '') === existingCode.replace(/^0+/, ''))) {
+          if (code.length >= existingCode.length) {
+            deduplicatedMap.set(groupKey, item);
+          }
+        }
+      } else {
+        deduplicatedMap.set(groupKey, item);
+      }
+    });
+
     state.rawLinesData = rawMap;
-    state.linesList = mergedList;
+    state.linesList = Array.from(deduplicatedMap.values());
 
     // Ordenação inicial natural (ex: 006, 007, 10, 100, 472, LECD133, SVB685)
     sortLinesList();

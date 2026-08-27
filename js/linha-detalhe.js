@@ -312,15 +312,35 @@ export async function loadLineData(lineCodeToLoad, targetCitySlug) {
     state.cityConfig = CITIES_CONFIG[foundCitySlug] || getCityConfig(foundCitySlug);
     state.detailData = detailData;
 
-    // Atualiza metadados
-    if (!info) {
-      info = state.allCityLines[state.lineCode];
+    // Garante que o line_info da cidade esteja carregado
+    if (!info || !info.description) {
+      try {
+        const resInfo = await fetch(`${CDN_BASE_URL}/${foundCitySlug}/line_info.json`);
+        if (resInfo.ok) {
+          const cityInfoDict = await resInfo.json();
+          Object.assign(state.allCityLines, cityInfoDict);
+          info = findLineInfoCanonical(state.lineCode, cityInfoDict);
+        }
+      } catch (e) {}
     }
-    state.lineInfo = info || {
-      description: `Linha ${state.lineCode}`,
-      consortiumName: state.cityConfig.name,
-      consortiumColor: '#1C83E4',
-      price: state.cityConfig.fare
+
+    // Se ainda não encontrou descrição, extrai dos trip_headsign dos trajetos
+    const headsigns = (detailData.trajetos || []).map(t => t.trip_headsign).filter(Boolean);
+    let derivedDesc = '';
+    if (headsigns.length >= 2 && headsigns[0] !== headsigns[1]) {
+      derivedDesc = `${headsigns[0]} ⇄ ${headsigns[1]}`;
+    } else if (headsigns.length >= 1) {
+      derivedDesc = headsigns[0];
+    } else {
+      derivedDesc = `Itinerário da Linha ${state.lineCode}`;
+    }
+
+    state.lineInfo = {
+      description: info?.description || derivedDesc,
+      consortiumName: info?.consortiumName || info?.operatorCompany || (foundCitySlug === 'rio_intermunicipal' ? 'Intermunicipal (DETRO)' : state.cityConfig.name),
+      consortiumColor: info?.consortiumColor || '#1C83E4',
+      textColor: info?.textColor || '#FFFFFF',
+      price: info?.price || state.cityConfig.fare
     };
 
     updateBreadcrumbs();
@@ -345,6 +365,18 @@ export async function loadLineData(lineCodeToLoad, targetCitySlug) {
       }, 100);
     }
   }
+}
+
+/**
+ * Formata valores de tarifa de forma segura evitando NaN
+ */
+function formatPrice(val, defaultFare) {
+  if (!val && !defaultFare) return '-';
+  const raw = String(val || defaultFare || '').trim();
+  if (raw.startsWith('R$')) return raw;
+  const num = parseFloat(raw.replace(',', '.').replace(/[^0-9.]/g, ''));
+  if (isNaN(num)) return raw || defaultFare || '-';
+  return `R$ ${num.toFixed(2).replace('.', ',')}`;
 }
 
 /**
@@ -395,15 +427,14 @@ function renderLineHeader() {
   }
 
   if (fareEl) {
-    const p = state.lineInfo.price ? `R$ ${parseFloat(state.lineInfo.price).toFixed(2).replace('.', ',')}` : state.cityConfig.fare;
-    fareEl.textContent = p;
+    fareEl.textContent = formatPrice(state.lineInfo.price, state.cityConfig.fare);
   }
 
   if (agencyEl) {
     agencyEl.textContent = state.cityConfig.fullName;
   }
 
-  document.title = `Linha ${state.lineCode} (${state.lineInfo.description}) — Trajeto e Ônibus ao Vivo | Cadê o Ônibus?`;
+  document.title = `${state.lineCode} — ${state.lineInfo.description} | Cadê o Ônibus?`;
 }
 
 /**
@@ -986,8 +1017,9 @@ function renderStopsTimeline() {
 
         return `
           <div class="stop-item" onclick="window.focusStop(${lat}, ${lon}, '${encodeURIComponent(p.stopName)}')">
+            <span class="stop-item-seq">${originalIndex + 1}</span>
             <span class="stop-item-title">${p.stopName}</span>
-            <span class="stop-item-seq">Ponto ${originalIndex + 1}</span>
+            <span class="stop-item-action" title="Ver parada no mapa"><i class="fa-solid fa-location-crosshairs fa-crosshairs"></i></span>
           </div>
         `;
       }).join('')}
