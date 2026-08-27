@@ -6,6 +6,7 @@
 
 import {
   CITIES_CONFIG,
+  STATE_HUBS,
   CDN_BASE_URL,
   getCityConfig,
   normalizeCitySlug
@@ -145,7 +146,7 @@ export function switchCity(newCitySlug) {
 }
 
 /**
- * Carrega o arquivo `line_info.json` da cidade
+ * Carrega o arquivo `line_info.json` de todos os subsistemas do polo regional (ex: Rio + DETRO, SP + EMTU + Campinas)
  */
 async function loadCityLines(citySlug) {
   const grid = document.getElementById('lines-grid');
@@ -153,46 +154,84 @@ async function loadCityLines(citySlug) {
   const countBadge = document.getElementById('total-lines-badge');
   const metaCount = document.getElementById('results-count');
 
+  const normHub = normalizeCitySlug(citySlug);
+  const hub = STATE_HUBS.find(h => h.key === normHub);
+  const subCitiesKeys = (hub && hub.citiesKeys && hub.citiesKeys.length > 0) ? hub.citiesKeys : [citySlug];
+
   if (grid) {
     grid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted);">
         <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--primary); margin-bottom: 12px;"></i>
-        <p>Carregando linhas de <strong>${state.cityConfig.name}</strong>...</p>
+        <p>Carregando catálogo unificado de <strong>${state.cityConfig.stateFullName || state.cityConfig.name}</strong>...</p>
       </div>
     `;
   }
 
   try {
-    const res = await fetch(`${CDN_BASE_URL}/${citySlug}/line_info.json`);
-    if (!res.ok) throw new Error(`Não foi possível carregar as linhas (${res.status})`);
-
-    const data = await res.json();
-    state.rawLinesData = data;
-
-    // Normaliza para array com código
-    state.linesList = Object.entries(data).map(([codigo, info]) => {
-      const consortiumName = info.consortiumName || info.operatorCompany || 'Municipal';
-      const cleanDesc = info.description || info.agencyName || 'Itinerário não informado';
-      const color = info.consortiumColor || getConsortiumColor(consortiumName);
-      const textColor = info.textColor || '#ffffff';
-      const price = info.price ? `R$ ${parseFloat(info.price).toFixed(2).replace('.', ',')}` : state.cityConfig.fare;
-
-      return {
-        codigo: String(codigo),
-        description: cleanDesc,
-        consortiumName: consortiumName,
-        consortiumColor: color,
-        textColor: textColor,
-        price: price
-      };
+    // Busca os dados de todas as subcidades do polo em paralelo
+    const fetchPromises = subCitiesKeys.map(async (subKey) => {
+      try {
+        const res = await fetch(`${CDN_BASE_URL}/${subKey}/line_info.json`);
+        if (!res.ok) return { subKey, data: {} };
+        const data = await res.json();
+        return { subKey, data };
+      } catch (e) {
+        console.warn(`Erro ao carregar linhas da subcidade ${subKey}:`, e);
+        return { subKey, data: {} };
+      }
     });
+
+    const responses = await Promise.all(fetchPromises);
+
+    const mergedList = [];
+    const rawMap = {};
+
+    responses.forEach(({ subKey, data }) => {
+      const subConfig = CITIES_CONFIG[subKey] || state.cityConfig;
+
+      Object.entries(data).forEach(([codigo, info]) => {
+        rawMap[codigo] = info;
+
+        let consortiumName = info.consortiumName || info.operatorCompany;
+        if (!consortiumName || consortiumName === 'Municipal') {
+          if (subKey === 'rio_intermunicipal') {
+            consortiumName = 'Intermunicipal (DETRO)';
+          } else if (subKey === 'emtu') {
+            consortiumName = 'EMTU Metropolitano';
+          } else if (subKey !== normHub) {
+            consortiumName = subConfig.name;
+          } else {
+            consortiumName = 'Municipal';
+          }
+        }
+
+        const cleanDesc = info.description || info.agencyName || 'Itinerário não informado';
+        const color = info.consortiumColor || getConsortiumColor(consortiumName, subConfig);
+        const textColor = info.textColor || '#ffffff';
+        const price = info.price ? `R$ ${parseFloat(info.price).toFixed(2).replace('.', ',')}` : subConfig.fare;
+
+        mergedList.push({
+          codigo: String(codigo),
+          cityKey: subKey,
+          agencyName: info.agencyName || subConfig.agencyName,
+          description: cleanDesc,
+          consortiumName: consortiumName,
+          consortiumColor: color,
+          textColor: textColor,
+          price: price
+        });
+      });
+    });
+
+    state.rawLinesData = rawMap;
+    state.linesList = mergedList;
 
     // Ordenação inicial natural (ex: 006, 007, 10, 100, 472, LECD133, SVB685)
     sortLinesList();
     state.filteredLines = [...state.linesList];
 
     if (countBadge) {
-      countBadge.textContent = `${state.linesList.length} linhas cadastradas`;
+      countBadge.textContent = `${state.linesList.length} linhas disponíveis`;
     }
 
     renderConsortiumFilters();
@@ -321,12 +360,13 @@ function renderLinesGrid() {
   const visibleLines = state.filteredLines.slice(0, state.renderedCount);
 
   grid.innerHTML = visibleLines.map(line => {
-    const detailUrl = `linha.html?cidade=${state.currentCitySlug}&linha=${encodeURIComponent(line.codigo)}`;
+    const targetCity = line.cityKey || state.currentCitySlug;
+    const detailUrl = `linha.html?cidade=${targetCity}&linha=${encodeURIComponent(line.codigo)}`;
     const badgeBg = line.consortiumColor || 'var(--primary)';
     const badgeColor = getContrastColor(badgeBg);
 
     return `
-      <a href="${detailUrl}" class="line-card" data-city="${state.currentCitySlug}" data-code="${line.codigo}">
+      <a href="${detailUrl}" class="line-card" data-city="${targetCity}" data-code="${line.codigo}">
         <div class="line-card-header">
           <span class="line-badge" style="background: ${badgeBg}; color: ${badgeColor};">
             ${line.codigo}

@@ -6,6 +6,7 @@
 
 import {
   CITIES_CONFIG,
+  STATE_HUBS,
   CDN_BASE_URL,
   BACKEND_BASE_URL,
   getCityConfig,
@@ -87,8 +88,14 @@ function initParamsFromUrl() {
     }
   }
 
-  state.citySlug = normalizeCitySlug(cityParam || 'rio');
-  state.cityConfig = getCityConfig(state.citySlug);
+  const cleanParam = (cityParam || '').toLowerCase().trim().replace(/[\s-]+/g, '_');
+  if (cleanParam && CITIES_CONFIG[cleanParam]) {
+    state.citySlug = cleanParam;
+    state.cityConfig = CITIES_CONFIG[cleanParam];
+  } else {
+    state.citySlug = normalizeCitySlug(cleanParam || 'rio');
+    state.cityConfig = getCityConfig(state.citySlug);
+  }
 
   if (lineParam && lineParam.trim()) {
     state.lineCode = lineParam.trim();
@@ -131,14 +138,30 @@ function updateBreadcrumbs() {
 }
 
 /**
- * Carrega a lista completa de linhas da cidade para o autocomplete
+ * Carrega a lista completa de linhas do polo para busca rápida
  */
 async function loadAllCityLinesForSearch() {
+  const normHub = normalizeCitySlug(state.citySlug);
+  const hub = STATE_HUBS.find(h => h.key === normHub) || { citiesKeys: [state.citySlug] };
+  const subCities = (hub && hub.citiesKeys) ? hub.citiesKeys : [state.citySlug];
+
   try {
-    const res = await fetch(`${CDN_BASE_URL}/${state.citySlug}/line_info.json`);
-    if (res.ok) {
-      state.allCityLines = await res.json();
-    }
+    const promises = subCities.map(async (subKey) => {
+      try {
+        const res = await fetch(`${CDN_BASE_URL}/${subKey}/line_info.json`);
+        if (!res.ok) return {};
+        const data = await res.json();
+        Object.entries(data).forEach(([code, item]) => {
+          item.cityKey = subKey;
+        });
+        return data;
+      } catch (e) {
+        return {};
+      }
+    });
+
+    const results = await Promise.all(promises);
+    state.allCityLines = Object.assign({}, ...results);
   } catch (e) {
     console.warn('Não foi possível pré-carregar lista de linhas para busca rápida:', e);
   }
