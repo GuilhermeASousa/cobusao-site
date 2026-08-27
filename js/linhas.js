@@ -93,7 +93,7 @@ function renderQuickCityPills() {
   const container = document.getElementById('quick-cities-pills');
   if (!container) return;
 
-  const popularKeys = ['rio', 'sp', 'bh', 'curitiba', 'brasilia', 'porto_alegre', 'rio_intermunicipal', 'emtu'];
+  const popularKeys = ['rio', 'sp', 'bh', 'curitiba', 'brasilia', 'porto_alegre', 'florianopolis', 'salvador', 'goiania'];
   
   container.innerHTML = popularKeys.map(key => {
     const c = CITIES_CONFIG[key];

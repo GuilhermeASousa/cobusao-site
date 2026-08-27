@@ -94,6 +94,13 @@ class RegionManager {
     });
     window.dispatchEvent(event);
 
+    // Se estiver na página de planos operacionais e trocar para uma cidade que não é Rio, redireciona para as linhas
+    const isRio = normalized === 'rio' || normalized === 'rio_intermunicipal';
+    if (window.location.pathname.includes('planos-operacionais.html') && !isRio) {
+      window.location.href = `linhas.html?cidade=${normalized}`;
+      return;
+    }
+
     // Se estiver na página de linhas e tiver a função de reload, recarrega
     if (window.location.pathname.includes('linhas.html')) {
       if (options.triggerNavigation || !window.cobusaoReloadCityLines) {
@@ -170,16 +177,14 @@ class RegionManager {
       }
     });
 
-    // 2. Link para "Planos Operacionais (Rio)"
+    // 2. Link para "Planos Operacionais (Rio)" -> só aparece quando for Rio de Janeiro
     document.querySelectorAll('a[href*="planos-operacionais.html"]').forEach(link => {
       if (isRio) {
         link.style.display = '';
-        link.classList.remove('nav-link-disabled');
-        link.removeAttribute('title');
+        link.style.visibility = 'visible';
       } else {
-        // Se estiver em outra cidade, mantemos acessível com um aviso ou badge sutil
-        link.style.display = '';
-        link.setAttribute('title', 'Exclusivo para o sistema SPPO do Rio de Janeiro');
+        link.style.display = 'none';
+        link.style.visibility = 'hidden';
       }
     });
   }
@@ -303,16 +308,16 @@ class RegionManager {
   }
 
   /**
-   * Renderiza os cards das cidades respeitando o filtro e a pesquisa
+   * Renderiza os cards das 14 regiões unificadas (idêntico ao app Flutter)
    */
   renderCityList() {
     const listContainer = document.getElementById('city-modal-list-container');
     if (!listContainer) return;
 
     const query = this.searchQuery.toLowerCase().trim();
-    const allCities = Object.values(CITIES_CONFIG);
+    const hubs = STATE_HUBS;
 
-    const filtered = allCities.filter(c => {
+    const filtered = hubs.filter(c => {
       // Filtro de Macro-região
       if (this.selectedFilterRegion !== 'Todas' && c.macroRegion !== this.selectedFilterRegion) {
         return false;
@@ -320,12 +325,11 @@ class RegionManager {
 
       // Filtro de Busca
       if (query) {
-        const nameMatch = (c.name || '').toLowerCase().includes(query);
-        const stateMatch = (c.stateFullName || '').toLowerCase().includes(query);
-        const ufMatch = (c.state || '').toLowerCase().includes(query);
+        const nameMatch = (c.stateFullName || '').toLowerCase().includes(query);
+        const ufMatch = (c.stateUf || '').toLowerCase().includes(query);
         const subtitleMatch = (c.coverageSubtitle || '').toLowerCase().includes(query);
-        const aliasMatch = (c.aliases || []).some(a => a.toLowerCase().includes(query));
-        return nameMatch || stateMatch || ufMatch || subtitleMatch || aliasMatch;
+        const keyMatch = (c.key || '').toLowerCase().includes(query);
+        return nameMatch || ufMatch || subtitleMatch || keyMatch;
       }
 
       return true;
@@ -351,11 +355,11 @@ class RegionManager {
           </div>
           <div class="city-item-content">
             <div class="city-item-header">
-              <span class="city-item-title">${c.stateFullName || c.name}</span>
-              <span class="city-item-badge-uf">${c.state}</span>
+              <span class="city-item-title">${c.stateFullName}</span>
+              <span class="city-item-badge-uf">${c.stateUf}</span>
               <span class="city-item-badge-macro">${c.macroRegion}</span>
             </div>
-            <p class="city-item-subtitle">${c.coverageSubtitle || c.name}</p>
+            <p class="city-item-subtitle">${c.coverageSubtitle}</p>
           </div>
           <div class="city-item-action">
             ${isCurrent ? `

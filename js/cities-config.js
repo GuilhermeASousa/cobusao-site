@@ -589,23 +589,54 @@ export const STATE_HUBS = [
 ];
 
 /**
- * Normaliza um slug de cidade aceitando variações como 'rio-de-janeiro' -> 'rio'
+ * Normaliza um slug de cidade para os 14 polos regionais oficiais (idêntico a City.fromCode do Flutter)
  */
 export function normalizeCitySlug(slug) {
   if (!slug) return 'rio';
-  const clean = String(slug).toLowerCase().trim().replace(/\s+/g, '-');
+  const clean = String(slug).toLowerCase().trim().replace(/[\s_-]+/g, '_');
   
-  for (const [key, config] of Object.entries(CITIES_CONFIG)) {
-    if (key === clean) return key;
-    if (config.aliases && config.aliases.includes(clean)) return key;
+  if (
+    clean === 'campinas' ||
+    clean === 'emtu' ||
+    clean === 'sp_emtu' ||
+    clean === 'emtu_sp' ||
+    clean === 'sao_paulo_emtu' ||
+    clean === 'bauru' ||
+    clean === 'americana' ||
+    clean === 'caraguatatuba' ||
+    clean === 'caragua' ||
+    clean === 'valinhos'
+  ) {
+    return 'sp';
+  }
+  if (
+    clean === 'caxias_do_sul' ||
+    clean === 'caxiasdosul' ||
+    clean === 'caxias' ||
+    clean === 'sao_leopoldo' ||
+    clean === 'saoleopoldo' ||
+    clean === 'leopoldo' ||
+    clean === 'portoalegre'
+  ) {
+    return 'porto_alegre';
+  }
+  if (clean === 'itajai') return 'florianopolis';
+  if (clean === 'araucaria') return 'curitiba';
+  if (clean === 'uberlandia') return 'bh';
+  if (clean === 'rio_intermunicipal' || clean === 'detro' || clean === 'baixada') return 'rio';
+  if (clean === 'boavista') return 'boa_vista';
+  if (clean === 'campogrande') return 'campo_grande';
+
+  for (const hub of STATE_HUBS) {
+    if (hub.key === clean) return hub.key;
   }
   
-  if (clean.includes('rio') && !clean.includes('inter')) return 'rio';
-  if (clean.includes('sao-paulo') || clean === 'sp') return 'sp';
-  if (clean.includes('belo') || clean === 'bh') return 'bh';
-  if (clean.includes('curitiba') || clean === 'cwb') return 'curitiba';
-  if (clean.includes('brasilia') || clean === 'bsb') return 'brasilia';
-  if (clean.includes('porto') || clean === 'poa') return 'porto_alegre';
+  if (clean.includes('rio')) return 'rio';
+  if (clean.includes('sao_paulo') || clean.includes('sp')) return 'sp';
+  if (clean.includes('belo') || clean.includes('bh')) return 'bh';
+  if (clean.includes('curitiba') || clean.includes('cwb')) return 'curitiba';
+  if (clean.includes('brasilia') || clean.includes('bsb')) return 'brasilia';
+  if (clean.includes('porto') || clean.includes('poa')) return 'porto_alegre';
 
   return 'rio';
 }
