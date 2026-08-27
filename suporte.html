@@ -9,23 +9,36 @@
     <meta property="og:site_name" content="Cadê o Ônibus?" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Suporte — Cadê o Ônibus?" />
-    <meta property="og:url" content="https://web.cadeoonibus.api.br/suporte.html" />
+    <meta property="og:url" content="https://cadeoonibus.com.br/suporte.html" />
     <meta property="og:locale" content="pt_BR" />
 
     <link rel="icon" type="image/png" href="app-logo.png" />
     <link rel="stylesheet" href="style.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body>
+    <!-- Header Integrado -->
     <header class="site-header">
         <div class="header-inner">
             <a class="brand" href="index.html">
-                <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
+                <img src="app-logo.png" alt="Cadê o Ônibus?" />
+                <span>Cadê o Ônibus?</span>
             </a>
+
+            <button class="header-region-pill" type="button" id="btn-header-region-selector" title="Trocar região / cidade">
+                <span class="pill-dot"></span>
+                <span class="pill-flag" id="header-region-flag">🏖️</span>
+                <span class="pill-text" id="header-region-label">Rio de Janeiro (RJ)</span>
+                <i class="fa-solid fa-chevron-down pill-chevron"></i>
+            </button>
+
             <nav class="site-nav">
                 <a href="index.html">Início</a>
                 <a href="linhas.html">Linhas de Ônibus</a>
                 <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
-                <a href="planos-operacionais.html">Planos Operacionais (Rio)</a>
+                <a href="planos-operacionais.html" id="nav-planos-link">Planos Operacionais (Rio)</a>
                 <a href="privacidade.html">Privacidade</a>
                 <a href="termos-uso.html">Termos</a>
                 <a class="active" href="suporte.html">Suporte</a>
@@ -33,61 +46,58 @@
         </div>
     </header>
 
-    <section class="hero">
-        <div class="hero-icon">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 6h16v12H4V6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                <path d="M4.5 6.5l7.5 6 7.5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </div>
-        <h1>Suporte</h1>
+    <section class="page-hero">
+        <h1>Suporte & Contato</h1>
         <p class="lede">Precisa de ajuda com o app <strong>Cadê o Ônibus?</strong> Fale diretamente conosco por e-mail — respondemos o mais rápido possível.</p>
     </section>
 
-    <div class="support-wrap">
-        <div class="contact-card">
-            <span class="contact-card-label">E-mail de suporte</span>
-            <a class="contact-email" href="mailto:cobusao@gmail.com">cobusao@gmail.com</a>
-            <a class="btn-primary" href="mailto:cobusao@gmail.com">
-                Enviar e-mail
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="doc-layout">
+        <div class="support-card">
+            <div style="font-size: 2.4rem; color: var(--primary); margin-bottom: 12px;">
+                <i class="fa-solid fa-envelope-open-text"></i>
+            </div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 6px;">E-mail Direto de Suporte</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Clique no e-mail abaixo para abrir seu aplicativo de mensagens:</p>
+            <a class="support-email" href="mailto:cobusao@gmail.com">cobusao@gmail.com</a>
+            
+            <a class="btn-primary" href="mailto:cobusao@gmail.com" style="margin: 0 auto; display: inline-flex;">
+                <i class="fa-solid fa-paper-plane"></i> Enviar Mensagem Agora
             </a>
         </div>
 
-        <p class="topics-intro">Para agilizar sua resposta, escolha o assunto que mais combina com sua dúvida — o e-mail já abre com o assunto preenchido:</p>
+        <article class="doc-card" style="margin-top: 24px;">
+            <h2>Tópicos Frequentes</h2>
+            <p>Para agilizar sua resposta, você pode escolher o assunto predefinido:</p>
 
-        <ul class="topics">
-            <li>
-                <a href="mailto:cobusao@gmail.com?subject=Suporte%20-%20D%C3%BAvida%20geral">
-                    <strong>Dúvidas gerais sobre o app</strong>
-                    <span>Como usar recursos, linhas e cidades atendidas</span>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 18px;">
+                <a href="mailto:cobusao@gmail.com?subject=Suporte%20-%20D%C3%BAvida%20geral" style="background: var(--surface-container-low); border: 1px solid var(--surface-border); border-radius: var(--radius-md); padding: 16px; display: block; color: var(--text); transition: all 0.2s;">
+                    <strong style="display: block; font-size: 1rem; margin-bottom: 4px; color: var(--primary);"><i class="fa-solid fa-circle-question"></i> Dúvidas Gerais</strong>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Como usar recursos, linhas e cidades atendidas</span>
                 </a>
-            </li>
-            <li>
-                <a href="mailto:cobusao@gmail.com?subject=Suporte%20-%20Problema%20t%C3%A9cnico">
-                    <strong>Problema técnico ou erro</strong>
-                    <span>App travando, dados de ônibus incorretos, notificações</span>
-                </a>
-            </li>
-            <li>
-                <a href="mailto:cobusao@gmail.com?subject=Suporte%20-%20Sugest%C3%A3o%20de%20melhoria">
-                    <strong>Sugestão de melhoria</strong>
-                    <span>Ideias para novas funcionalidades ou melhorias no design</span>
-                </a>
-            </li>
-            <li>
-                <a href="mailto:cobusao@gmail.com?subject=Suporte%20-%20Privacidade%20e%20dados%20%28LGPD%29">
-                    <strong>Privacidade e dados (LGPD)</strong>
-                    <span>Acesso, correção ou exclusão dos seus dados pessoais</span>
-                </a>
-            </li>
-        </ul>
 
-        <p class="topics-footnote" style="margin-top: 24px; color: var(--text-muted); font-size: 0.95rem; text-align: center;">
-            Consulte também os nossos <a href="termos-uso.html">Termos de Uso</a> e a <a href="privacidade.html">Política de Privacidade</a> — muitas dúvidas já estão respondidas lá.
-        </p>
+                <a href="mailto:cobusao@gmail.com?subject=Suporte%20-%20Problema%20t%C3%A9cnico" style="background: var(--surface-container-low); border: 1px solid var(--surface-border); border-radius: var(--radius-md); padding: 16px; display: block; color: var(--text); transition: all 0.2s;">
+                    <strong style="display: block; font-size: 1rem; margin-bottom: 4px; color: var(--primary);"><i class="fa-solid fa-triangle-exclamation"></i> Problema Técnico</strong>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Divergência de GPS, rotas ou notificações</span>
+                </a>
+
+                <a href="mailto:cobusao@gmail.com?subject=Suporte%20-%20Sugest%C3%A3o%20de%20melhoria" style="background: var(--surface-container-low); border: 1px solid var(--surface-border); border-radius: var(--radius-md); padding: 16px; display: block; color: var(--text); transition: all 0.2s;">
+                    <strong style="display: block; font-size: 1rem; margin-bottom: 4px; color: var(--primary);"><i class="fa-solid fa-lightbulb"></i> Sugestão de Melhoria</strong>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Ideias para novas funções ou novas cidades</span>
+                </a>
+
+                <a href="mailto:cobusao@gmail.com?subject=Suporte%20-%20Privacidade%20e%20dados%20%28LGPD%29" style="background: var(--surface-container-low); border: 1px solid var(--surface-border); border-radius: var(--radius-md); padding: 16px; display: block; color: var(--text); transition: all 0.2s;">
+                    <strong style="display: block; font-size: 1rem; margin-bottom: 4px; color: var(--primary);"><i class="fa-solid fa-user-shield"></i> Privacidade (LGPD)</strong>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Acesso ou exclusão dos seus dados locais</span>
+                </a>
+            </div>
+
+            <p style="margin-top: 32px; color: var(--text-muted); font-size: 0.95rem; text-align: center;">
+                Consulte também nossos <a href="termos-uso.html">Termos de Uso</a> e a <a href="privacidade.html">Política de Privacidade</a>.
+            </p>
+        </article>
     </div>
 
+    <!-- Rodapé -->
     <footer class="site-footer">
         <div class="footer-inner">
             <a class="brand" href="index.html">
@@ -104,5 +114,8 @@
             <div class="copyright">© 2026 Cadê o Ônibus? (Guialshy). Todos os direitos reservados.</div>
         </div>
     </footer>
+
+    <!-- Gerenciador Global de Região -->
+    <script type="module" src="js/region-manager.js"></script>
 </body>
 </html>

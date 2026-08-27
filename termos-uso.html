@@ -9,23 +9,36 @@
     <meta property="og:site_name" content="Cadê o Ônibus?" />
     <meta property="og:type" content="article" />
     <meta property="og:title" content="Termos de Uso — Cadê o Ônibus?" />
-    <meta property="og:url" content="https://web.cadeoonibus.api.br/termos-uso.html" />
+    <meta property="og:url" content="https://cadeoonibus.com.br/termos-uso.html" />
     <meta property="og:locale" content="pt_BR" />
 
     <link rel="icon" type="image/png" href="app-logo.png" />
     <link rel="stylesheet" href="style.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body>
+    <!-- Header Integrado -->
     <header class="site-header">
         <div class="header-inner">
             <a class="brand" href="index.html">
-                <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
+                <img src="app-logo.png" alt="Cadê o Ônibus?" />
+                <span>Cadê o Ônibus?</span>
             </a>
+
+            <button class="header-region-pill" type="button" id="btn-header-region-selector" title="Trocar região / cidade">
+                <span class="pill-dot"></span>
+                <span class="pill-flag" id="header-region-flag">🏖️</span>
+                <span class="pill-text" id="header-region-label">Rio de Janeiro (RJ)</span>
+                <i class="fa-solid fa-chevron-down pill-chevron"></i>
+            </button>
+
             <nav class="site-nav">
                 <a href="index.html">Início</a>
                 <a href="linhas.html">Linhas de Ônibus</a>
                 <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
-                <a href="planos-operacionais.html">Planos Operacionais (Rio)</a>
+                <a href="planos-operacionais.html" id="nav-planos-link">Planos Operacionais (Rio)</a>
                 <a href="privacidade.html">Privacidade</a>
                 <a class="active" href="termos-uso.html">Termos</a>
                 <a href="suporte.html">Suporte</a>
@@ -33,97 +46,58 @@
         </div>
     </header>
 
-    <section class="hero">
+    <section class="page-hero">
         <h1>Termos de Uso</h1>
-        <p class="lede">Estes Termos regem o uso do aplicativo <strong>Cadê o Ônibus?</strong>, disponível para dispositivos móveis. Ao instalar, acessar ou usar o aplicativo, você concorda com o que está descrito aqui.</p>
+        <p class="lede">Estes Termos regem o uso do aplicativo e site <strong>Cadê o Ônibus?</strong>. Ao utilizar qualquer uma de nossas ferramentas, você concorda com o que está descrito aqui.</p>
         <span class="updated-badge"><span class="dot"></span> Última atualização em 14 de Julho de 2026</span>
     </section>
 
-    <div class="layout">
-        <article class="doc">
+    <div class="doc-layout">
+        <article class="doc-card">
             <section id="servico">
-                <h2>1. Sobre o serviço</h2>
+                <h2>1. Sobre o Serviço</h2>
                 <p>
-                    O Cadê o Ônibus? é um aplicativo totalmente <strong>gratuito e sem anúncios</strong>, criado para
-                    fornecer informações de transporte público, incluindo horários, rotas e a posição estimada de ônibus
-                    em tempo real. O aplicativo funciona integrando-se com fontes públicas de dados para as cidades do
-                    <strong>Rio de Janeiro, São Paulo e Belo Horizonte</strong>.
+                    O <strong>Cadê o Ônibus?</strong> é uma ferramenta 100% <strong>gratuita e sem anúncios</strong>, desenvolvida para fornecer informações sobre o transporte público, incluindo paradas, rotas, tabelas de horários e a posição de veículos em tempo real através dos dados abertos de GPS das prefeituras e órgãos reguladores.
                 </p>
                 <p>
-                    As funcionalidades estão abertas a todos os usuários, sem necessidade de cadastro, conta premium ou
-                    pagamento.
+                    Todas as funcionalidades são abertas a todos os usuários, sem necessidade de cadastro, assinaturas pagas ou qualquer cobrança.
                 </p>
             </section>
 
             <section id="precisao">
-                <h2>2. Precisão dos Dados e Inteligência Artificial</h2>
+                <h2>2. Origem e Precisão dos Dados</h2>
                 <p>
-                    As posições dos veículos e previsões de chegada exibidas no mapa são baseadas nos sinais de GPS dos
-                    ônibus reportados pelas prefeituras. Além disso, utilizamos recursos de <strong>Inteligência Artificial</strong> (IA) no backend para processar relatórios de trânsito colaborativos.
+                    Os dados de posicionamento GPS, itinerários e previsões de chegada são obtidos diretamente dos canais públicos e oficiais de órgãos de transporte (como SMTR/SPPO no Rio, SPTrans em São Paulo, BHTRANS/Sumob em BH, URBS em Curitiba, entre outros).
                 </p>
-                <div class="callout">
-                    <strong>Atenção:</strong> O serviço é fornecido "como está". Não garantimos a
-                    exatidão 100% dos dados. Podem ocorrer atrasos de rede, falta de sinal GPS no veículo ou
-                    divergências. O processamento automático por IA pode eventualmente gerar avisos equivocados (alucinações).
-                    O aplicativo é uma ferramenta de apoio e não nos responsabilizamos por perdas de compromissos
-                    decorrentes de informações exibidas.
+                <div class="doc-callout">
+                    <strong>Aviso de Isenção:</strong> O serviço depende da disponibilidade e precisão dos sinais transmitidos pelas frotas de cada município. Eventuais falhas de comunicação com satélites ou atrasos na transmissão dos órgãos oficiais podem gerar divergências temporárias.
                 </div>
             </section>
 
-            <section id="colaborativos">
-                <h2>3. Uso dos Recursos Colaborativos</h2>
+            <section id="conduta">
+                <h2>3. Uso Aceitável e Recursos Colaborativos</h2>
                 <p>
-                    O aplicativo possui recursos onde o usuário pode reportar o status do ônibus (ex: lotado, ar
-                    condicionado quebrado). Ao usar esses recursos, você concorda em:
-                </p>
-                <ul>
-                    <li>Fornecer informações verdadeiras para ajudar a comunidade.</li>
-                    <li>Não realizar spam, flood ou enviar relatórios automatizados.</li>
-                    <li>Usar os recursos sociais de forma anônima e respeitosa.</li>
-                </ul>
-            </section>
-
-            <section id="restricoes">
-                <h2>4. Restrições de Uso</h2>
-                <p>
-                    Ao utilizar o Cadê o Ônibus?, você concorda em não tentar aplicar engenharia reversa no código, não
-                    realizar interceptação das APIs internas para uso em outros projetos e não usar bots ou processos automatizados
-                    para sobrecarregar nossos servidores.
+                    Ao utilizar os recursos de colaboração comunitária (ex: alertas de lotação ou ar-condicionado), você se compromete a reportar informações verídicas e condizentes com a realidade para ajudar outros passageiros.
                 </p>
             </section>
 
-            <section id="privacidade">
-                <h2>5. Privacidade</h2>
+            <section id="propriedade">
+                <h2>4. Propriedade Intelectual</h2>
                 <p>
-                    A forma como tratamos a sua localização e dados anônimos está descrita em detalhes na nossa
-                    <a href="privacidade.html">Política de Privacidade</a>. Ao concordar com estes Termos, você também
-                    concorda com nossa Política de Privacidade.
-                </p>
-            </section>
-
-            <section id="disponibilidade">
-                <h2>6. Disponibilidade e Atualizações</h2>
-                <p>
-                    Trabalhamos para manter os serviços sempre online, mas os desenvolvedores reservam-se o direito de
-                    interromper, atualizar ou modificar as funcionalidades a qualquer momento, para manutenção ou evolução do
-                    sistema, sem necessidade de aviso prévio.
+                    A identidade visual, logotipo, código-fonte, arquitetura e interface do <strong>Cadê o Ônibus?</strong> são de propriedade de seu criador e mantenedor (Guialshy). Os dados abertos de transporte público pertencem aos seus respectivos órgãos emissores sob licenças de dados abertos governamentais.
                 </p>
             </section>
 
             <section id="contato">
-                <h2>7. Contato</h2>
+                <h2>5. Dúvidas e Suporte</h2>
                 <p>
-                    Se você tiver alguma dúvida sobre estes Termos, reportar algum erro ou sugestão, entre em contato
-                    conosco:
+                    Caso tenha dúvidas sobre estes termos ou queira entrar em contato, envie um e-mail para <a href="mailto:cobusao@gmail.com">cobusao@gmail.com</a> ou acesse nossa <a href="suporte.html">página de suporte</a>.
                 </p>
-                <ul>
-                    <li><strong>E-mail:</strong> <a href="mailto:cobusao@gmail.com">cobusao@gmail.com</a></li>
-                </ul>
-                <p>Veja também nossa <a href="suporte.html">página de suporte</a>.</p>
             </section>
         </article>
     </div>
 
+    <!-- Rodapé -->
     <footer class="site-footer">
         <div class="footer-inner">
             <a class="brand" href="index.html">
@@ -140,5 +114,8 @@
             <div class="copyright">© 2026 Cadê o Ônibus? (Guialshy). Todos os direitos reservados.</div>
         </div>
     </footer>
+
+    <!-- Gerenciador Global de Região -->
+    <script type="module" src="js/region-manager.js"></script>
 </body>
 </html>

@@ -10,6 +10,7 @@ import {
   getCityConfig,
   normalizeCitySlug
 } from './cities-config.js';
+import { regionManager } from './region-manager.js';
 
 // Estado global da listagem
 const state = {
@@ -32,12 +33,22 @@ document.addEventListener('DOMContentLoaded', () => {
   loadCityLines(state.currentCitySlug);
 });
 
+// Escuta alterações de região vindas de outras partes do site
+window.addEventListener('cobusao-region-changed', (e) => {
+  if (e.detail && e.detail.cityKey && e.detail.cityKey !== state.currentCitySlug) {
+    switchCity(e.detail.cityKey);
+  }
+});
+
+// Expõe globalmente para o regionManager
+window.cobusaoReloadCityLines = switchCity;
+
 /**
- * Lê a cidade da query string (?cidade=sp ou ?cidade=rio)
+ * Lê a cidade da query string (?cidade=sp ou ?cidade=rio) ou da região ativa do storage
  */
 function initCityFromUrl() {
   const params = new URLSearchParams(window.location.search);
-  const cityParam = params.get('cidade') || params.get('c') || 'rio';
+  const cityParam = params.get('cidade') || params.get('c') || regionManager.getActiveCity() || 'rio';
   const queryParam = params.get('q') || params.get('busca') || '';
 
   state.currentCitySlug = normalizeCitySlug(cityParam);
@@ -429,113 +440,9 @@ function setupEventListeners() {
  */
 function setupCityModal() {
   const openBtn = document.getElementById('btn-open-city-modal');
-  const modal = document.getElementById('city-modal');
-  const closeBtn = document.getElementById('btn-close-city-modal');
-  const searchInput = document.getElementById('modal-city-search');
-
   if (openBtn) {
-    openBtn.addEventListener('click', openCityModal);
+    openBtn.addEventListener('click', () => regionManager.openModal());
   }
-
-  if (closeBtn) {
-    closeBtn.addEventListener('click', closeCityModal);
-  }
-
-  if (modal) {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeCityModal();
-    });
-  }
-
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      renderCityModalList(e.target.value);
-    });
-  }
-
-  renderCityModalList('');
-}
-
-function openCityModal() {
-  const modal = document.getElementById('city-modal');
-  if (modal) {
-    modal.classList.add('open');
-    const input = document.getElementById('modal-city-search');
-    if (input) {
-      input.value = '';
-      renderCityModalList('');
-      setTimeout(() => input.focus(), 50);
-    }
-  }
-}
-
-function closeCityModal() {
-  const modal = document.getElementById('city-modal');
-  if (modal) modal.classList.remove('open');
-}
-
-function renderCityModalList(query) {
-  const container = document.getElementById('city-modal-groups');
-  if (!container) return;
-
-  const q = (query || '').toLowerCase().trim();
-
-  const groups = {
-    capitais: { title: 'Grandes Capitais', items: [] },
-    metropolitana: { title: 'Regiões Metropolitanas', items: [] },
-    interior: { title: 'Cidades do Interior', items: [] }
-  };
-
-  Object.values(CITIES_CONFIG).forEach(city => {
-    if (q) {
-      const matchName = city.name.toLowerCase().includes(q);
-      const matchState = city.state.toLowerCase().includes(q);
-      const matchFull = city.fullName.toLowerCase().includes(q);
-      if (!matchName && !matchState && !matchFull) return;
-    }
-
-    const cat = city.category || 'interior';
-    if (groups[cat]) {
-      groups[cat].items.push(city);
-    } else {
-      groups.interior.items.push(city);
-    }
-  });
-
-  let html = '';
-
-  Object.values(groups).forEach(grp => {
-    if (grp.items.length === 0) return;
-
-    html += `
-      <div class="city-modal-category-title">${grp.title}</div>
-      <div class="city-modal-grid">
-        ${grp.items.map(city => {
-          const isActive = city.key === state.currentCitySlug;
-          return `
-            <div class="city-modal-item ${isActive ? 'active' : ''}" data-city="${city.key}">
-              <span style="font-size: 1.2rem;">${city.flag || '📍'}</span>
-              <span>${city.name}</span>
-              <span class="uf-tag" style="font-size:0.75rem; margin-left:auto; color:var(--text-muted);">${city.state}</span>
-            </div>
-          `;
-        }).join('')}
-      </div>
-    `;
-  });
-
-  if (!html) {
-    html = `<div style="text-align: center; padding: 30px; color: var(--text-muted);">Nenhuma cidade encontrada para "${query}"</div>`;
-  }
-
-  container.innerHTML = html;
-
-  container.querySelectorAll('.city-modal-item').forEach(item => {
-    item.addEventListener('click', () => {
-      const slug = item.getAttribute('data-city');
-      if (slug) switchCity(slug);
-    });
-  });
 }
 
 function getConsortiumColor(name) {

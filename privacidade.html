@@ -9,23 +9,36 @@
     <meta property="og:site_name" content="Cadê o Ônibus?" />
     <meta property="og:type" content="article" />
     <meta property="og:title" content="Política de Privacidade — Cadê o Ônibus?" />
-    <meta property="og:url" content="https://web.cadeoonibus.api.br/privacidade.html" />
+    <meta property="og:url" content="https://cadeoonibus.com.br/privacidade.html" />
     <meta property="og:locale" content="pt_BR" />
 
     <link rel="icon" type="image/png" href="app-logo.png" />
     <link rel="stylesheet" href="style.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body>
+    <!-- Header Integrado -->
     <header class="site-header">
         <div class="header-inner">
             <a class="brand" href="index.html">
-                <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
+                <img src="app-logo.png" alt="Cadê o Ônibus?" />
+                <span>Cadê o Ônibus?</span>
             </a>
+
+            <button class="header-region-pill" type="button" id="btn-header-region-selector" title="Trocar região / cidade">
+                <span class="pill-dot"></span>
+                <span class="pill-flag" id="header-region-flag">🏖️</span>
+                <span class="pill-text" id="header-region-label">Rio de Janeiro (RJ)</span>
+                <i class="fa-solid fa-chevron-down pill-chevron"></i>
+            </button>
+
             <nav class="site-nav">
                 <a href="index.html">Início</a>
                 <a href="linhas.html">Linhas de Ônibus</a>
                 <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
-                <a href="planos-operacionais.html">Planos Operacionais (Rio)</a>
+                <a href="planos-operacionais.html" id="nav-planos-link">Planos Operacionais (Rio)</a>
                 <a class="active" href="privacidade.html">Privacidade</a>
                 <a href="termos-uso.html">Termos</a>
                 <a href="suporte.html">Suporte</a>
@@ -33,14 +46,14 @@
         </div>
     </header>
 
-    <section class="hero">
+    <section class="page-hero">
         <h1>Política de Privacidade</h1>
         <p class="lede">A sua privacidade é fundamental para nós. O aplicativo <strong>Cadê o Ônibus?</strong> foi desenvolvido com a premissa de coletar a menor quantidade possível de dados.</p>
         <span class="updated-badge"><span class="dot"></span> Última atualização em 14 de Julho de 2026</span>
     </section>
 
-    <div class="layout">
-        <article class="doc">
+    <div class="doc-layout">
+        <article class="doc-card">
             <p>
                 Este documento está em conformidade com a Lei Geral de Proteção de Dados (LGPD) e garante transparência total sobre como suas informações são processadas. O aplicativo é 100% gratuito e <strong>não possui anúncios ou rastreadores de publicidade de terceiros</strong>.
             </p>
@@ -53,7 +66,7 @@
                 <ul>
                     <li><strong>Apenas em Primeiro Plano:</strong> Usamos sua localização precisa para mostrar onde você está no mapa e quais paradas e ônibus estão próximos enquanto o aplicativo estiver aberto e em uso na tela.</li>
                 </ul>
-                <div class="callout">
+                <div class="doc-callout">
                     <strong>Nota Importante:</strong> Nós <strong>NÃO</strong> rastreamos ou coletamos sua localização em segundo plano (com o aplicativo minimizado ou a tela bloqueada). Não mantemos histórico dos seus trajetos.
                 </div>
 
@@ -93,8 +106,7 @@
 
                 <h3>Compartilhamento com Terceiros e Processamento por IA</h3>
                 <p>
-                    Nós não vendemos nem alugamos dados. Compartilhamos informações anonimizadas apenas com provedores tecnológicos essenciais para o funcionamento do app (nossa infraestrutura de servidores e APIs de transporte público).
-                    Não há compartilhamento com redes de anúncios.
+                    Nós não vendemos nem alugamos dados. Compartilhamos informações anonimizadas apenas com provedores tecnológicos essenciais para o funcionamento do app (nossa infraestrutura de servidores e APIs de transporte público). Não há compartilhamento com redes de anúncios.
                 </p>
                 <p>
                     <strong>Inteligência Artificial:</strong> Alguns dados de operação ou relatos podem ser processados por APIs de Inteligência Artificial do Google instaladas em nosso servidor (Gemini) para gerar avisos dentro do aplicativo de forma automática. Nenhum dado que identifique você pessoalmente é enviado para a IA.
@@ -124,6 +136,7 @@
         </article>
     </div>
 
+    <!-- Rodapé -->
     <footer class="site-footer">
         <div class="footer-inner">
             <a class="brand" href="index.html">
@@ -140,5 +153,8 @@
             <div class="copyright">© 2026 Cadê o Ônibus? (Guialshy). Todos os direitos reservados.</div>
         </div>
     </footer>
+
+    <!-- Gerenciador Global de Região -->
+    <script type="module" src="js/region-manager.js"></script>
 </body>
 </html>

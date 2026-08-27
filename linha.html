@@ -30,14 +30,24 @@
     <header class="site-header">
         <div class="header-inner">
             <a class="brand" href="index.html">
-                <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
+                <img src="app-logo.png" alt="Cadê o Ônibus?" />
+                <span>Cadê o Ônibus?</span>
             </a>
+
+            <button class="header-region-pill" type="button" id="btn-header-region-selector" title="Trocar região / cidade">
+                <span class="pill-dot"></span>
+                <span class="pill-flag" id="header-region-flag">🏖️</span>
+                <span class="pill-text" id="header-region-label">Rio de Janeiro (RJ)</span>
+                <i class="fa-solid fa-chevron-down pill-chevron"></i>
+            </button>
+
             <nav class="site-nav">
                 <a href="index.html">Início</a>
                 <a class="active" href="linhas.html">Linhas de Ônibus</a>
                 <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
-                <a href="planos-operacionais.html">Planos Operacionais (Rio)</a>
+                <a href="planos-operacionais.html" id="nav-planos-link">Planos Operacionais (Rio)</a>
                 <a href="privacidade.html">Privacidade</a>
+                <a href="termos-uso.html">Termos</a>
                 <a href="suporte.html">Suporte</a>
             </nav>
         </div>
@@ -220,7 +230,8 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- Script da Página -->
+    <!-- Script da Página & Região -->
+    <script type="module" src="js/region-manager.js"></script>
     <script type="module" src="js/linha-detalhe.js"></script>
 </body>
 </html>

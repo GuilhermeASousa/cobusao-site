@@ -3,32 +3,48 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cadê o Ônibus? — O App Inteligente de Transporte Público</title>
-    <meta name="description" content="Rastreamento em tempo real no Rio, SP e BH. Economize dados, bateria e tempo com o app de ônibus mais rápido do Brasil." />
-    <meta name="keywords" content="ônibus, transporte público, tempo real, cadê o ônibus, app de ônibus, rastreamento de ônibus" />
+    <title>Cadê o Ônibus? — Chega de esperar no ponto às cegas</title>
+    <meta name="description" content="Acompanhe seu ônibus em tempo real pelo GPS oficial. Saiba exatamente a hora que ele vai chegar no ponto. 100% gratuito e sem anúncios." />
+    <meta name="keywords" content="ônibus em tempo real, cadê o ônibus, app de ônibus, rastreador de ônibus, gps ônibus, rio de janeiro, são paulo, belo horizonte, curitiba" />
 
+    <!-- Open Graph & Social -->
     <meta property="og:site_name" content="Cadê o Ônibus?" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Cadê o Ônibus? — Chega de esperar no ponto" />
-    <meta property="og:description" content="Veja onde seu ônibus está agora. Leve, rápido e sem cadastro." />
-    <meta property="og:url" content="https://web.cadeoonibus.api.br/" />
+    <meta property="og:title" content="Cadê o Ônibus? — O app inteligente de transporte público" />
+    <meta property="og:description" content="Veja onde seu ônibus está agora no mapa em tempo real. Rápido, leve, sem cadastro e 100% grátis." />
+    <meta property="og:url" content="https://cadeoonibus.com.br/" />
     <meta property="og:image" content="https://web.cadeoonibus.api.br/og-image.jpg" />
     <meta property="og:locale" content="pt_BR" />
 
     <link rel="icon" type="image/png" href="app-logo.png" />
     <link rel="stylesheet" href="style.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body>
+    <!-- Cabeçalho Integrado com Seletor de Região -->
     <header class="site-header">
         <div class="header-inner">
             <a class="brand" href="index.html">
-                <img src="app-logo.png" alt="Cadê o Ônibus?" /> Cadê o Ônibus?
+                <img src="app-logo.png" alt="Cadê o Ônibus?" />
+                <span>Cadê o Ônibus?</span>
             </a>
+
+            <!-- Botão do Seletor de Região (gerenciado dinamicamente por region-manager.js) -->
+            <button class="header-region-pill" type="button" id="btn-header-region-selector" title="Trocar região / cidade">
+                <span class="pill-dot"></span>
+                <span class="pill-flag" id="header-region-flag">🏖️</span>
+                <span class="pill-text" id="header-region-label">Rio de Janeiro (RJ)</span>
+                <i class="fa-solid fa-chevron-down pill-chevron"></i>
+            </button>
+
+            <!-- Menu de Navegação -->
             <nav class="site-nav">
                 <a class="active" href="index.html">Início</a>
                 <a href="linhas.html">Linhas de Ônibus</a>
                 <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
-                <a href="planos-operacionais.html">Planos Operacionais (Rio)</a>
+                <a href="planos-operacionais.html" id="nav-planos-link">Planos Operacionais (Rio)</a>
                 <a href="privacidade.html">Privacidade</a>
                 <a href="termos-uso.html">Termos</a>
                 <a href="suporte.html">Suporte</a>
@@ -36,172 +52,216 @@
         </div>
     </header>
 
-    <section class="home-hero">
-        <div class="home-hero-icon">
-            <img src="app-logo.png" alt="Cadê o Ônibus?" />
-        </div>
-        <span class="eyebrow"><span class="eyebrow-dot"></span> 100% Grátis e Sem Anúncios</span>
-        <h1>O ônibus tá vindo? Saiba agora.</h1>
-        <p class="lede">Rastreamento em tempo real, previsões exatas e alertas de chegada. Tudo isso sem gastar sua bateria ou seu plano de dados.</p>
+    <!-- Hero / Apresentação do App -->
+    <section class="hero-wrap">
+        <div class="hero-container">
+            <!-- Conteúdo de Apresentação -->
+            <div class="hero-content">
+                <div class="hero-pill-badge">
+                    <span class="dot"></span>
+                    <span>100% Gratuito &bull; Zero Anúncios &bull; Sem Cadastro</span>
+                </div>
 
-        <div class="cta-row">
-            <a class="btn-primary" href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" target="_blank">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 3.5v17a1 1 0 001.5.87l14-8.5a1 1 0 000-1.74l-14-8.5A1 1 0 004 3.5z" fill="#fff"/></svg>
-                Baixar no Google Play
-            </a>
-            <a class="btn-secondary" href="https://web.cadeoonibus.api.br" target="_blank">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" stroke="currentColor" stroke-width="2"/></svg>
-                Acessar no Navegador
-            </a>
-        </div>
-        <div class="platform-row">
-            <span class="platform-chip"><span class="dot"></span> Android — disponível</span>
-            <span class="platform-chip"><span class="dot"></span> Web — disponível</span>
+                <h1 class="hero-title">
+                    O ônibus tá vindo? <br />
+                    <span class="highlight">Saiba exatamente agora.</span>
+                </h1>
+
+                <p class="hero-desc">
+                    Chega de esperar no ponto às cegas. Acompanhe a localização exata dos ônibus em tempo real no mapa e receba alertas inteligentes antes dele passar.
+                </p>
+
+                <!-- Card de Região Ativa com troca rápida -->
+                <div class="hero-active-region-card">
+                    <div class="region-indicator-left">
+                        <span class="region-indicator-flag" id="home-hero-flag">🏖️</span>
+                        <div class="region-indicator-info">
+                            <h4 id="home-current-city-name">Rio de Janeiro (RJ)</h4>
+                            <p>Sua região selecionada para consultas e rotas</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-change-region" data-open-region-modal>
+                        <i class="fa-solid fa-location-dot"></i> Trocar Região
+                    </button>
+                </div>
+
+                <!-- Botões de Ação / Download -->
+                <div class="hero-actions">
+                    <a class="btn-primary" href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" target="_blank">
+                        <i class="fa-brands fa-google-play"></i> Baixar no Google Play
+                    </a>
+                    <a class="btn-secondary" href="https://web.cadeoonibus.api.br" target="_blank">
+                        <i class="fa-solid fa-globe"></i> Acessar Versão Web
+                    </a>
+                </div>
+            </div>
+
+            <!-- Moldura do Smartphone com Captura Real do App -->
+            <div class="hero-visual">
+                <div class="phone-mockup-wrapper">
+                    <!-- Badges flutuantes no mockup -->
+                    <div class="floating-badge badge-top-right">
+                        <div class="badge-icon"><i class="fa-solid fa-bus"></i></div>
+                        <span>GPS em Tempo Real</span>
+                    </div>
+
+                    <div class="floating-badge badge-bottom-left">
+                        <div class="badge-icon"><i class="fa-solid fa-bell"></i></div>
+                        <span>Alerta de Chegada</span>
+                    </div>
+
+                    <div class="phone-frame">
+                        <div class="phone-screen">
+                            <img src="img/screen-1.webp" alt="Tela do aplicativo Cadê o Ônibus em tempo real" />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <section class="stats-section">
-        <div class="stats-grid">
-            <div class="stat-item">
-                <h3>26</h3>
-                <p>Cidades e Regiões</p>
-            </div>
-            <div class="stat-item">
-                <h3>+19.000</h3>
-                <p>Ônibus Monitorados</p>
-            </div>
-            <div class="stat-item">
-                <h3>+10.000</h3>
-                <p>Linhas de Ônibus</p>
-            </div>
-            <div class="stat-item">
-                <h3>100%</h3>
-                <p>Gratuito</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Seção de Cidades e Linhas em Tempo Real -->
-    <section class="section" style="background: var(--surface); border-top: 1px solid var(--surface-border); border-bottom: 1px solid var(--surface-border); padding: 60px 20px;">
-        <div class="section-head" style="max-width: 800px; margin: 0 auto 36px; text-align: center;">
-            <p class="section-eyebrow" style="background: var(--line-card-bg);">Catálogo Completo</p>
-            <h2>Explore as Linhas por Cidade</h2>
-            <p>Selecione sua cidade para ver o mapa com o trajeto detalhado, paradas e a localização dos ônibus em tempo real.</p>
-        </div>
-
-        <div style="max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;">
-            <a href="linhas.html?cidade=rio" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-                <span>🏖️ Rio de Janeiro</span>
-                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">495 linhas</span>
-            </a>
-            <a href="linhas.html?cidade=sp" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-                <span>🏙️ São Paulo</span>
-                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">1.361 linhas</span>
-            </a>
-            <a href="linhas.html?cidade=bh" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-                <span>⛰️ Belo Horizonte</span>
-                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">326 linhas</span>
-            </a>
-            <a href="linhas.html?cidade=curitiba" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-                <span>🌲 Curitiba</span>
-                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">261 linhas</span>
-            </a>
-            <a href="linhas.html?cidade=brasilia" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-                <span>🏛️ Brasília</span>
-                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">1.069 linhas</span>
-            </a>
-            <a href="linhas.html?cidade=porto_alegre" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-                <span>🧉 Porto Alegre</span>
-                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">728 linhas</span>
-            </a>
-            <a href="linhas.html?cidade=rio_intermunicipal" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-                <span>🚌 Rio Intermunicipal</span>
-                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">1.238 linhas</span>
-            </a>
-            <a href="linhas.html?cidade=emtu" style="background: var(--line-card-bg); border: 1px solid var(--surface-border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-                <span>🚎 São Paulo (EMTU)</span>
-                <span style="font-size: 0.75rem; background: var(--surface); padding: 2px 8px; border-radius: 6px; color: var(--primary);">827 linhas</span>
-            </a>
-        </div>
-
-        <div style="text-align: center; margin-top: 24px;">
-            <a href="linhas.html" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
-                Ver todas as 26 cidades disponíveis <i class="fa-solid fa-arrow-right"></i>
-            </a>
-        </div>
-    </section>
-
+    <!-- Diferenciais e Funcionalidades Principais -->
     <section class="section">
         <div class="section-head">
-            <p class="section-eyebrow">Tudo o que você precisa</p>
-            <h2>Projetado para o dia a dia</h2>
-            <p>Mais leve, mais rápido e feito para quem depende do transporte público.</p>
+            <span class="section-eyebrow">Experiência Simples & Direta</span>
+            <h2>Feito para facilitar a sua rotina</h2>
+            <p>Tudo o que você precisa para se locomover com tranquilidade no transporte público da sua cidade.</p>
         </div>
 
-        <div class="feature-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.3 7-11.5a7 7 0 10-14 0C5 14.7 12 21 12 21z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.4" stroke="#fff" stroke-width="1.6"/></svg>
+        <div class="features-grid">
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fa-solid fa-map-location-dot"></i>
                 </div>
-                <h3>Rastreamento Preciso</h3>
-                <p>Usamos dados diretos das prefeituras. Você vê o ônibus se mexendo no mapa em tempo real, sem atrasos irritantes.</p>
+                <h3>Ônibus ao Vivo no Mapa</h3>
+                <p>Veja o deslocamento real de cada veículo segundo a segundo pelo sinal de GPS oficial, sabendo com precisão a distância até o seu ponto.</p>
             </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M18 16v-5a6 6 0 10-12 0v5l-2 2v1h16v-1l-2-2z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 21a2 2 0 004 0" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fa-solid fa-bell-ring fa-bell"></i>
                 </div>
                 <h3>Alertas de Chegada</h3>
-                <p>Configure um alarme. O celular vibra quando o ônibus estiver a 1km, 500m ou chegando no ponto.</p>
+                <p>Receba uma notificação no celular quando a sua linha estiver se aproximando. Não perca tempo esperando no ponto sem necessidade.</p>
             </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 21v-2a4 4 0 00-3-3.87" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 3.13a4 4 0 010 7.75" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fa-solid fa-route"></i>
                 </div>
-                <h3>Recursos Colaborativos</h3>
-                <p>O ônibus tá lotado? O ar tá quebrado? Veja relatos de outros passageiros antes de embarcar.</p>
+                <h3>Itinerários & Paradas</h3>
+                <p>Consulte o trajeto completo de ida e volta, a lista de todas as paradas e encontre com facilidade o melhor local para embarcar.</p>
             </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fa-solid fa-shield-heart"></i>
                 </div>
-                <h3>Economia de Dados</h3>
-                <p>Nosso sistema baixa os dados apenas da linha que você está visualizando, gastando até 80% menos internet.</p>
+                <h3>100% Grátis e Zero Anúncios</h3>
+                <p>Nenhum anúncio em tela cheia, banners invasivos ou planos pagos. Feito de passageiro para passageiro com foco total na agilidade.</p>
             </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fa-solid fa-bolt"></i>
                 </div>
-                <h3>Modo Escuro</h3>
-                <p>Interface bonita e confortável para usar à noite ou economizar bateria em telas OLED.</p>
+                <h3>Sem Cadastro ou Burocracia</h3>
+                <p>Abriu o app, já está funcionando. Não exigimos cadastro, e-mail ou senhas para você começar a usar imediatamente.</p>
             </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.6"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18" stroke="#fff" stroke-width="1.6"/></svg>
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fa-solid fa-city"></i>
                 </div>
-                <h3>3 Grandes Capitais</h3>
-                <p>Disponível no Rio de Janeiro (RJ), São Paulo (SP) e Belo Horizonte (MG).</p>
+                <h3>Cobertura Ampla</h3>
+                <p>Presente em 26 regiões e capitais pelo Brasil com integração contínua com os dados oficiais de mobilidade.</p>
             </div>
         </div>
     </section>
 
-    <section class="section section-flush-top">
-        <div class="premium-strip" style="border: 2px solid var(--primary); background: rgba(37, 99, 235, 0.03);">
-            <div style="font-size: 2.5rem; margin-bottom: 16px;">✨</div>
-            <h2 style="color: var(--primary);">100% Gratuito. Zero Anúncios.</h2>
-            <p>Diferente de outros aplicativos, o <strong>Cadê o Ônibus?</strong> foi feito de passageiro para passageiro. Não há planos premium, não pedimos cadastro e você <strong>nunca será interrompido por propagandas</strong>.</p>
-            <div class="cta-row" style="margin-top: 32px;">
-                <a class="btn-primary" href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" target="_blank">
-                    Baixar grátis no Google Play
+    <!-- Vitrine Visual / Screenshots do Aplicativo -->
+    <div class="showcase-strip-wrap">
+        <div class="section-head" style="margin-bottom: 36px;">
+            <span class="section-eyebrow">Conheça as Telas</span>
+            <h2>Design Moderno & Intuitivo</h2>
+            <p>Interface limpa, moderna e pensada para quem precisa de respostas rápidas na rua.</p>
+        </div>
+
+        <div class="showcase-cards-grid">
+            <div class="showcase-item">
+                <div class="showcase-item-img">
+                    <img src="img/screen-2.webp" alt="Visualização de mapa e rotas" loading="lazy" />
+                </div>
+                <div class="showcase-item-text">
+                    <h4>Mapa Interativo</h4>
+                    <p>Posicionamento em tempo real dos veículos da linha selecionada.</p>
+                </div>
+            </div>
+
+            <div class="showcase-item">
+                <div class="showcase-item-img">
+                    <img src="img/screen-3.webp" alt="Catálogo de linhas de ônibus" loading="lazy" />
+                </div>
+                <div class="showcase-item-text">
+                    <h4>Consulta de Linhas</h4>
+                    <p>Busca instantânea por número ou nome com filtros rápidos.</p>
+                </div>
+            </div>
+
+            <div class="showcase-item">
+                <div class="showcase-item-img">
+                    <img src="img/screen-4.webp" alt="Detalhes do trajeto e paradas" loading="lazy" />
+                </div>
+                <div class="showcase-item-text">
+                    <h4>Pontos e Paradas</h4>
+                    <p>Todos os pontos do trajeto mapeados detalhadamente.</p>
+                </div>
+            </div>
+
+            <div class="showcase-item">
+                <div class="showcase-item-img">
+                    <img src="img/screen-5.webp" alt="Alertas e avisos em tempo real" loading="lazy" />
+                </div>
+                <div class="showcase-item-text">
+                    <h4>Alertas e Notificações</h4>
+                    <p>Avisos na tela para você sair no momento exato.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Estados e Cidades Atendidas (Idêntico ao App Flutter) -->
+    <section class="coverage-section">
+        <div class="section-head">
+            <span class="section-eyebrow">Cidades Atendidas</span>
+            <h2>Disponível em 26 Regiões pelo Brasil</h2>
+            <p>Selecione seu estado ou região para explorar as linhas e o mapa em tempo real.</p>
+        </div>
+
+        <!-- Grid de Polos Regionais (Idêntico ao CityPickerSheet) -->
+        <div class="state-hubs-grid" id="home-state-hubs-container">
+            <!-- Renderizado dinamicamente com os 14 polos estaduais do Flutter -->
+        </div>
+    </section>
+
+    <!-- Banner de Download e Acesso Web -->
+    <section class="section" style="padding-top: 0;">
+        <div class="download-banner">
+            <h2>Pronto para não perder mais seu ônibus?</h2>
+            <p>Experimente agora mesmo o app no seu celular Android ou acesse diretamente pelo navegador do seu computador ou iPhone.</p>
+
+            <div class="cta-row">
+                <a class="btn-white" href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" target="_blank">
+                    <i class="fa-brands fa-google-play"></i> Baixar Grátis no Google Play
+                </a>
+                <a class="btn-outline-white" href="https://web.cadeoonibus.api.br" target="_blank">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir Versão Web
                 </a>
             </div>
         </div>
     </section>
 
+    <!-- Rodapé -->
     <footer class="site-footer">
         <div class="footer-inner">
             <a class="brand" href="index.html">
@@ -218,5 +278,69 @@
             <div class="copyright">© 2026 Cadê o Ônibus? (Guialshy). Todos os direitos reservados.</div>
         </div>
     </footer>
+
+    <!-- Scripts do Sistema de Região e Interações da Home -->
+    <script type="module">
+        import { STATE_HUBS, CITIES_CONFIG } from './js/cities-config.js';
+        import { regionManager } from './js/region-manager.js';
+
+        // Renderiza os Cards de Estados no mesmo formato do Flutter
+        function renderHomeStateHubs() {
+            const container = document.getElementById('home-state-hubs-container');
+            if (!container) return;
+
+            const activeKey = regionManager.getActiveCity();
+
+            container.innerHTML = STATE_HUBS.map(hub => {
+                const isSelected = hub.key === activeKey || (hub.citiesKeys && hub.citiesKeys.includes(activeKey));
+
+                return `
+                    <div class="state-hub-card ${isSelected ? 'active-selected' : ''}" data-hub-key="${hub.key}">
+                        <div class="state-hub-icon-wrap">
+                            <span>${hub.flag}</span>
+                        </div>
+                        <div class="state-hub-details">
+                            <div class="state-hub-title-row">
+                                <span class="state-hub-name">${hub.stateFullName}</span>
+                                <span class="state-hub-uf-badge">${hub.stateUf}</span>
+                                <span class="state-hub-macro-badge">${hub.macroRegion}</span>
+                            </div>
+                            <p class="state-hub-subtitle">${hub.coverageSubtitle}</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right state-hub-arrow"></i>
+                    </div>
+                `;
+            }).join('');
+
+            // Adiciona listeners para selecionar a região e navegar para a aba de linhas
+            container.querySelectorAll('.state-hub-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const hubKey = card.getAttribute('data-hub-key');
+                    regionManager.setCity(hubKey);
+                    // Abre diretamente a aba de linhas da região selecionada
+                    window.location.href = `linhas.html?cidade=${hubKey}`;
+                });
+            });
+        }
+
+        // Atualiza a interface quando a região muda
+        window.addEventListener('cobusao-region-changed', (e) => {
+            const config = e.detail.config;
+            const flagEl = document.getElementById('home-hero-flag');
+            const cityEl = document.getElementById('home-current-city-name');
+            if (flagEl) flagEl.textContent = config.flag || '📍';
+            if (cityEl) cityEl.textContent = `${config.name} (${config.state})`;
+            renderHomeStateHubs();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderHomeStateHubs();
+            const config = regionManager.getActiveConfig();
+            const flagEl = document.getElementById('home-hero-flag');
+            const cityEl = document.getElementById('home-current-city-name');
+            if (flagEl) flagEl.textContent = config.flag || '📍';
+            if (cityEl) cityEl.textContent = `${config.name} (${config.state})`;
+        });
+    </script>
 </body>
 </html>
