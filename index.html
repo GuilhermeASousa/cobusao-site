@@ -352,11 +352,27 @@
             if (mockup) {
                 mockup.addEventListener('mouseenter', stopTimer);
                 mockup.addEventListener('mouseleave', startTimer);
-                // Toque em dispositivos mobile avança
-                mockup.addEventListener('click', () => {
-                    goToSlide(currentIdx + 1);
+
+                // Suporte a swipe de toque no celular
+                let touchStartX = 0;
+                let touchEndX = 0;
+                mockup.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                    stopTimer();
+                }, { passive: true });
+
+                mockup.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    const diff = touchStartX - touchEndX;
+                    if (Math.abs(diff) > 35) {
+                        if (diff > 0) {
+                            goToSlide(currentIdx + 1); // Swipe esquerda -> próximo
+                        } else {
+                            goToSlide(currentIdx - 1); // Swipe direita -> anterior
+                        }
+                    }
                     startTimer();
-                });
+                }, { passive: true });
             }
 
             startTimer();

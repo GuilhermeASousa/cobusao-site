@@ -63,6 +63,7 @@ class RegionManager {
 
   init() {
     this.injectHeaderRegionButton();
+    this.injectMobileMenu();
     this.createModal();
     this.updateNavigationLinks();
     this.bindGlobalTriggers();
@@ -130,7 +131,7 @@ class RegionManager {
         <span class="pill-dot"></span>
         <span class="pill-flag" id="header-region-flag">🏖️</span>
         <span class="pill-text" id="header-region-label">Rio de Janeiro</span>
-        <svg class="pill-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        <i class="fa-solid fa-chevron-down pill-chevron"></i>
       `;
 
       // Insere antes da navegação
@@ -146,6 +147,148 @@ class RegionManager {
   }
 
   /**
+   * Injeta o menu hambúrguer e o Drawer lateral para celular
+   */
+  injectMobileMenu() {
+    const headerInner = document.querySelector('.header-inner');
+    if (!headerInner) return;
+
+    let menuBtn = document.getElementById('btn-mobile-menu-toggle');
+    if (!menuBtn) {
+      menuBtn = document.createElement('button');
+      menuBtn.id = 'btn-mobile-menu-toggle';
+      menuBtn.className = 'btn-mobile-menu';
+      menuBtn.type = 'button';
+      menuBtn.setAttribute('aria-label', 'Abrir Menu de Navegação');
+      menuBtn.innerHTML = `<i class="fa-solid fa-bars"></i>`;
+      headerInner.appendChild(menuBtn);
+    }
+
+    let drawer = document.getElementById('cobusao-mobile-drawer');
+    if (!drawer) {
+      drawer = document.createElement('div');
+      drawer.id = 'cobusao-mobile-drawer';
+      drawer.className = 'mobile-drawer-backdrop';
+      drawer.innerHTML = `
+        <div class="mobile-drawer-content" role="dialog" aria-modal="true">
+          <div class="mobile-drawer-header">
+            <a class="brand" href="index.html">
+              <img src="app-logo.png" alt="Cadê o Ônibus?" />
+              <span>Cadê o Ônibus?</span>
+            </a>
+            <button type="button" class="btn-drawer-close" id="btn-close-mobile-drawer" aria-label="Fechar Menu">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <div class="mobile-drawer-region-card">
+            <div class="region-card-left">
+              <span class="region-flag-lg" id="drawer-region-flag">🏖️</span>
+              <div class="region-text-group">
+                <span class="region-label-small">Região Selecionada</span>
+                <h4 id="drawer-region-label">Rio de Janeiro (RJ)</h4>
+              </div>
+            </div>
+            <button type="button" class="btn-drawer-switch-region" id="btn-drawer-switch-city">
+              Trocar
+            </button>
+          </div>
+
+          <nav class="mobile-drawer-nav">
+            <a href="linhas.html" class="drawer-link" id="drawer-link-linhas">
+              <i class="fa-solid fa-bus"></i>
+              <span>Linhas de Ônibus</span>
+            </a>
+            <a href="https://web.cadeoonibus.api.br" target="_blank" class="drawer-link">
+              <i class="fa-solid fa-globe"></i>
+              <span>Versão Web (App no Navegador)</span>
+            </a>
+            <a href="planos-operacionais.html" id="drawer-planos-link" class="drawer-link">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Planos Operacionais (Rio)</span>
+            </a>
+
+            <div class="drawer-nav-divider"></div>
+
+            <a href="privacidade.html" class="drawer-link sub-link">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span>Política de Privacidade</span>
+            </a>
+            <a href="termos-uso.html" class="drawer-link sub-link">
+              <i class="fa-solid fa-file-contract"></i>
+              <span>Termos de Uso</span>
+            </a>
+            <a href="suporte.html" class="drawer-link sub-link">
+              <i class="fa-solid fa-circle-question"></i>
+              <span>Suporte & Ajuda</span>
+            </a>
+          </nav>
+
+          <div class="mobile-drawer-footer">
+            <a class="btn-primary" style="width: 100%; justify-content: center; padding: 12px;" href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" target="_blank">
+              <i class="fa-brands fa-google-play"></i> Baixar App Grátis
+            </a>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(drawer);
+
+      const closeBtn = drawer.querySelector('#btn-close-mobile-drawer');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.closeMobileDrawer();
+        });
+      }
+
+      drawer.addEventListener('click', (e) => {
+        if (e.target === drawer) {
+          this.closeMobileDrawer();
+        }
+      });
+
+      const switchBtn = drawer.querySelector('#btn-drawer-switch-city');
+      if (switchBtn) {
+        switchBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.closeMobileDrawer();
+          setTimeout(() => this.openModal(), 150);
+        });
+      }
+    }
+
+    menuBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.toggleMobileDrawer();
+    });
+  }
+
+  toggleMobileDrawer() {
+    const drawer = document.getElementById('cobusao-mobile-drawer');
+    if (!drawer) return;
+    if (drawer.classList.contains('open')) {
+      this.closeMobileDrawer();
+    } else {
+      this.openMobileDrawer();
+    }
+  }
+
+  openMobileDrawer() {
+    const drawer = document.getElementById('cobusao-mobile-drawer');
+    if (!drawer) return;
+    drawer.classList.add('open');
+    document.body.classList.add('mobile-drawer-open');
+  }
+
+  closeMobileDrawer() {
+    const drawer = document.getElementById('cobusao-mobile-drawer');
+    if (!drawer) return;
+    drawer.classList.remove('open');
+    document.body.classList.remove('mobile-drawer-open');
+  }
+
+  /**
    * Atualiza a label e ícone do botão de região do cabeçalho
    */
   updateHeaderButton() {
@@ -155,6 +298,12 @@ class RegionManager {
 
     if (flagEl) flagEl.textContent = config.flag || '📍';
     if (labelEl) labelEl.textContent = `${config.name} (${config.state})`;
+
+    // Atualiza também drawer mobile
+    const drawerFlag = document.getElementById('drawer-region-flag');
+    const drawerLabel = document.getElementById('drawer-region-label');
+    if (drawerFlag) drawerFlag.textContent = config.flag || '📍';
+    if (drawerLabel) drawerLabel.textContent = `${config.name} (${config.state})`;
 
     // Atualiza também seletor na página inicial se existir
     const homeCurrentCity = document.getElementById('home-current-city-name');
@@ -171,7 +320,6 @@ class RegionManager {
 
     // 1. Link para "Linhas de Ônibus" -> sempre leva para a cidade ativa
     document.querySelectorAll('a[href*="linhas.html"]').forEach(link => {
-      // Se não for um link com cidade explícita pré-definida em um card de outra cidade
       if (!link.classList.contains('preserve-link-city')) {
         link.href = `linhas.html?cidade=${this.activeCityKey}`;
       }
@@ -187,6 +335,12 @@ class RegionManager {
         link.style.visibility = 'hidden';
       }
     });
+
+    // 3. Atualiza link do drawer
+    const drawerPlanos = document.getElementById('drawer-planos-link');
+    if (drawerPlanos) {
+      drawerPlanos.style.display = isRio ? 'flex' : 'none';
+    }
   }
 
   /**

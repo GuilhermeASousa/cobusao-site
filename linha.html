@@ -63,24 +63,21 @@
 
         <div id="detail-main-content" style="display: none;">
             <!-- Barra Superior com Breadcrumbs e Busca Rápida de Linha -->
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;">
-                <nav class="breadcrumb-nav" style="margin-bottom: 0;">
-                    <a href="index.html"><i class="fa-solid fa-house"></i> Início</a>
-                    <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
-                    <a id="breadcrumb-city" href="linhas.html">Cidades</a>
-                    <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+            <div class="line-top-bar-row">
+                <nav class="breadcrumb-nav">
+                    <a id="breadcrumb-city" href="linhas.html"><i class="fa-solid fa-arrow-left"></i> Voltar às Linhas</a>
+                    <i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; opacity: 0.6;"></i>
                     <span id="breadcrumb-line" style="font-weight: 700; color: var(--text);">Linha</span>
                 </nav>
 
                 <!-- Input de Busca Rápida de Linhas com Autocomplete -->
-                <div style="position: relative; width: 100%; max-width: 320px;">
+                <div class="line-quick-search-wrap">
                     <div style="position: relative;">
                         <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.9rem;"></i>
                         <input 
                             type="text" 
                             id="line-quick-search-input" 
                             placeholder="Buscar outra linha (ex: 472, 804, 107T)..." 
-                            style="width: 100%; height: 38px; padding: 0 12px 0 34px; border-radius: 10px; border: 1.5px solid var(--surface-border); background: var(--line-card-bg); color: var(--text); font-size: 0.88rem; outline: none;" 
                             autocomplete="off"
                         />
                     </div>
@@ -114,9 +111,9 @@
                     </div>
                 </div>
 
-                <!-- Alternador de Sentidos (Ida / Volta) -->
-                <div class="direction-switcher-row" id="direction-switcher">
-                    <!-- Gerado via JS: Sentido Ida vs Volta -->
+                <!-- Seletor de Sentido da Linha (Ida / Volta) -->
+                <div class="direction-switcher" id="direction-switcher">
+                    <!-- Gerado dinamicamente via JS -->
                 </div>
             </section>
 
@@ -141,11 +138,11 @@
                 <div class="map-legend-overlay">
                     <div class="legend-item">
                         <span class="legend-color-bar" style="background: var(--primary);"></span>
-                        <span>Trajeto da Linha</span>
+                        <span>Trajeto</span>
                     </div>
                     <div class="legend-item">
                         <span style="width: 10px; height: 10px; border-radius: 50%; background: #2563eb; border: 2px solid #fff; display: inline-block;"></span>
-                        <span>Ônibus ao Vivo (GPS)</span>
+                        <span>Ao Vivo</span>
                     </div>
                     <div class="legend-item">
                         <span style="width: 8px; height: 8px; border-radius: 50%; background: #fff; border: 2px solid #4b5563; display: inline-block;"></span>
@@ -158,13 +155,20 @@
             <section>
                 <nav class="line-tabs-nav">
                     <button type="button" class="line-tab-btn active" data-tab="veiculos">
-                        <i class="fa-solid fa-satellite-dish"></i> Ônibus em Tempo Real
+                        <i class="fa-solid fa-satellite-dish"></i>
+                        <span class="tab-label-full">Ônibus em Tempo Real</span>
+                        <span class="tab-label-short">Ao Vivo</span>
                     </button>
                     <button type="button" class="line-tab-btn" data-tab="paradas">
-                        <i class="fa-solid fa-list-ol"></i> Itinerário & Paradas <span id="stops-tab-count" style="font-size: 0.8rem; opacity: 0.7;"></span>
+                        <i class="fa-solid fa-list-ol"></i>
+                        <span class="tab-label-full">Itinerário & Paradas</span>
+                        <span class="tab-label-short">Paradas</span>
+                        <span id="stops-tab-count" style="font-size: 0.8rem; opacity: 0.7;"></span>
                     </button>
                     <button type="button" class="line-tab-btn" data-tab="horarios">
-                        <i class="fa-regular fa-calendar-days"></i> Quadro de Horários
+                        <i class="fa-regular fa-calendar-days"></i>
+                        <span class="tab-label-full">Quadro de Horários</span>
+                        <span class="tab-label-short">Horários</span>
                     </button>
                 </nav>
 
