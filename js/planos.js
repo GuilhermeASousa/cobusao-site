@@ -437,6 +437,13 @@ function renderLinesGrid(lines) {
       ? `<span class="badge badge-status-active">Ativa</span>`
       : `<span class="badge badge-status-extinct">Extinta</span>`;
 
+    let depSub = "";
+    if (l.latest_dep_circ_du > 0) {
+      depSub = `<span style="font-size:0.72rem; color:var(--text-muted); display:block;">(${l.latest_dep_circ_du} circ.)</span>`;
+    } else if (l.latest_dep_ida_du > 0 || l.latest_dep_volta_du > 0) {
+      depSub = `<span style="font-size:0.72rem; color:var(--text-muted); display:block;">(${l.latest_dep_ida_du}i / ${l.latest_dep_volta_du}v)</span>`;
+    }
+
     return `
       <div class="line-card" onclick="openLineModal('${l.line_code}')">
         <div class="line-card-header">
@@ -446,7 +453,10 @@ function renderLinesGrid(lines) {
         <div class="line-card-name">${escapeHTML(l.latest_name || "Itinerário não especificado")}</div>
         <div class="line-card-meta">
           <span class="badge ${consClass}">${escapeHTML(l.latest_consortium || "Consórcio -")}</span>
-          <span><span class="line-stat-val">${l.latest_trips_weekday || 0}</span> viagens/dia</span>
+          <div>
+            <span class="line-stat-val">${l.latest_trips_weekday || 0}</span> viagens/dia
+            ${depSub}
+          </div>
         </div>
       </div>
     `;
@@ -743,6 +753,20 @@ async function openLineModal(lineCode) {
   setText("modal-line-consortium", line.latest_consortium || "-");
   setText("modal-line-trips", `${line.latest_trips_weekday || 0} viagens/dia`);
 
+  const depBadge = document.getElementById("modal-line-departures");
+  if (depBadge) {
+    if (line.latest_dep_circ_du > 0) {
+      depBadge.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> ${line.latest_dep_circ_du} partidas circulares/dia`;
+      depBadge.style.display = "inline-flex";
+    } else if (line.latest_dep_ida_du > 0 || line.latest_dep_volta_du > 0) {
+      const tot = line.latest_dep_total_du || (line.latest_dep_ida_du + line.latest_dep_volta_du);
+      depBadge.innerHTML = `<i class="fa-solid fa-route"></i> ${line.latest_dep_ida_du} Ida / ${line.latest_dep_volta_du} Volta • <strong>${tot} partidas totais/dia</strong>`;
+      depBadge.style.display = "inline-flex";
+    } else {
+      depBadge.style.display = "none";
+    }
+  }
+
   const modalBackdrop = document.getElementById("obs-line-modal");
   if (modalBackdrop) modalBackdrop.classList.add("open");
 
@@ -876,13 +900,48 @@ function renderModalHistoryTable(timeline) {
       domExtra = ` <span style="${color} font-size:0.75rem; font-weight:700;">(${row.deltaDom > 0 ? '+' : ''}${row.deltaDom})</span>`;
     }
 
+    let duDeparturesSub = "";
+    if (row.dep_circ_du > 0) {
+      duDeparturesSub = `<div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;"><i class="fa-solid fa-arrows-rotate"></i> ${row.dep_circ_du} circ.</div>`;
+    } else if (row.dep_ida_du > 0 || row.dep_volta_du > 0) {
+      const tot = row.dep_total_du || (row.dep_ida_du + row.dep_volta_du);
+      const isAsym = row.dep_ida_du !== row.dep_volta_du;
+      const colorStyle = isAsym ? "color:var(--primary); font-weight:600;" : "color:var(--text-muted);";
+      duDeparturesSub = `<div style="font-size:0.75rem; ${colorStyle} margin-top:2px;" title="${row.dep_ida_du} ida / ${row.dep_volta_du} volta (${tot} partidas totais no dia útil)">${row.dep_ida_du} ida / ${row.dep_volta_du} volta <span style="opacity:0.75;">(${tot}p)</span></div>`;
+    }
+
+    let sabDeparturesSub = "";
+    if (row.dep_circ_sab > 0) {
+      sabDeparturesSub = `<div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">${row.dep_circ_sab} circ.</div>`;
+    } else if (row.dep_ida_sab > 0 || row.dep_volta_sab > 0) {
+      const totSab = row.dep_total_sab || (row.dep_ida_sab + row.dep_volta_sab);
+      sabDeparturesSub = `<div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">${row.dep_ida_sab}i / ${row.dep_volta_sab}v (${totSab}p)</div>`;
+    }
+
+    let domDeparturesSub = "";
+    if (row.dep_circ_dom > 0) {
+      domDeparturesSub = `<div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">${row.dep_circ_dom} circ.</div>`;
+    } else if (row.dep_ida_dom > 0 || row.dep_volta_dom > 0) {
+      const totDom = row.dep_total_dom || (row.dep_ida_dom + row.dep_volta_dom);
+      domDeparturesSub = `<div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">${row.dep_ida_dom}i / ${row.dep_volta_dom}v (${totDom}p)</div>`;
+    }
+
     return `
       <tr class="${rowClass}">
         <td><strong>${formatDateBR(row.date)}</strong></td>
-        <td><strong style="font-size:0.95rem;">${row.trips_du}</strong></td>
+        <td>
+          <div style="font-weight:800; font-size:0.95rem; color:var(--text);">${row.trips_du}</div>
+          ${duDeparturesSub}
+        </td>
         <td>${deltaBadge}</td>
-        <td>${row.trips_sab}${sabExtra}</td>
-        <td>${row.trips_dom}${domExtra}</td>
+        <td>
+          <div><strong>${row.trips_sab}</strong>${sabExtra}</div>
+          ${sabDeparturesSub}
+        </td>
+        <td>
+          <div><strong>${row.trips_dom}</strong>${domExtra}</div>
+          ${domDeparturesSub}
+        </td>
         <td>${row.km_du ? row.km_du.toFixed(1) + ' km' : "-"}</td>
         <td><span class="badge ${getConsortiumClass(row.consortium)}">${escapeHTML(row.consortium || "-")}</span></td>
         <td style="max-width:220px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${escapeHTML(row.route_name || "")}">${escapeHTML(row.route_name || "-")}</td>
