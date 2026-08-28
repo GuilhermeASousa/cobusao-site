@@ -76,7 +76,8 @@ function updatePageMeta(city) {
 
   const heroDesc = document.getElementById('hero-desc');
   if (heroDesc) {
-    heroDesc.textContent = `Consulte o trajeto, paradas, tabela de horários e rastreamento em tempo real dos ônibus de ${city.fullName}.`;
+    const subtitle = city.coverageSubtitle ? ` (${city.coverageSubtitle})` : '';
+    heroDesc.textContent = `Consulte o trajeto, paradas, tabela de horários e rastreamento em tempo real das linhas de ${city.name} e região${subtitle}.`;
   }
 
   const currentCityBtnText = document.getElementById('current-city-name');

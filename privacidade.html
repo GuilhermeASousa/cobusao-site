@@ -5,7 +5,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Política de Privacidade — Cadê o Ônibus?</title>
-    <meta name="description" content="Política de Privacidade do aplicativo Cadê o Ônibus." />
+    <meta name="description"
+        content="Política de Privacidade e proteção de dados (LGPD) do aplicativo e site Cadê o Ônibus. 100% gratuito e sem anúncios." />
 
     <meta property="og:site_name" content="Cadê o Ônibus?" />
     <meta property="og:type" content="article" />
@@ -53,115 +54,115 @@
 
     <section class="page-hero">
         <h1>Política de Privacidade</h1>
-        <p class="lede">A sua privacidade é fundamental para nós. O aplicativo <strong>Cadê o Ônibus?</strong> foi
-            desenvolvido com a premissa de coletar a menor quantidade possível de dados.</p>
-        <span class="updated-badge"><span class="dot"></span> Última atualização em 14 de Julho de 2026</span>
+        <p class="lede">A sua privacidade é um compromisso central do <strong>Cadê o Ônibus?</strong>. Desenvolvemos
+            nossos serviços com o princípio de privacidade por design (Privacy by Design), coletando o estritamente
+            necessário para a operação do aplicativo.</p>
+        <span class="updated-badge"><span class="dot"></span> Atualizado em Agosto de 2026</span>
     </section>
 
     <div class="doc-layout">
         <article class="doc-card">
             <p>
-                Este documento está em conformidade com a Lei Geral de Proteção de Dados (LGPD) e garante transparência
-                total sobre como suas informações são processadas. O aplicativo é 100% gratuito e <strong>não possui
-                    anúncios ou rastreadores de publicidade de terceiros</strong>.
+                Este documento está em plena conformidade com a <strong>Lei Geral de Proteção de Dados Pessoais (LGPD -
+                    Lei nº 13.709/2018)</strong> e assegura transparência sobre o tratamento de dados no aplicativo para
+                Android, na versão web e neste portal. O serviço é 100% gratuito, sem cadastros obrigatórios e
+                <strong>livre de redes de publicidade invasiva ou rastreadores de terceiros</strong>.
             </p>
 
-            <section id="dados">
-                <h2>1. Dados que Coletamos</h2>
+            <section id="dados-coletados">
+                <h2>1. Dados Coletados e Finalidade</h2>
 
-                <h3>a) Dados de Localização (GPS)</h3>
-                <p>Para o funcionamento principal do aplicativo, solicitamos acesso à sua localização:</p>
+                <h3>a) Dados de Localização Geográfica (GPS)</h3>
+                <p>
+                    Para proporcionar a melhor experiência de transporte, o aplicativo pode solicitar permissão de
+                    acesso à sua localização:
+                </p>
                 <ul>
-                    <li><strong>Apenas em Primeiro Plano:</strong> Usamos sua localização precisa para mostrar onde você
-                        está no mapa e quais paradas e ônibus estão próximos enquanto o aplicativo estiver aberto e em
-                        uso na tela.</li>
-                </ul>
-                <div class="doc-callout">
-                    <strong>Nota Importante:</strong> Nós <strong>NÃO</strong> rastreamos ou coletamos sua localização
-                    em segundo plano (com o aplicativo minimizado ou a tela bloqueada). Não mantemos histórico dos seus
-                    trajetos.
-                </div>
-
-                <h3>b) Dados Colaborativos (Anônimos)</h3>
-                <p>Quando você utiliza os recursos sociais do app (ex: informar que o ônibus está "Lotado" ou com
-                    "Ar-condicionado Quebrado"), enviamos essa informação para nosso servidor.</p>
-                <ul>
-                    <li>Esses dados são associados a um identificador anônimo temporário.</li>
-                    <li>Não exigimos cadastro: não há vínculo com seu nome, e-mail ou número de telefone.</li>
+                    <li><strong>Uso Exclusivo em Primeiro Plano:</strong> Sua localização é utilizada exclusivamente
+                        enquanto o aplicativo estiver aberto e ativo na tela, com a finalidade de centralizar o mapa no seu
+                        ponto atual, calcular a distância até as paradas mais próximas e ordenar as linhas com base na
+                        sua proximidade.</li>
+                    <li><strong>Sem Rastreamento em Segundo Plano:</strong> Não rastreamos, não registramos e não
+                        coletamos sua localização quando o aplicativo estiver minimizado ou com a tela desligada.</li>
+                    <li><strong>Sem Histórico de Deslocamento:</strong> Não gravamos em servidores o itinerário pessoal ou
+                        os trajetos percorridos pelo usuário.</li>
                 </ul>
 
-                <h3>c) Dados Técnicos, Push e Identificadores (Analytics)</h3>
-                <p>Para melhorar o app e enviar alertas, utilizamos serviços do Firebase. Com isso, coletamos
-                    automaticamente:</p>
+                <h3>b) Preferências e Dados Locais (No Dispositivo)</h3>
+                <p>
+                    Suas linhas favoritas, paradas salvas, região ativa selecionada e buscas recentes ficam armazenadas
+                    <strong>estritamente na memória local do seu aparelho</strong> (via <em>SharedPreferences</em> no
+                    Android e <em>localStorage</em> no navegador web). Nenhum desses dados é vinculado a uma conta pessoal
+                    em nossos servidores.
+                </p>
+
+                <h3>c) Informações Colaborativas em Tempo Real</h3>
+                <p>
+                    Ao enviar relatos voluntários no app (ex: status de lotação do veículo ou ar-condicionado):
+                </p>
                 <ul>
-                    <li><strong>Tokens de Dispositivo:</strong> Um código único para podermos enviar notificações Push
-                        de chegada.</li>
-                    <li><strong>ID de Publicidade (AD_ID):</strong> Embora nosso app seja livre de anúncios, o Firebase
-                        Analytics utiliza o ID de Publicidade do Android exclusivamente para gerar estatísticas de uso
-                        (ex: quantidade de usuários ativos). Esse ID não é utilizado para propaganda.</li>
-                    <li><strong>Relatórios de Falhas:</strong> Coletamos crash logs anonimizados para corrigir bugs.
-                    </li>
+                    <li>O relato é transmitido de forma <strong>100% anônima</strong> ao nosso servidor WebSocket para
+                        atualização temporária do status daquele veículo específico para os outros passageiros da linha.</li>
+                    <li>Nenhum dado pessoal (como nome, e-mail, telefone ou identificadores sensíveis) é atrelado ao relato.</li>
+                </ul>
+
+                <h3>d) Notificações Push e Métricas Técnicas</h3>
+                <ul>
+                    <li><strong>Tokens de Notificação (FCM):</strong> Um identificador anônimo de dispositivo gerado pelo
+                        Firebase Cloud Messaging é utilizado exclusivamente para encaminhar os alarmes de aproximação e
+                        alertas de chegada que você programar no app.</li>
+                    <li><strong>Diagnósticos e Falhas (Crashlytics):</strong> Relatórios técnicos de erro e falhas do
+                        sistema despersonalizados são coletados para identificação de bugs e melhoria da estabilidade do
+                        aplicativo.</li>
                 </ul>
             </section>
 
-            <section id="base-legal">
-                <h2>2. Base Legal (LGPD) e Como Usamos Seus Dados</h2>
-                <p>Nós utilizamos seus dados com base nas seguintes hipóteses legais:</p>
+            <section id="bases-legais">
+                <h2>2. Bases Legais para o Tratamento (LGPD)</h2>
+                <p>O tratamento de dados no <strong>Cadê o Ônibus?</strong> baseia-se nas seguintes hipóteses legais:</p>
                 <ul>
-                    <li><strong>Consentimento:</strong> Solicitado diretamente no sistema operacional do seu celular
-                        para acesso à sua localização GPS.</li>
-                    <li><strong>Legítimo Interesse:</strong> Para coletar métricas anônimas de falhas (crash logs)
-                        visando aprimorar a qualidade do serviço.</li>
+                    <li><strong>Consentimento (Art. 7º, I da LGPD):</strong> Para a obtenção da localização GPS em
+                        primeiro plano, concedida explicitamente por você no sistema operacional do dispositivo.</li>
+                    <li><strong>Legítimo Interesse (Art. 7º, IX da LGPD):</strong> Para a transmissão das métricas anônimas
+                        de estabilidade e envio das notificações solicitadas pelo próprio usuário.</li>
                 </ul>
-                <p>Os dados coletados são usados exclusivamente para mostrar estimativas de chegada, enviar notificações
-                    push (alertas de chegada) e manter a estabilidade do serviço.</p>
             </section>
 
             <section id="compartilhamento">
-                <h2>3. Armazenamento e Compartilhamento com Terceiros</h2>
-
-                <h3>Onde ficam seus dados?</h3>
+                <h2>3. Compartilhamento e Segurança da Informação</h2>
                 <p>
-                    As informações pessoais (como histórico de pesquisa e paradas favoritas) ficam guardadas
-                    <strong>apenas no seu dispositivo (localmente)</strong>.
-                </p>
-
-                <h3>Compartilhamento com Terceiros e Processamento por IA</h3>
-                <p>
-                    Nós não vendemos nem alugamos dados. Compartilhamos informações anonimizadas apenas com provedores
-                    tecnológicos essenciais para o funcionamento do app (nossa infraestrutura de servidores e APIs de
-                    transporte público). Não há compartilhamento com redes de anúncios.
+                    Nós <strong>não comercializamos, não alugamos e não compartilhamos</strong> dados de usuários com
+                    empresas de marketing, corretores de dados (data brokers) ou anunciantes.
                 </p>
                 <p>
-                    <strong>Inteligência Artificial:</strong> Alguns dados de operação ou relatos podem ser processados
-                    por APIs de Inteligência Artificial do Google instaladas em nosso servidor (Gemini) para gerar
-                    avisos dentro do aplicativo de forma automática. Nenhum dado que identifique você pessoalmente é
-                    enviado para a IA.
+                    Os dados técnicos necessários transitam através de conexões criptografadas seguras (HTTPS / WSS com TLS
+                    1.3) para nossa infraestrutura de servidores em nuvem e provedores de CDN (como Cloudflare Pages),
+                    garantindo alta disponibilidade e proteção contra acessos não autorizados.
                 </p>
             </section>
 
-            <section id="direitos">
-                <h2>4. Seus Direitos (LGPD)</h2>
-                <p>De acordo com a Lei Geral de Proteção de Dados (LGPD), você tem direito a:</p>
+            <section id="direitos-usuario">
+                <h2>4. Direitos do Titular de Dados</h2>
+                <p>Em conformidade com a LGPD, você possui controle sobre suas informações:</p>
                 <ul>
-                    <li>Saber quais dados coletamos (descritos nesta política).</li>
-                    <li>Revogar o consentimento de localização a qualquer momento nas configurações do seu celular.</li>
-                    <li>Solicitar a exclusão de dados: como não exigimos criação de conta, basta <strong>desinstalar o
-                            aplicativo</strong> para que todos os dados locais sejam automaticamente removidos do seu
-                        aparelho.</li>
+                    <li><strong>Revogação de Permissões:</strong> A permissão de localização pode ser ativada ou desativada
+                        a qualquer momento nas configurações de privacidade do seu smartphone.</li>
+                    <li><strong>Exclusão de Dados:</strong> Como não mantemos contas nem registros de usuários em banco de
+                        dados central, a desinstalação do aplicativo ou a limpeza dos dados do navegador remove
+                        instantaneamente todas as preferências e favoritos locais do seu aparelho.</li>
                 </ul>
             </section>
 
             <section id="contato">
-                <h2>5. Contato</h2>
+                <h2>5. Encarregado de Dados e Contato</h2>
                 <p>
-                    Se você tiver dúvidas sobre esta Política de Privacidade ou sobre as práticas deste aplicativo,
-                    entre em contato conosco:
+                    Para esclarecimentos adicionais sobre nossa política de privacidade ou sobre o tratamento de dados,
+                    entre em contato direto com o desenvolvedor responsável:
                 </p>
                 <ul>
                     <li><strong>E-mail:</strong> <a href="mailto:cobusao@gmail.com">cobusao@gmail.com</a></li>
+                    <li><strong>Canal de Atendimento:</strong> <a href="suporte.html">Página de Suporte</a></li>
                 </ul>
-                <p>Veja também nossa <a href="suporte.html">página de suporte</a>.</p>
             </section>
         </article>
     </div>
