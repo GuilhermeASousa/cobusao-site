@@ -944,7 +944,7 @@ function renderModalHistoryTable(timeline) {
         </td>
         <td>${row.km_du ? row.km_du.toFixed(1) + ' km' : "-"}</td>
         <td><span class="badge ${getConsortiumClass(row.consortium)}">${escapeHTML(row.consortium || "-")}</span></td>
-        <td style="max-width:220px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${escapeHTML(row.route_name || "")}">${escapeHTML(row.route_name || "-")}</td>
+        <td class="modal-table-route" title="${escapeHTML(row.route_name || "")}">${escapeHTML(row.route_name || "-")}</td>
       </tr>
     `;
   }).join("");
