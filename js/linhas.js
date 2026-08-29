@@ -31,8 +31,42 @@ document.addEventListener('DOMContentLoaded', () => {
   initCityFromUrl();
   setupEventListeners();
   setupCityModal();
+  renderFavoritesPanel();
   loadCityLines(state.currentCitySlug);
 });
+
+/**
+ * Renderiza o painel de linhas favoritas salvas pelo usuário
+ */
+function renderFavoritesPanel() {
+  const panel = document.getElementById('favorite-lines-panel');
+  const container = document.getElementById('favorite-lines-chips');
+  if (!panel || !container) return;
+
+  try {
+    const raw = localStorage.getItem('cobusao_favorite_lines');
+    const favorites = raw ? JSON.parse(raw) : [];
+
+    // Filtra favoritos da cidade atual ou exibe todos
+    const cityFavs = favorites.filter(f => f.city === state.currentCitySlug || !f.city);
+
+    if (cityFavs.length === 0) {
+      panel.style.display = 'none';
+      return;
+    }
+
+    container.innerHTML = cityFavs.map(f => `
+      <a href="linha.html?cidade=${f.city || state.currentCitySlug}&linha=${encodeURIComponent(f.code)}" class="favorite-line-chip" title="${f.desc || ''}">
+        <span class="chip-badge">${f.code}</span>
+        <span>${f.desc || 'Linha ' + f.code}</span>
+      </a>
+    `).join('');
+
+    panel.style.display = 'block';
+  } catch (e) {
+    panel.style.display = 'none';
+  }
+}
 
 // Escuta alterações de região vindas de outras partes do site
 window.addEventListener('cobusao-region-changed', (e) => {
@@ -141,6 +175,7 @@ export function switchCity(newCitySlug) {
   window.history.pushState({}, '', url);
 
   updatePageMeta(state.cityConfig);
+  renderFavoritesPanel();
   loadCityLines(norm);
 
   // Fecha modal de cidades se estiver aberto

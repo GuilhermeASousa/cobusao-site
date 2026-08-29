@@ -62,11 +62,13 @@ class RegionManager {
   }
 
   init() {
+    this.initTheme();
     this.injectHeaderRegionButton();
     this.injectMobileMenu();
     this.createModal();
     this.updateNavigationLinks();
     this.bindGlobalTriggers();
+    this.initHomeHeroSearch();
   }
 
   /**
@@ -353,6 +355,16 @@ class RegionManager {
         this.openModal();
       });
     });
+
+    // Vincula acordeons de FAQ em qualquer página
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.faq-item');
+        if (item) {
+          item.classList.toggle('open');
+        }
+      });
+    });
   }
 
   /**
@@ -555,6 +567,145 @@ class RegionManager {
       this.modalEl.style.display = 'none';
       document.body.style.overflow = '';
     }
+  }
+
+  /**
+   * Inicializa o gerenciador de tema Claro / Escuro
+   */
+  initTheme() {
+    try {
+      const saved = localStorage.getItem('cobusao_theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    } catch (e) {}
+
+    this.injectThemeButton();
+    this.updateThemeButton();
+  }
+
+  toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const isDark = current === 'dark' || (!current && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const newTheme = isDark ? 'light' : 'dark';
+
+    document.documentElement.setAttribute('data-theme', newTheme);
+    try {
+      localStorage.setItem('cobusao_theme', newTheme);
+    } catch (e) {}
+
+    this.updateThemeButton();
+
+    // Notifica outros scripts (ex: mapa Carto basemaps)
+    window.dispatchEvent(new CustomEvent('cobusao-theme-changed', { detail: { theme: newTheme } }));
+  }
+
+  injectThemeButton() {
+    let themeBtn = document.getElementById('btn-theme-toggle');
+    const headerInner = document.querySelector('.header-inner');
+    if (!themeBtn && headerInner) {
+      themeBtn = document.createElement('button');
+      themeBtn.id = 'btn-theme-toggle';
+      themeBtn.className = 'header-theme-toggle';
+      themeBtn.type = 'button';
+      themeBtn.title = 'Alternar modo claro / escuro';
+      themeBtn.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+
+      const regionBtn = document.getElementById('btn-header-region-selector');
+      if (regionBtn && regionBtn.parentNode) {
+        regionBtn.parentNode.insertBefore(themeBtn, regionBtn.nextSibling);
+      } else {
+        headerInner.appendChild(themeBtn);
+      }
+    }
+
+    if (themeBtn) {
+      themeBtn.onclick = () => this.toggleTheme();
+    }
+  }
+
+  updateThemeButton() {
+    const themeBtn = document.getElementById('btn-theme-toggle');
+    if (!themeBtn) return;
+    const current = document.documentElement.getAttribute('data-theme');
+    const isDark = current === 'dark' || (!current && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    themeBtn.innerHTML = `<i class="fa-solid ${isDark ? 'fa-sun' : 'fa-moon'}"></i>`;
+    themeBtn.title = isDark ? 'Alternar para Modo Claro' : 'Alternar para Modo Escuro';
+  }
+
+  /**
+   * Inicializa o widget de busca rápida na Home
+   */
+  async initHomeHeroSearch() {
+    const input = document.getElementById('hero-search-input');
+    const dropdown = document.getElementById('hero-search-dropdown');
+    if (!input || !dropdown) return;
+
+    let cityLinesDict = {};
+
+    const loadLinesForActiveCity = async () => {
+      try {
+        const res = await fetch(`https://cobusao-data.pages.dev/${this.activeCityKey}/line_info.json`);
+        if (res.ok) {
+          cityLinesDict = await res.json();
+        }
+      } catch (e) {}
+    };
+
+    await loadLinesForActiveCity();
+    window.addEventListener('cobusao-region-changed', () => loadLinesForActiveCity());
+
+    input.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        dropdown.style.display = 'none';
+        return;
+      }
+
+      const matches = Object.entries(cityLinesDict).filter(([code, info]) => {
+        return code.toLowerCase().includes(q) || (info.description && info.description.toLowerCase().includes(q));
+      }).slice(0, 8);
+
+      if (matches.length === 0) {
+        dropdown.innerHTML = `
+          <div style="padding: 12px 16px; color: var(--text-muted); font-size: 0.88rem;">
+            Nenhuma linha encontrada para "${e.target.value}"
+          </div>
+        `;
+        dropdown.style.display = 'block';
+        return;
+      }
+
+      dropdown.innerHTML = matches.map(([code, info]) => {
+        const desc = info.description || '';
+        return `
+          <a href="linha.html?cidade=${this.activeCityKey}&linha=${encodeURIComponent(code)}" class="hero-search-item">
+            <span class="hero-search-badge">${code}</span>
+            <span class="hero-search-desc">${desc}</span>
+          </a>
+        `;
+      }).join('');
+
+      dropdown.style.display = 'block';
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const q = input.value.toLowerCase().trim();
+        const match = Object.entries(cityLinesDict).find(([code, info]) => {
+          return code.toLowerCase() === q || code.toLowerCase().includes(q) || (info.description && info.description.toLowerCase().includes(q));
+        });
+        if (match) {
+          window.location.href = `linha.html?cidade=${this.activeCityKey}&linha=${encodeURIComponent(match[0])}`;
+        }
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.style.display = 'none';
+      }
+    });
   }
 }
 

@@ -385,6 +385,7 @@ export async function loadLineData(lineCodeToLoad, targetCitySlug) {
     updateLineStatsStrip();
     renderFAQSection();
     renderOtherLinesSection();
+    updateFavoriteButtonState();
 
     // Inicia rastreamento ao vivo com Socket.IO e Polling HTTP
     initSocketConnection();
@@ -1427,9 +1428,10 @@ function renderOtherLinesSection() {
   container.innerHTML = selected.map(([code, info]) => {
     const desc = info.description || `Linha ${code}`;
     const city = info.cityKey || state.citySlug;
+    const badgeColor = info.consortiumColor || 'var(--primary)';
     return `
       <a href="linha.html?cidade=${city}&linha=${encodeURIComponent(code)}" class="other-line-card">
-        <span class="other-line-badge">${code}</span>
+        <span class="other-line-badge" style="color: ${badgeColor};">${code}</span>
         <span class="other-line-headsign" title="${desc}">${desc}</span>
       </a>
     `;
@@ -1719,10 +1721,147 @@ function setupEventListeners() {
     });
   }
 
+  // Listeners de Favoritar e Compartilhar
+  const btnFavorite = document.getElementById('btn-favorite-line');
+  if (btnFavorite) {
+    btnFavorite.addEventListener('click', toggleFavoriteLine);
+  }
+
+  const btnShare = document.getElementById('btn-share-line');
+  if (btnShare) {
+    btnShare.addEventListener('click', shareLine);
+  }
+
+  // Listener para atualização dinâmica do mapa ao alternar tema claro/escuro
+  window.addEventListener('cobusao-theme-changed', (e) => {
+    if (state.map && state.tileLayer) {
+      const isDark = e.detail?.theme === 'dark';
+      const newUrl = isDark
+        ? `https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`
+        : `https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`;
+      state.tileLayer.setUrl(newUrl);
+    }
+  });
+
   window.addEventListener('popstate', () => {
     initParamsFromUrl();
     loadLineData(state.lineCode);
   });
+}
+
+/**
+ * Toast de notificação global
+ */
+let toastTimeout = null;
+export function showToast(message) {
+  const toast = document.getElementById('site-toast');
+  const toastText = document.getElementById('toast-text');
+  if (!toast || !toastText) return;
+
+  toastText.textContent = message;
+  toast.classList.add('show');
+
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3200);
+}
+
+/**
+ * Gerenciamento de Linhas Favoritas
+ */
+const FAVORITES_STORAGE_KEY = 'cobusao_favorite_lines';
+
+function getFavoriteLines() {
+  try {
+    const raw = localStorage.getItem(FAVORITES_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function isLineFavorited(code, city) {
+  const list = getFavoriteLines();
+  return list.some(item => item.code === code && item.city === city);
+}
+
+function updateFavoriteButtonState() {
+  const btnFavorite = document.getElementById('btn-favorite-line');
+  const icon = document.getElementById('favorite-star-icon');
+  const text = document.getElementById('favorite-btn-text');
+  if (!btnFavorite) return;
+
+  const isFav = isLineFavorited(state.lineCode, state.citySlug);
+  if (isFav) {
+    btnFavorite.classList.add('active');
+    if (icon) {
+      icon.className = 'fa-solid fa-star';
+    }
+    if (text) text.textContent = 'Salva';
+    btnFavorite.title = 'Remover linha dos favoritos';
+  } else {
+    btnFavorite.classList.remove('active');
+    if (icon) {
+      icon.className = 'fa-regular fa-star';
+    }
+    if (text) text.textContent = 'Favoritar';
+    btnFavorite.title = 'Salvar linha nos favoritos';
+  }
+}
+
+function toggleFavoriteLine() {
+  const list = getFavoriteLines();
+  const index = list.findIndex(item => item.code === state.lineCode && item.city === state.citySlug);
+
+  if (index >= 0) {
+    list.splice(index, 1);
+    try {
+      localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(list));
+    } catch (e) {}
+    updateFavoriteButtonState();
+    showToast(`Linha ${state.lineCode} removida dos favoritos`);
+  } else {
+    list.unshift({
+      code: state.lineCode,
+      city: state.citySlug,
+      desc: state.lineInfo?.description || `Linha ${state.lineCode}`
+    });
+    try {
+      localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(list.slice(0, 30)));
+    } catch (e) {}
+    updateFavoriteButtonState();
+    showToast(`Linha ${state.lineCode} adicionada aos favoritos! ⭐`);
+  }
+}
+
+/**
+ * Compartilhamento de Linha
+ */
+async function shareLine() {
+  const shareData = {
+    title: `Linha ${state.lineCode} em Tempo Real — Cadê o Ônibus?`,
+    text: `Acompanhe a localização ao vivo e os horários da Linha ${state.lineCode} (${state.lineInfo?.description || state.cityConfig.name})`,
+    url: window.location.href
+  };
+
+  if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+    try {
+      await navigator.share(shareData);
+      return;
+    } catch (e) {
+      if (e.name !== 'AbortError') {
+        console.warn('Erro ao compartilhar via Web Share:', e);
+      }
+    }
+  }
+
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+    showToast('Link do trajeto copiado para a área de transferência! 🔗');
+  } catch (err) {
+    showToast('Link: ' + window.location.href);
+  }
 }
 
 /**

@@ -104,6 +104,16 @@
                         <div class="line-hero-title-wrap">
                             <h1 id="line-title">Carregando linha...</h1>
                         </div>
+                        <div class="line-hero-actions-wrap">
+                            <button type="button" class="btn-hero-action btn-hero-favorite" id="btn-favorite-line" title="Salvar linha nos Favoritos">
+                                <i class="fa-regular fa-star" id="favorite-star-icon"></i>
+                                <span id="favorite-btn-text">Favoritar</span>
+                            </button>
+                            <button type="button" class="btn-hero-action btn-hero-share" id="btn-share-line" title="Compartilhar trajeto">
+                                <i class="fa-solid fa-share-nodes"></i>
+                                <span>Compartilhar</span>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Tags e Metadados ocupando dinamicamente toda a largura logo abaixo -->
@@ -327,6 +337,10 @@
                 </div>
             </div>
         </div>
+    <!-- Toast de Notificações -->
+    <div class="toast-notification" id="site-toast">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toast-text">Link do trajeto copiado com sucesso!</span>
     </div>
 
     <!-- Leaflet JS & Socket.IO -->

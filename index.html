@@ -94,6 +94,18 @@
                     </button>
                 </div>
 
+                <!-- Busca Rápida de Linha na Home -->
+                <div class="hero-search-box">
+                    <div class="hero-search-input-wrap">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="hero-search-input" class="hero-search-input"
+                            placeholder="Buscar linha de ônibus (ex: 472, 842, 107T, 104)..." autocomplete="off" />
+                    </div>
+                    <div id="hero-search-dropdown" class="hero-search-dropdown">
+                        <!-- Preenchido dinamicamente via JS -->
+                    </div>
+                </div>
+
                 <!-- Botões de Ação / Download -->
                 <div class="hero-actions">
                     <a class="btn-primary" href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus"
@@ -235,6 +247,65 @@
         <!-- Grid de Polos Regionais (Idêntico ao CityPickerSheet) -->
         <div class="state-hubs-grid" id="home-state-hubs-container">
             <!-- Renderizado dinamicamente com os 14 polos estaduais do Flutter -->
+        </div>
+    </section>
+
+    <!-- Perguntas Frequentes (FAQ Geral) -->
+    <section class="section" style="background: var(--surface-container-low); border-top: 1px solid var(--surface-border); border-bottom: 1px solid var(--surface-border);">
+        <div class="section-head">
+            <span class="section-eyebrow">Dúvidas Frequentes</span>
+            <h2>Perguntas Comuns sobre o Cadê o Ônibus?</h2>
+            <p>Tire suas principais dúvidas sobre o monitoramento em tempo real e o funcionamento do aplicativo.</p>
+        </div>
+
+        <div style="max-width: 820px; margin: 0 auto;">
+            <div class="faq-accordion">
+                <div class="faq-item open">
+                    <button type="button" class="faq-question">
+                        <span>Como o Cadê o Ônibus sabe a posição dos ônibus em tempo real?</span>
+                        <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>O aplicativo se conecta diretamente às <strong>APIs oficiais de telemetria e satélite GPS</strong> das prefeituras, órgãos de trânsito (como SMTR, SPTrans, DETRO, BHTrans, URBS) e empresas concessionárias. Os sinais de cada ônibus são sincronizados automaticamente a cada poucos segundos.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button type="button" class="faq-question">
+                        <span>O aplicativo é realmente 100% gratuito e sem anúncios?</span>
+                        <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p><strong>Sim!</strong> O Cadê o Ônibus foi criado de passageiro para passageiro com o compromisso de nunca exibir anúncios intrusivos em tela cheia nem cobrar mensalidades para recursos essenciais de transporte público.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button type="button" class="faq-question">
+                        <span>Preciso criar uma conta ou fornecer dados para usar?</span>
+                        <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p><strong>Não!</strong> Você não precisa fazer nenhum tipo de cadastro, login ou fornecer e-mail/telefone. Basta abrir o site ou app e consultar as linhas imediatamente.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button type="button" class="faq-question">
+                        <span>Como funciona o alarme de aproximação no aplicativo?</span>
+                        <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>No aplicativo móvel, você pode definir um alarme na parada de sua preferência. O app monitora a aproximação dos ônibus pelo GPS e envia uma notificação no seu celular quando o ônibus estiver a poucos minutos ou centenas de metros do seu ponto.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button type="button" class="faq-question">
+                        <span>Quais estados e cidades são atendidos?</span>
+                        <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Atualmente oferecemos cobertura completa para <strong>14 estados e 26 regiões metropolitanas</strong>, incluindo Rio de Janeiro (Capital, Baixada e Intermunicipal), São Paulo (SPTrans e EMTU), Belo Horizonte, Curitiba, Brasília, Porto Alegre, Florianópolis, Salvador e muito mais.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
