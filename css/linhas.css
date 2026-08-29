@@ -467,10 +467,17 @@
 
 .breadcrumb-nav a {
   color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
 }
 
 .breadcrumb-nav a:hover {
   color: var(--primary);
+}
+
+.breadcrumb-sep {
+  font-size: 0.65rem;
+  opacity: 0.5;
 }
 
 /* Header da Linha */
@@ -1770,4 +1777,363 @@
     justify-content: center;
   }
 }
+
+/* ==========================================================================
+   Barra de Estatísticas Rápidas da Linha (Topo do Card)
+   ========================================================================== */
+.line-stats-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 12px 18px;
+  background: var(--bg);
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
+  margin-top: 4px;
+}
+
+.line-stats-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+}
+
+.line-stat-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.line-stat-item strong {
+  color: #10B981;
+  font-weight: 800;
+}
+
+.line-stat-dot {
+  opacity: 0.4;
+  font-size: 0.8rem;
+}
+
+.btn-install-app-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #10B981;
+  color: #ffffff !important;
+  font-weight: 800;
+  font-size: 0.88rem;
+  padding: 8px 18px;
+  border-radius: 20px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.28);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.btn-install-app-pill:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+/* ==========================================================================
+   Quadro de Horários por Intervalos Médios (Estilo Lá Vem o Ônibus)
+   ========================================================================== */
+.schedule-intervals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.schedule-interval-card {
+  background: var(--bg);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.15s ease;
+}
+
+.schedule-interval-card:hover {
+  border-color: var(--primary);
+  background: var(--surface-hover);
+}
+
+.schedule-interval-card i {
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.schedule-interval-card strong {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.schedule-toggle-view-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.btn-toggle-schedule-view {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  color: var(--primary);
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.btn-toggle-schedule-view:hover {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.schedule-note-footer {
+  margin-top: 18px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  padding-top: 14px;
+  border-top: 1px solid var(--surface-border);
+}
+
+/* ==========================================================================
+   Seção de Perguntas Frequentes (FAQ Accordion)
+   ========================================================================== */
+.line-faq-section,
+.city-other-lines-section {
+  margin-top: 40px;
+  margin-bottom: 30px;
+}
+
+.section-heading-wrap {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.section-title i {
+  color: var(--primary);
+  font-size: 1.3rem;
+}
+
+.section-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin: 0;
+}
+
+.faq-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faq-item {
+  background: var(--line-card-bg);
+  border: 1px solid var(--line-card-border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--line-card-shadow);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faq-item:hover {
+  border-color: var(--primary-light);
+}
+
+.faq-item.open {
+  border-color: var(--primary);
+  box-shadow: 0 6px 20px rgba(28, 131, 228, 0.12);
+}
+
+.faq-question {
+  width: 100%;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: var(--font-family);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  transition: color 0.15s ease;
+}
+
+.faq-question:hover {
+  color: var(--primary);
+}
+
+.faq-chevron {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.faq-item.open .faq-chevron {
+  transform: rotate(180deg);
+  color: var(--primary);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+  padding: 0 20px;
+  color: var(--text-muted);
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+.faq-item.open .faq-answer {
+  max-height: 300px;
+  padding: 0 20px 18px 20px;
+}
+
+.faq-answer strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   Seção de Outras Linhas da Cidade (Grid & Botão)
+   ========================================================================== */
+.other-lines-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.other-line-card {
+  background: var(--line-card-bg);
+  border: 1px solid var(--line-card-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--line-card-shadow);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.other-line-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--line-card-hover-shadow);
+}
+
+.other-line-badge {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #10B981;
+  display: inline-block;
+  letter-spacing: -0.02em;
+}
+
+.other-line-headsign {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.other-lines-action-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.btn-see-all-lines {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 28px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1.5px solid var(--surface-border);
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  box-shadow: var(--line-card-shadow);
+  transition: all 0.2s ease;
+}
+
+.btn-see-all-lines:hover {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(28, 131, 228, 0.2);
+}
+
+.data-source-footnote {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 22px;
+  opacity: 0.85;
+}
+
+@media (max-width: 768px) {
+  .line-stats-strip {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .btn-install-app-pill {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .other-lines-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-see-all-lines {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 

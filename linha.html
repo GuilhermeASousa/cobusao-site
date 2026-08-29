@@ -74,10 +74,11 @@
             <!-- Barra Superior com Breadcrumbs e Busca Rápida de Linha -->
             <div class="line-top-bar-row">
                 <nav class="breadcrumb-nav">
-                    <a id="breadcrumb-city" href="linhas.html"><i class="fa-solid fa-arrow-left"></i> Voltar às
-                        Linhas</a>
-                    <i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; opacity: 0.6;"></i>
-                    <span id="breadcrumb-line" style="font-weight: 700; color: var(--text);">Linha</span>
+                    <a id="breadcrumb-city" href="linhas.html">Rio de Janeiro</a>
+                    <i class="fa-solid fa-chevron-right breadcrumb-sep"></i>
+                    <a id="breadcrumb-lines" href="linhas.html">Linhas</a>
+                    <i class="fa-solid fa-chevron-right breadcrumb-sep"></i>
+                    <span id="breadcrumb-line" style="font-weight: 800; color: var(--text);">842</span>
                 </nav>
 
                 <!-- Input de Busca Rápida de Linhas com Autocomplete -->
@@ -116,6 +117,22 @@
                             <span class="pulse-dot"></span>
                             <span id="live-count-text">Buscando ônibus ao vivo...</span>
                         </span>
+                    </div>
+
+                    <!-- Barra de Estatísticas Rápidas da Linha (Estilo Lá Vem o Ônibus) -->
+                    <div class="line-stats-strip" id="line-stats-strip">
+                        <div class="line-stats-group">
+                            <span class="line-stat-item"><strong id="stat-stops-count">-</strong> paradas</span>
+                            <span class="line-stat-dot">&bull;</span>
+                            <span class="line-stat-item">primeira <strong id="stat-first-time">-</strong></span>
+                            <span class="line-stat-dot">&bull;</span>
+                            <span class="line-stat-item">última <strong id="stat-last-time">-</strong></span>
+                            <span class="line-stat-dot">&bull;</span>
+                            <span class="line-stat-item"><strong id="stat-distance-km">-</strong> km</span>
+                        </div>
+                        <a href="https://play.google.com/store/apps/details?id=com.guialshy.cadeoonibus" target="_blank" rel="noopener" class="btn-install-app-pill" title="Baixar aplicativo oficial no Google Play">
+                            <i class="fa-brands fa-google-play"></i> Instalar App
+                        </a>
                     </div>
 
                     <div class="line-detail-sync-row">
@@ -191,6 +208,37 @@
                 <div id="pane-horarios" class="line-tab-pane">
                     <!-- Gerado dinamicamente via JS -->
                 </div>
+            </section>
+
+            <!-- Seção de Perguntas Frequentes (FAQ Dinâmico) -->
+            <section class="line-faq-section" id="line-faq-section">
+                <div class="section-heading-wrap">
+                    <h2 class="section-title"><i class="fa-solid fa-circle-question"></i> Perguntas Frequentes</h2>
+                    <p class="section-subtitle">Principais dúvidas sobre o primeiro e último horário, quantidade de paradas e monitoramento em tempo real.</p>
+                </div>
+                <div class="faq-accordion" id="faq-accordion-container">
+                    <!-- Gerado dinamicamente via JS -->
+                </div>
+            </section>
+
+            <!-- Seção de Outras Linhas da Região -->
+            <section class="city-other-lines-section" id="city-other-lines-section">
+                <div class="section-heading-wrap">
+                    <h2 class="section-title" id="other-lines-title"><i class="fa-solid fa-signs-post"></i> Outras linhas do Rio de Janeiro</h2>
+                    <p class="section-subtitle">Veja o trajeto detalhado e os horários de outras linhas de ônibus da mesma cidade.</p>
+                </div>
+                <div class="other-lines-grid" id="other-lines-grid-container">
+                    <!-- Gerado dinamicamente via JS -->
+                </div>
+                <div class="other-lines-action-wrap">
+                    <a href="linhas.html" id="btn-see-all-city-lines" class="btn-see-all-lines">
+                        <span id="see-all-city-lines-label">Todas as linhas do Rio de Janeiro</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+                <p class="data-source-footnote">
+                    <i class="fa-solid fa-circle-info"></i> Fonte: horários e itinerários publicados pela operadora, consultados diariamente. A programação pode mudar em feriados.
+                </p>
             </section>
 
             <!-- Banner Promocional do App Mobile -->
