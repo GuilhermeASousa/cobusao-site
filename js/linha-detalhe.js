@@ -438,6 +438,19 @@ function findLineInfoCanonical(code, linesDict) {
 }
 
 /**
+ * Escapa strings HTML de forma segura contra XSS
+ */
+function escapeHTML(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/**
  * Renderiza Cabeçalho da Linha
  */
 function renderLineHeader() {
