@@ -27,9 +27,9 @@
 
 /* Container Principal do Observatório */
 .observatorio-container {
-  max-width: 1200px;
-  margin: 90px auto 60px;
-  padding: 0 20px;
+  max-width: 1320px;
+  margin: 104px auto 60px;
+  padding: 0 24px;
   width: 100%;
   overflow-x: hidden;
 }
@@ -653,12 +653,13 @@ tr.row-highlight-loss:hover td { background: rgba(239, 68, 68, 0.09) !important;
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(4px);
-  z-index: 999;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 2500;
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 40px 24px;
 }
 
 .obs-modal-backdrop.open {
@@ -668,32 +669,33 @@ tr.row-highlight-loss:hover td { background: rgba(239, 68, 68, 0.09) !important;
 .obs-modal {
   background: var(--bg);
   border: 1px solid var(--surface-border);
-  border-radius: 16px;
+  border-radius: 18px;
   width: 100%;
-  max-width: 860px;
-  max-height: 90vh;
+  max-width: 1260px;
+  max-height: calc(100vh - 72px);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.35);
   overflow: hidden;
   animation: modalPop 0.2s ease-out;
 }
 
 @keyframes modalPop {
-  from { opacity: 0; transform: scale(0.95); }
+  from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
 }
 
 .obs-modal-header {
-  padding: 20px 24px;
+  padding: 22px 28px;
   border-bottom: 1px solid var(--surface-border);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  background: var(--surface);
 }
 
 .obs-modal-body {
-  padding: 24px;
+  padding: 24px 28px 30px;
   overflow-y: auto;
   flex: 1;
 }
@@ -701,15 +703,26 @@ tr.row-highlight-loss:hover td { background: rgba(239, 68, 68, 0.09) !important;
 .obs-modal-close {
   background: transparent;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   color: var(--text-muted);
   cursor: pointer;
   padding: 4px;
   line-height: 1;
+  border-radius: 8px;
+  transition: all 0.15s;
 }
 
 .obs-modal-close:hover {
   color: var(--text);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.modal-table-route {
+  min-width: 200px;
+  max-width: 420px;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.35;
 }
 
 .badge-departures {
@@ -728,8 +741,15 @@ tr.row-highlight-loss:hover td { background: rgba(239, 68, 68, 0.09) !important;
 
 @media (max-width: 1024px) {
   .observatorio-container {
-    margin: 80px auto 40px;
+    margin: 88px auto 40px;
     padding: 0 16px;
+  }
+  .obs-modal {
+    max-width: 96vw;
+    max-height: calc(100vh - 50px);
+  }
+  .obs-modal-backdrop {
+    padding: 24px 12px;
   }
   .obs-grid-4 {
     grid-template-columns: repeat(2, 1fr);
@@ -831,9 +851,17 @@ tr.row-highlight-loss:hover td { background: rgba(239, 68, 68, 0.09) !important;
   .obs-modal {
     border-radius: 20px 20px 0 0;
     max-height: 94vh;
-    padding: 20px 16px;
+    padding: 0;
     max-width: 100vw;
     width: 100%;
+  }
+
+  .obs-modal-header {
+    padding: 16px 18px;
+  }
+
+  .obs-modal-body {
+    padding: 16px 16px 28px;
   }
 
   .obs-modal-header h2 {

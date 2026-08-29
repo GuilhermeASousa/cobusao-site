@@ -195,7 +195,7 @@ button {
 }
 
 .header-inner {
-  max-width: 1240px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 0 20px;
   height: 70px;
@@ -375,7 +375,7 @@ button {
 }
 
 .hero-container {
-  max-width: 1200px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 0 20px;
   display: grid;
@@ -809,7 +809,7 @@ button {
 
 .section {
   padding: 72px 20px;
-  max-width: 1240px;
+  max-width: 1320px;
   margin: 0 auto;
 }
 
@@ -915,7 +915,7 @@ button {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 24px;
-  max-width: 1240px;
+  max-width: 1320px;
   margin: 0 auto;
 }
 
@@ -978,7 +978,7 @@ button {
 
 .coverage-section {
   padding: 80px 20px;
-  max-width: 1240px;
+  max-width: 1320px;
   margin: 0 auto;
 }
 

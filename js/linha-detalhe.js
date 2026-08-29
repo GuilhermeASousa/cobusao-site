@@ -370,6 +370,7 @@ export async function loadLineData(lineCodeToLoad, targetCitySlug) {
 
     state.lineInfo = {
       description: info?.description || derivedDesc,
+      agencyName: info?.agencyName || (foundCitySlug === 'rio_intermunicipal' ? 'DETRO-RJ (Intermunicipal)' : (foundCitySlug === 'emtu' ? 'EMTU-SP (Intermunicipal)' : state.cityConfig.agencyName)),
       consortiumName: info?.consortiumName || info?.operatorCompany || (foundCitySlug === 'rio_intermunicipal' ? 'Intermunicipal (DETRO)' : state.cityConfig.name),
       consortiumColor: info?.consortiumColor || '#1C83E4',
       textColor: info?.textColor || '#FFFFFF',
@@ -460,7 +461,7 @@ function renderLineHeader() {
   }
 
   if (consortiumEl) {
-    consortiumEl.textContent = state.lineInfo.consortiumName || 'Operação Regular';
+    consortiumEl.innerHTML = `<i class="fa-solid fa-bus"></i> ${escapeHTML(state.lineInfo.consortiumName || 'Operação Regular')}`;
   }
 
   if (fareEl) {
@@ -468,7 +469,8 @@ function renderLineHeader() {
   }
 
   if (agencyEl) {
-    agencyEl.textContent = state.cityConfig.fullName;
+    const agencyText = state.lineInfo.agencyName || state.cityConfig.agencyName || state.cityConfig.fullName;
+    agencyEl.innerHTML = `<i class="fa-solid fa-building-columns"></i> ${escapeHTML(agencyText)}`;
   }
 
   document.title = `${state.lineCode} — ${state.lineInfo.description} | Cadê o Ônibus?`;
