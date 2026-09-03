@@ -68,14 +68,6 @@
             <h1>Observatório de Planos Operacionais</h1>
             <p>Monitore a evolução histórica das linhas municipais de ônibus do Rio de Janeiro (SPPO). Acompanhe
                 aumentos, cortes de viagens, linhas criadas e extinções.</p>
-
-            <div class="obs-badge-row">
-                <span class="obs-tag" id="obs-plans-badge"><span class="dot"></span> Carregando planos...</span>
-                <span class="obs-tag"><span class="dot" style="background:#10b981;"></span> Equivalências LECD
-                    Unificadas</span>
-                <span class="obs-tag"><span class="dot" style="background:#f59e0b;"></span> 4 Consórcios
-                    Monitorados</span>
-            </div>
         </div>
 
         <!-- Navegação por Abas -->
@@ -99,21 +91,23 @@
 
         <!-- ABA 1: VISÃO GERAL -->
         <div id="pane-overview" class="obs-pane active">
-            <!-- Grid de KPIs -->
+            <!-- Grid Expandido de KPIs Globais -->
             <div class="kpi-grid">
                 <div class="kpi-card">
                     <div class="kpi-icon"><i class="fa-solid fa-bus"></i></div>
                     <div class="kpi-info">
-                        <h4>Total de Linhas</h4>
+                        <h4>Total de Linhas Históricas</h4>
                         <div class="kpi-value" id="kpi-total-lines">-</div>
+                        <span class="kpi-sub">Cadastradas desde 2022</span>
                     </div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-icon" style="background:rgba(16,185,129,0.12); color:#10b981;"><i
                             class="fa-solid fa-circle-check"></i></div>
                     <div class="kpi-info">
-                        <h4>Linhas Ativas</h4>
+                        <h4>Linhas em Operação</h4>
                         <div class="kpi-value" id="kpi-active-lines">-</div>
+                        <span class="kpi-sub" id="kpi-active-pct" style="color:#10b981; font-weight:600;">-</span>
                     </div>
                 </div>
                 <div class="kpi-card">
@@ -122,32 +116,221 @@
                     <div class="kpi-info">
                         <h4>Linhas Extintas</h4>
                         <div class="kpi-value" id="kpi-extinct-lines">-</div>
+                        <span class="kpi-sub" id="kpi-extinct-pct" style="color:#ef4444; font-weight:600;">-</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background:rgba(37,99,235,0.12); color:var(--primary);"><i
+                            class="fa-solid fa-route"></i></div>
+                    <div class="kpi-info">
+                        <h4>Viagens / Dia Útil</h4>
+                        <div class="kpi-value" id="kpi-total-trips-du">-</div>
+                        <span class="kpi-sub">Programadas na cidade</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background:rgba(139,92,246,0.12); color:#8b5cf6;"><i
+                            class="fa-solid fa-gauge-high"></i></div>
+                    <div class="kpi-info">
+                        <h4>Quilometragem / Dia (DU)</h4>
+                        <div class="kpi-value" id="kpi-total-km-du">-</div>
+                        <span class="kpi-sub">Km diários monitorados</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background:rgba(245,158,11,0.12); color:#f59e0b;"><i
+                            class="fa-solid fa-calendar-week"></i></div>
+                    <div class="kpi-info">
+                        <h4>Viagens Finais de Semana</h4>
+                        <div class="kpi-value kpi-weekend-value" id="kpi-weekend-trips">-</div>
+                        <span class="kpi-sub" id="kpi-weekend-sub">Sábado e Domingo</span>
                     </div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-icon" style="background:rgba(16,185,129,0.12); color:#10b981;"><i
                             class="fa-solid fa-arrow-trend-up"></i></div>
                     <div class="kpi-info">
-                        <h4>Com Aumento</h4>
+                        <h4>Com Aumento de Viagens</h4>
                         <div class="kpi-value" id="kpi-increased-lines">-</div>
+                        <span class="kpi-sub">Expansão de oferta</span>
                     </div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-icon" style="background:rgba(245,158,11,0.12); color:#f59e0b;"><i
                             class="fa-solid fa-arrow-trend-down"></i></div>
                     <div class="kpi-info">
-                        <h4>Com Redução</h4>
+                        <h4>Com Redução de Viagens</h4>
                         <div class="kpi-value" id="kpi-decreased-lines">-</div>
+                        <span class="kpi-sub">Cortes ou ajustes</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Gráficos -->
+            <!-- Seção 2: Panorama dos 4 Consórcios Operacionais -->
+            <div class="obs-section-header">
+                <div class="obs-section-title">
+                    <i class="fa-solid fa-network-wired" style="color:var(--primary);"></i>
+                    <div>
+                        <h2>Divisão Operacional por Consórcio (Plano Vigente)</h2>
+                        <p>O transporte municipal do Rio de Janeiro é distribuído em 4 bacias operacionais licitadas.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="consortia-grid" id="consortia-cards-container">
+                <!-- Card Intersul -->
+                <div class="cons-card cons-card-intersul" onclick="filterByConsortiumTab('INTERSUL')">
+                    <div class="cons-card-header">
+                        <div class="cons-brand">
+                            <span class="cons-dot"></span>
+                            <h3 class="cons-name">Intersul</h3>
+                        </div>
+                        <span class="cons-share" id="intersul-share-badge">17.9% da frota</span>
+                    </div>
+                    <div class="cons-metrics">
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Linhas</span>
+                            <span class="cons-m-val" id="cons-intersul-lines">-</span>
+                        </div>
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Viagens/DU</span>
+                            <span class="cons-m-val" id="cons-intersul-trips">-</span>
+                        </div>
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Km/DU</span>
+                            <span class="cons-m-val" id="cons-intersul-km">-</span>
+                        </div>
+                    </div>
+                    <div class="cons-footer-action">
+                        <span>Explorar Linhas</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <!-- Card Internorte -->
+                <div class="cons-card cons-card-internorte" onclick="filterByConsortiumTab('INTERNORTE')">
+                    <div class="cons-card-header">
+                        <div class="cons-brand">
+                            <span class="cons-dot"></span>
+                            <h3 class="cons-name">Internorte</h3>
+                        </div>
+                        <span class="cons-share" id="internorte-share-badge">31.7% da frota</span>
+                    </div>
+                    <div class="cons-metrics">
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Linhas</span>
+                            <span class="cons-m-val" id="cons-internorte-lines">-</span>
+                        </div>
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Viagens/DU</span>
+                            <span class="cons-m-val" id="cons-internorte-trips">-</span>
+                        </div>
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Km/DU</span>
+                            <span class="cons-m-val" id="cons-internorte-km">-</span>
+                        </div>
+                    </div>
+                    <div class="cons-footer-action">
+                        <span>Explorar Linhas</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <!-- Card Transcarioca -->
+                <div class="cons-card cons-card-transcarioca" onclick="filterByConsortiumTab('TRANSCARIOCA')">
+                    <div class="cons-card-header">
+                        <div class="cons-brand">
+                            <span class="cons-dot"></span>
+                            <h3 class="cons-name">Transcarioca</h3>
+                        </div>
+                        <span class="cons-share" id="transcarioca-share-badge">23.6% da frota</span>
+                    </div>
+                    <div class="cons-metrics">
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Linhas</span>
+                            <span class="cons-m-val" id="cons-transcarioca-lines">-</span>
+                        </div>
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Viagens/DU</span>
+                            <span class="cons-m-val" id="cons-transcarioca-trips">-</span>
+                        </div>
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Km/DU</span>
+                            <span class="cons-m-val" id="cons-transcarioca-km">-</span>
+                        </div>
+                    </div>
+                    <div class="cons-footer-action">
+                        <span>Explorar Linhas</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <!-- Card Santa Cruz -->
+                <div class="cons-card cons-card-santacruz" onclick="filterByConsortiumTab('SANTA CRUZ')">
+                    <div class="cons-card-header">
+                        <div class="cons-brand">
+                            <span class="cons-dot"></span>
+                            <h3 class="cons-name">Santa Cruz</h3>
+                        </div>
+                        <span class="cons-share" id="santacruz-share-badge">26.9% da frota</span>
+                    </div>
+                    <div class="cons-metrics">
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Linhas</span>
+                            <span class="cons-m-val" id="cons-santacruz-lines">-</span>
+                        </div>
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Viagens/DU</span>
+                            <span class="cons-m-val" id="cons-santacruz-trips">-</span>
+                        </div>
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Km/DU</span>
+                            <span class="cons-m-val" id="cons-santacruz-km">-</span>
+                        </div>
+                    </div>
+                    <div class="cons-footer-action">
+                        <span>Explorar Linhas</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela Comparativa de Consórcios -->
+            <div class="obs-table-wrap" style="margin-bottom: 28px;">
+                <table class="obs-table">
+                    <thead>
+                        <tr>
+                            <th>Consórcio</th>
+                            <th>Linhas em Operação</th>
+                            <th>Viagens Dia Útil</th>
+                            <th>Viagens Sábado</th>
+                            <th>Viagens Domingo</th>
+                            <th>Km Programado (DU)</th>
+                            <th>Média Viagens / Linha</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-consortium-summary">
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Carregando consolidação consorcial...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Gráficos com Controles -->
             <div class="charts-grid">
                 <div class="chart-card">
                     <div class="chart-header">
-                        <h3><i class="fa-solid fa-chart-line" style="color:var(--primary); margin-right:8px;"></i>
-                            Evolução de Viagens e Frota na Cidade</h3>
+                        <div>
+                            <h3><i class="fa-solid fa-chart-line" style="color:var(--primary); margin-right:8px;"></i>
+                                Evolução Histórica da Rede (2022–2026)</h3>
+                            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Acompanhe a curva de viagens e linhas oficiais determinadas pela SMTR.</p>
+                        </div>
+                        <div class="chart-toggle-group">
+                            <button class="chart-toggle-btn active" data-chart-metric="trips_lines">Viagens & Linhas</button>
+                            <button class="chart-toggle-btn" data-chart-metric="weekends">Sábados & Domingos</button>
+                            <button class="chart-toggle-btn" data-chart-metric="km">Quilometragem</button>
+                        </div>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="chart-timeline"></canvas>
@@ -156,8 +339,11 @@
 
                 <div class="chart-card">
                     <div class="chart-header">
-                        <h3><i class="fa-solid fa-chart-pie" style="color:var(--primary); margin-right:8px;"></i>
-                            Divisão por Consórcio</h3>
+                        <div>
+                            <h3><i class="fa-solid fa-chart-pie" style="color:var(--primary); margin-right:8px;"></i>
+                                Divisão Consorcial</h3>
+                            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Participação de cada bacia na oferta municipal.</p>
+                        </div>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="chart-consortium"></canvas>
@@ -177,6 +363,59 @@
                     <h3 style="color:#ef4444;"><i class="fa-solid fa-arrow-down-right-dots"></i> Maiores Reduções de
                         Viagens</h3>
                     <div class="highlight-list" id="list-losers"></div>
+                </div>
+            </div>
+
+            <!-- Seção de Contexto & Metodologia do SPPO -->
+            <div class="obs-section-header" style="margin-top:16px;">
+                <div class="obs-section-title">
+                    <i class="fa-solid fa-book-open-reader" style="color:var(--primary);"></i>
+                    <div>
+                        <h2>Entenda o Transporte Municipal e os Planos Operacionais</h2>
+                        <p>Principais conceitos, regras regulatórias da SMTR-Rio e metodologia do observatório.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-guide-grid">
+                <div class="info-guide-card">
+                    <div class="info-guide-icon" style="background:rgba(37,99,235,0.1); color:var(--primary);">
+                        <i class="fa-solid fa-file-contract"></i>
+                    </div>
+                    <div class="info-guide-content">
+                        <h4>O que é o Plano Operacional da SMTR?</h4>
+                        <p>É o instrumento regulatório oficial expedido pela Secretaria Municipal de Transportes (SMTR-Rio) e publicado no Diário Oficial. O plano estabelece as obrigações contratuais das concessionárias: itinerários autorizados, frotas mínimas em operação (FRO), partidas diárias e a quantidade programada de viagens e quilometragem que devem ser rigorosamente cumpridas em dias úteis, sábados e domingos/feriados.</p>
+                    </div>
+                </div>
+
+                <div class="info-guide-card">
+                    <div class="info-guide-icon" style="background:rgba(16,185,129,0.1); color:#10b981;">
+                        <i class="fa-solid fa-code-merge"></i>
+                    </div>
+                    <div class="info-guide-content">
+                        <h4>Linha Experimental de Coleta de Dados (LECD)</h4>
+                        <p>A sigla <strong>LECD</strong> significa <strong>Linha Experimental de Coleta de Dados</strong>. Trata-se de uma designação técnica temporária criada pela SMTR para testar novos trajetos, tempos de percurso e demanda real de passageiros antes de consolidar o serviço no SPPO. Quando a viabilidade é atestada, a SMTR publica Resolução oficial conferindo o número regular definitivo (ex: LECD 28 &rarr; 311, LECD 32 &rarr; 817, LECD 66 &rarr; 764, LECD 70 &rarr; 798). O observatório unifica o período experimental ao histórico definitivo da linha.</p>
+                    </div>
+                </div>
+
+                <div class="info-guide-card">
+                    <div class="info-guide-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b;">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                    </div>
+                    <div class="info-guide-content">
+                        <h4>Acordo Judicial & Subsídio por GPS</h4>
+                        <p>Firmado em 2022 entre o Município do Rio, SMTR, Ministério Público (MPRJ) e as concessionárias, o Termo de Conciliação Judicial condicionou o repasse do subsídio tarifário público à prestação efetiva do serviço: os consórcios só são remunerados mediante a comprovação da quilometragem rodada e viagens atestadas por telemetria GPS e bilhetagem eletrônica. Esse mecanismo viabilizou a reativação de mais de 80 linhas desativadas em toda a cidade.</p>
+                    </div>
+                </div>
+
+                <div class="info-guide-card">
+                    <div class="info-guide-icon" style="background:rgba(139,92,246,0.1); color:#8b5cf6;">
+                        <i class="fa-solid fa-arrows-split-up-and-left"></i>
+                    </div>
+                    <div class="info-guide-content">
+                        <h4>Prefixos e Sufixos Operacionais do SPPO</h4>
+                        <p>O sistema municipal adota prefixos e sufixos normatizados pela SMTR para distinguir variantes de serviço da linha principal: <strong>SV</strong> (Serviço Variante com desvio de itinerário), <strong>SN</strong> (Serviço Noturno na madrugada), <strong>SP</strong> (Serviço Parcial com trajeto encurtado em trechos de pico), <strong>SR</strong> (Serviço Rápido/Semi-Direto) e <strong>SE</strong> (Serviço Especial temporário para eventos ou contingências).</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -449,7 +688,7 @@
                 <a href="suporte.html">Suporte</a>
                 <a href="https://web.cadeoonibus.api.br" target="_blank">Versão Web</a>
             </div>
-            <div class="copyright">© 2026 Cadê o Ônibus? (Guialshy). Todos os direitos reservados.</div>
+            <div class="copyright">© 2026 Cadê o Ônibus?. Todos os direitos reservados.</div>
         </div>
     </footer>
 

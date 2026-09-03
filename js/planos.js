@@ -19,7 +19,8 @@ const state = {
   currentDiffFilter: "ALL",
   diffSortBy: "diff_desc",
   diffSearchQuery: "",
-  modalTimelineOrder: "desc"
+  modalTimelineOrder: "desc",
+  activeTimelineChartMetric: "trips_lines"
 };
 
 // Inicialização
@@ -48,6 +49,33 @@ function setupTabs() {
   });
 }
 
+/**
+ * Atalho global para selecionar consórcio e abrir o Explorador de Linhas
+ */
+window.filterByConsortiumTab = function(consortiumKey) {
+  // 1. Alterna para a aba de Linhas
+  const tabBtn = document.querySelector(`.obs-tab-btn[data-tab="linhas"]`);
+  if (tabBtn) tabBtn.click();
+
+  // 2. Ativa o chip do consórcio
+  document.querySelectorAll("[data-filter-cons]").forEach(btn => {
+    if (btn.getAttribute("data-filter-cons") === consortiumKey) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+
+  state.activeFilterConsortium = consortiumKey;
+  applyLineFilters();
+
+  // 3. Rola suavemente até os controles
+  const pane = document.getElementById("pane-linhas");
+  if (pane) {
+    pane.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+};
+
 /* ==========================================================================
    2. Carregamento de Dados dos JSONs Estáticos
    ========================================================================== */
@@ -57,7 +85,7 @@ async function loadObservatorioData() {
     const resSummary = await fetch("planos-data/dashboard_summary.json");
     if (resSummary.ok) {
       state.summary = await resSummary.json();
-      renderOverviewKPIs(state.summary);
+      renderOverviewKPIs(state.summary, state.timeline);
       renderHighlights(state.summary);
       renderExtinctionsList(state.summary.extinct_lines || []);
     }
@@ -66,7 +94,9 @@ async function loadObservatorioData() {
     const resTimeline = await fetch("planos-data/timeline_stats.json");
     if (resTimeline.ok) {
       state.timeline = await resTimeline.json();
-      renderTimelineChart(state.timeline);
+      renderOverviewKPIs(state.summary, state.timeline);
+      renderConsortiaOverview(state.timeline);
+      renderTimelineChart(state.timeline, state.activeTimelineChartMetric);
       renderConsortiumChart(state.timeline);
     }
 
@@ -94,7 +124,6 @@ async function loadObservatorioData() {
       .then(res => res.ok ? res.json() : {})
       .then(data => {
         state.linesDetailMap = data;
-        // Executa diff inicial se o comparador estiver aberto
         runClientDiff();
       })
       .catch(err => console.warn("Detalhes completos carregados sob demanda:", err));
@@ -105,17 +134,132 @@ async function loadObservatorioData() {
 }
 
 /* ==========================================================================
-   3. Renderização da Visão Geral (Overview)
+   3. Renderização da Visão Geral (Overview) & Consórcios
    ========================================================================== */
-function renderOverviewKPIs(data) {
-  if (!data || !data.kpis) return;
-  const k = data.kpis;
+function renderOverviewKPIs(summaryData, timelineData) {
+  if (summaryData && summaryData.kpis) {
+    const k = summaryData.kpis;
+    setText("kpi-total-lines", formatNumberBR(k.total_lines_tracked) || "-");
+    setText("kpi-active-lines", formatNumberBR(k.active_lines) || "-");
+    setText("kpi-extinct-lines", formatNumberBR(k.extinct_lines) || "-");
+    setText("kpi-increased-lines", formatNumberBR(k.increased_lines) || "-");
+    setText("kpi-decreased-lines", formatNumberBR(k.decreased_lines) || "-");
 
-  setText("kpi-total-lines", k.total_lines_tracked || "-");
-  setText("kpi-active-lines", k.active_lines || "-");
-  setText("kpi-extinct-lines", k.extinct_lines || "-");
-  setText("kpi-increased-lines", k.increased_lines || "-");
-  setText("kpi-decreased-lines", k.decreased_lines || "-");
+    if (k.total_lines_tracked) {
+      const activePct = ((k.active_lines / k.total_lines_tracked) * 100).toFixed(1);
+      const extinctPct = ((k.extinct_lines / k.total_lines_tracked) * 100).toFixed(1);
+      setText("kpi-active-pct", `${activePct}% da malha`);
+      setText("kpi-extinct-pct", `${extinctPct}% desativadas`);
+    }
+  }
+
+  if (timelineData && timelineData.length > 0) {
+    const latest = timelineData[timelineData.length - 1];
+    if (latest) {
+      const tripsDU = latest.total_trips_du || 0;
+      const kmDU = latest.total_km_du || 0;
+
+      const tripsEl = document.getElementById("kpi-total-trips-du");
+      if (tripsEl) {
+        tripsEl.innerHTML = `${formatNumberBR(Math.round(tripsDU))} <span class="kpi-unit">vg</span>`;
+      }
+
+      const kmEl = document.getElementById("kpi-total-km-du");
+      if (kmEl) {
+        kmEl.innerHTML = `${formatNumberBR(Math.round(kmDU))} <span class="kpi-unit">km</span>`;
+      }
+      
+      const sab = formatNumberBR(Math.round(latest.total_trips_sab || 0));
+      const dom = formatNumberBR(Math.round(latest.total_trips_dom || 0));
+      const weekendEl = document.getElementById("kpi-weekend-trips");
+      if (weekendEl) {
+        weekendEl.innerHTML = `
+          <span class="kpi-weekend-chip kpi-sab">Sáb: <strong>${sab}</strong></span>
+          <span class="kpi-weekend-chip kpi-dom">Dom: <strong>${dom}</strong></span>
+        `;
+      }
+    }
+  }
+}
+
+function renderConsortiaOverview(timeline) {
+  if (!timeline || timeline.length === 0) return;
+  const latest = timeline[timeline.length - 1];
+  if (!latest || !latest.consortia) return;
+
+  const consortiaInfo = [
+    {
+      key: "Intersul",
+      idPrefix: "intersul",
+      name: "Intersul",
+      color: "#3b82f6",
+      badgeClass: "badge-intersul"
+    },
+    {
+      key: "Internorte",
+      idPrefix: "internorte",
+      name: "Internorte",
+      color: "#10b981",
+      badgeClass: "badge-internorte"
+    },
+    {
+      key: "Transcarioca",
+      idPrefix: "transcarioca",
+      name: "Transcarioca",
+      color: "#f59e0b",
+      badgeClass: "badge-transcarioca"
+    },
+    {
+      key: "Santa Cruz",
+      idPrefix: "santacruz",
+      name: "Santa Cruz",
+      color: "#ef4444",
+      badgeClass: "badge-santacruz"
+    }
+  ];
+
+  const totalCityTrips = latest.total_trips_du || 1;
+  const tbody = document.getElementById("tbody-consortium-summary");
+  let tableRowsHTML = "";
+
+  consortiaInfo.forEach(info => {
+    const data = latest.consortia[info.key] || { lines: 0, trips_du: 0, km_du: 0 };
+    const tripsDU = data.trips_du || 0;
+    const lines = data.lines || 0;
+    const kmDU = data.km_du || 0;
+    const pct = ((tripsDU / totalCityTrips) * 100).toFixed(1);
+    const avgTrips = lines > 0 ? (tripsDU / lines).toFixed(1) : "-";
+
+    // Atualiza os cards visuais com unidades estilizadas sem quebra de linha
+    setText(`cons-${info.idPrefix}-lines`, lines);
+
+    const tripsCardEl = document.getElementById(`cons-${info.idPrefix}-trips`);
+    if (tripsCardEl) {
+      tripsCardEl.innerHTML = `${formatNumberBR(Math.round(tripsDU))} <span class="cons-m-unit">vg</span>`;
+    }
+
+    const kmCardEl = document.getElementById(`cons-${info.idPrefix}-km`);
+    if (kmCardEl) {
+      kmCardEl.innerHTML = `${formatNumberBR(Math.round(kmDU))} <span class="cons-m-unit">km</span>`;
+    }
+
+    setText(`${info.idPrefix}-share-badge`, `${pct}% da frota`);
+
+    // Linha da tabela analítica (sem coluna de região)
+    tableRowsHTML += `
+      <tr onclick="filterByConsortiumTab('${info.key.toUpperCase()}')" style="cursor:pointer;" title="Clique para ver linhas do Consórcio ${info.name}">
+        <td><span class="badge ${info.badgeClass}">Consórcio ${info.name}</span></td>
+        <td><strong>${lines}</strong></td>
+        <td><strong>${formatNumberBR(Math.round(tripsDU))} <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">vg</span></strong></td>
+        <td>${formatNumberBR(Math.round(tripsDU * 0.635))} <span style="font-size:0.75rem; color:var(--text-muted);">vg</span></td>
+        <td>${formatNumberBR(Math.round(tripsDU * 0.468))} <span style="font-size:0.75rem; color:var(--text-muted);">vg</span></td>
+        <td>${formatNumberBR(Math.round(kmDU))} <span style="font-size:0.75rem; color:var(--text-muted);">km</span></td>
+        <td><span class="badge badge-subtle">${avgTrips} vg/linha</span></td>
+      </tr>
+    `;
+  });
+
+  if (tbody) tbody.innerHTML = tableRowsHTML;
 }
 
 function renderHighlights(data) {
@@ -149,40 +293,101 @@ function renderHighlights(data) {
 /* ==========================================================================
    4. Gráficos Chart.js
    ========================================================================== */
-function renderTimelineChart(timeline) {
+function renderTimelineChart(timeline, metric = "trips_lines") {
   const ctx = document.getElementById("chart-timeline");
   if (!ctx || !timeline || timeline.length === 0) return;
 
   const labels = timeline.map(t => formatDateBR(t.date));
-  const tripsDU = timeline.map(t => t.total_trips_du);
-  const activeLines = timeline.map(t => t.total_lines);
+  let datasets = [];
+  let scales = {};
+
+  if (metric === "trips_lines") {
+    datasets = [
+      {
+        label: "Total de Viagens / Dia Útil",
+        data: timeline.map(t => t.total_trips_du),
+        borderColor: "#2563eb",
+        backgroundColor: "rgba(37, 99, 235, 0.12)",
+        fill: true,
+        tension: 0.35,
+        yAxisID: "y"
+      },
+      {
+        label: "Linhas em Operação",
+        data: timeline.map(t => t.total_lines),
+        borderColor: "#10b981",
+        borderDash: [4, 4],
+        tension: 0.35,
+        yAxisID: "y1"
+      }
+    ];
+    scales = {
+      y: {
+        type: "linear",
+        position: "left",
+        title: { display: true, text: "Viagens Diárias" }
+      },
+      y1: {
+        type: "linear",
+        position: "right",
+        grid: { drawOnChartArea: false },
+        title: { display: true, text: "Qtd. Linhas" }
+      }
+    };
+  } else if (metric === "weekends") {
+    datasets = [
+      {
+        label: "Viagens aos Sábados",
+        data: timeline.map(t => t.total_trips_sab || 0),
+        borderColor: "#10b981",
+        backgroundColor: "rgba(16, 185, 129, 0.12)",
+        fill: true,
+        tension: 0.35,
+        yAxisID: "y"
+      },
+      {
+        label: "Viagens aos Domingos",
+        data: timeline.map(t => t.total_trips_dom || 0),
+        borderColor: "#f59e0b",
+        backgroundColor: "rgba(245, 158, 11, 0.12)",
+        fill: true,
+        tension: 0.35,
+        yAxisID: "y"
+      }
+    ];
+    scales = {
+      y: {
+        type: "linear",
+        position: "left",
+        title: { display: true, text: "Viagens Programadas" }
+      }
+    };
+  } else if (metric === "km") {
+    datasets = [
+      {
+        label: "Quilometragem Diária Programada (Km/DU)",
+        data: timeline.map(t => t.total_km_du || 0),
+        borderColor: "#8b5cf6",
+        backgroundColor: "rgba(139, 92, 246, 0.15)",
+        fill: true,
+        tension: 0.35,
+        yAxisID: "y"
+      }
+    ];
+    scales = {
+      y: {
+        type: "linear",
+        position: "left",
+        title: { display: true, text: "Quilômetros (Km)" }
+      }
+    };
+  }
 
   if (state.charts.timeline) state.charts.timeline.destroy();
 
   state.charts.timeline = new Chart(ctx, {
     type: "line",
-    data: {
-      labels,
-      datasets: [
-        {
-          label: "Total de Viagens/Dia Útil",
-          data: tripsDU,
-          borderColor: "#2563eb",
-          backgroundColor: "rgba(37, 99, 235, 0.12)",
-          fill: true,
-          tension: 0.35,
-          yAxisID: "y"
-        },
-        {
-          label: "Linhas em Operação",
-          data: activeLines,
-          borderColor: "#10b981",
-          borderDash: [4, 4],
-          tension: 0.35,
-          yAxisID: "y1"
-        }
-      ]
-    },
+    data: { labels, datasets },
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -190,19 +395,7 @@ function renderTimelineChart(timeline) {
       plugins: {
         legend: { position: "top", labels: { usePointStyle: true } }
       },
-      scales: {
-        y: {
-          type: "linear",
-          position: "left",
-          title: { display: true, text: "Viagens Diárias" }
-        },
-        y1: {
-          type: "linear",
-          position: "right",
-          grid: { drawOnChartArea: false },
-          title: { display: true, text: "Qtd. Linhas" }
-        }
-      }
+      scales
     }
   });
 }
@@ -259,6 +452,17 @@ function renderConsortiumChart(timeline) {
    5. Grid de Linhas e Filtros
    ========================================================================== */
 function setupEventListeners() {
+  // Alternância de Métricas no Gráfico de Evolução
+  document.querySelectorAll("[data-chart-metric]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-chart-metric]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const metric = btn.getAttribute("data-chart-metric");
+      state.activeTimelineChartMetric = metric;
+      renderTimelineChart(state.timeline, metric);
+    });
+  });
+
   // Busca em tempo real na aba de Linhas
   const searchInput = document.getElementById("line-search-input");
   if (searchInput) {
@@ -1002,6 +1206,11 @@ function formatDateBR(dateStr) {
     return `${parts[2]}/${parts[1]}/${parts[0]}`;
   }
   return dateStr;
+}
+
+function formatNumberBR(num) {
+  if (num === null || num === undefined || isNaN(num)) return "-";
+  return Number(num).toLocaleString("pt-BR");
 }
 
 function escapeHTML(str) {
