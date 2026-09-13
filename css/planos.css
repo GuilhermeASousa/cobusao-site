@@ -351,6 +351,14 @@
   --cons-accent: #ef4444;
 }
 
+.cons-card-sistema-rio-a2 {
+  --cons-accent: #8031A7;
+}
+
+.cons-card-sistema-rio-b2 {
+  --cons-accent: #FF7500;
+}
+
 .cons-card:hover {
   transform: translateY(-3px);
   border-color: var(--cons-accent);
@@ -493,9 +501,21 @@
 /* Cards do Guia Informativo e Metodologia */
 .info-guide-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 28px;
+}
+
+@media (max-width: 1024px) {
+  .info-guide-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .info-guide-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .info-guide-card {
@@ -579,62 +599,137 @@
   width: 100%;
 }
 
-/* Destaques / Variações */
-.highlights-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
-  margin-bottom: 28px;
-}
-
-.highlight-box {
+/* Ranking Interativo de Variações de Oferta */
+.ranking-section-card {
   background: var(--surface);
   border: 1px solid var(--surface-border);
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 }
 
-.highlight-box h3 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin-bottom: 16px;
+.ranking-header {
   display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.highlight-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.highlight-item {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.ranking-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ranking-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.ranking-title-wrap h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 4px 0;
+}
+
+.ranking-subtitle {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.ranking-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ranking-btn-group {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.ranking-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 7px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.highlight-item:hover {
-  background: rgba(37, 99, 235, 0.08);
-  border-color: var(--primary);
-}
-
-.highlight-item .line-badge {
-  font-weight: 800;
-  font-size: 0.95rem;
+.ranking-toggle-btn:hover {
   color: var(--text);
 }
 
-.highlight-item .line-sub {
-  font-size: 0.8rem;
+.ranking-toggle-btn.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+}
+
+.ranking-btn-group#ranking-direction-group .ranking-toggle-btn[data-ranking-dir="gainers"].active {
+  background: #10b981;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+}
+
+.ranking-btn-group#ranking-direction-group .ranking-toggle-btn[data-ranking-dir="losers"].active {
+  background: #ef4444;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
+}
+
+.ranking-table tr {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.ranking-pos-badge {
+  font-weight: 800;
+  font-size: 0.85rem;
   color: var(--text-muted);
+  display: inline-block;
+  min-width: 24px;
+  text-align: center;
+}
+
+.ranking-pos-top1 { color: #f59e0b; font-weight: 900; }
+.ranking-pos-top2 { color: #94a3b8; font-weight: 900; }
+.ranking-pos-top3 { color: #b45309; font-weight: 900; }
+
+.ranking-footer-note {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--surface-border);
 }
 
 /* Barra de Filtros e Busca */
@@ -792,6 +887,9 @@
 .badge-internorte { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
 .badge-transcarioca { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
 .badge-santacruz { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+.badge-a2-gtu, .badge-sistema-rio { background: rgba(128, 49, 167, 0.15); color: #c084fc; border: 1px solid rgba(128, 49, 167, 0.4); }
+.badge-b2-tuse, .badge-sistema-rio-b2 { background: rgba(255, 117, 0, 0.15); color: #fb923c; border: 1px solid rgba(255, 117, 0, 0.4); }
+.badge-system-trans { background: rgba(168, 85, 247, 0.18); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
 
 .badge-status-active { background: rgba(16, 185, 129, 0.15); color: #34d399; }
 .badge-status-extinct { background: rgba(239, 68, 68, 0.15); color: #f87171; }

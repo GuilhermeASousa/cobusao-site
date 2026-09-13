@@ -20,7 +20,9 @@ const state = {
   diffSortBy: "diff_desc",
   diffSearchQuery: "",
   modalTimelineOrder: "desc",
-  activeTimelineChartMetric: "trips_lines"
+  activeTimelineChartMetric: "trips_lines",
+  rankingDirection: "gainers",
+  rankingMetric: "abs"
 };
 
 // Inicialização
@@ -86,7 +88,7 @@ async function loadObservatorioData() {
     if (resSummary.ok) {
       state.summary = await resSummary.json();
       renderOverviewKPIs(state.summary, state.timeline);
-      renderHighlights(state.summary);
+      renderVariationsRanking();
       renderExtinctionsList(state.summary.extinct_lines || []);
     }
 
@@ -117,6 +119,7 @@ async function loadObservatorioData() {
       state.lines = await resLines.json();
       state.filteredLines = state.lines;
       renderLinesGrid(state.filteredLines);
+      renderVariationsRanking();
     }
 
     // 5. Detalhes completos das linhas (em segundo plano para modal e diff instantâneo)
@@ -148,7 +151,9 @@ function renderOverviewKPIs(summaryData, timelineData) {
     if (k.total_lines_tracked) {
       const activePct = ((k.active_lines / k.total_lines_tracked) * 100).toFixed(1);
       const extinctPct = ((k.extinct_lines / k.total_lines_tracked) * 100).toFixed(1);
-      setText("kpi-active-pct", `${activePct}% da malha`);
+      const sppoCount = k.active_sppo_lines || (k.active_lines - (k.active_sistema_rio_lines || 0));
+      const srCount = k.active_sistema_rio_lines || 0;
+      setText("kpi-active-pct", `${sppoCount} SPPO • ${srCount} Sistema Rio (${activePct}%)`);
       setText("kpi-extinct-pct", `${extinctPct}% desativadas`);
     }
   }
@@ -215,6 +220,20 @@ function renderConsortiaOverview(timeline) {
       name: "Santa Cruz",
       color: "#ef4444",
       badgeClass: "badge-santacruz"
+    },
+    {
+      key: "A2 - GTU",
+      idPrefix: "gtu-a2",
+      name: "A2 - GTU",
+      color: "#8031A7",
+      badgeClass: "badge-a2-gtu"
+    },
+    {
+      key: "B2 - TUSE",
+      idPrefix: "tuse-b2",
+      name: "B2 - TUSE",
+      color: "#FF7500",
+      badgeClass: "badge-b2-tuse"
     }
   ];
 
@@ -245,10 +264,11 @@ function renderConsortiaOverview(timeline) {
 
     setText(`${info.idPrefix}-share-badge`, `${pct}% da frota`);
 
-    // Linha da tabela analítica (sem coluna de região)
+    // Linha da tabela analítica
+    const displayName = info.name.includes("Sistema Rio") ? info.name : `Consórcio ${info.name}`;
     tableRowsHTML += `
-      <tr onclick="filterByConsortiumTab('${info.key.toUpperCase()}')" style="cursor:pointer;" title="Clique para ver linhas do Consórcio ${info.name}">
-        <td><span class="badge ${info.badgeClass}">Consórcio ${info.name}</span></td>
+      <tr onclick="filterByConsortiumTab('${info.key.toUpperCase()}')" style="cursor:pointer;" title="Clique para ver linhas de ${info.name}">
+        <td><span class="badge ${info.badgeClass}">${displayName}</span></td>
         <td><strong>${lines}</strong></td>
         <td><strong>${formatNumberBR(Math.round(tripsDU))} <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">vg</span></strong></td>
         <td>${formatNumberBR(Math.round(tripsDU * 0.635))} <span style="font-size:0.75rem; color:var(--text-muted);">vg</span></td>
@@ -262,32 +282,98 @@ function renderConsortiaOverview(timeline) {
   if (tbody) tbody.innerHTML = tableRowsHTML;
 }
 
-function renderHighlights(data) {
-  if (!data) return;
+function renderVariationsRanking() {
+  const tbody = document.getElementById("tbody-variations-ranking");
+  if (!tbody) return;
 
-  const renderList = (elementId, list, isPositive) => {
-    const el = document.getElementById(elementId);
-    if (!el || !list) return;
+  const linesList = state.lines && state.lines.length > 0
+    ? state.lines
+    : (state.summary && state.summary.top_gainers ? [...state.summary.top_gainers, ...state.summary.top_losers] : []);
 
-    el.innerHTML = list.slice(0, 6).map(item => {
-      const pct = item.trip_change_pct;
-      const pctStr = pct > 0 ? `+${pct.toFixed(1)}%` : `${pct.toFixed(1)}%`;
-      const badgeClass = isPositive ? "badge-status-gain" : "badge-status-loss";
+  if (!linesList || linesList.length === 0) return;
 
-      return `
-        <div class="highlight-item" onclick="openLineModal('${item.line_code}')">
-          <div>
-            <span class="line-badge">${escapeHTML(item.display_code || item.line_code)}</span>
-            <div class="line-sub">${escapeHTML(item.latest_name || "-")}</div>
-          </div>
-          <span class="badge ${badgeClass}">${pctStr}</span>
-        </div>
-      `;
-    }).join("");
-  };
+  const isGainers = state.rankingDirection === "gainers";
+  const isAbs = state.rankingMetric === "abs";
 
-  renderList("list-gainers", data.top_gainers, true);
-  renderList("list-losers", data.top_losers, false);
+  // Mapeia todas as linhas com deltas calculados
+  const calculated = linesList.map(line => {
+    const init = Number(line.initial_trips_weekday) || 0;
+    const latest = Number(line.latest_trips_weekday) || 0;
+    const delta = latest - init;
+    let pct = typeof line.trip_change_pct === "number" ? line.trip_change_pct : 0;
+    if (init > 0) {
+      pct = ((delta / init) * 100);
+    } else if (latest > 0) {
+      pct = 100.0;
+    }
+
+    return {
+      line,
+      init,
+      latest,
+      delta,
+      pct
+    };
+  });
+
+  // Filtra por direção
+  const filtered = calculated.filter(item => {
+    return isGainers ? item.delta > 0 : item.delta < 0;
+  });
+
+  // Ordena pela métrica escolhida
+  filtered.sort((a, b) => {
+    if (isGainers) {
+      return isAbs ? (b.delta - a.delta) : (b.pct - a.pct);
+    } else {
+      return isAbs ? (a.delta - b.delta) : (a.pct - b.pct);
+    }
+  });
+
+  const top10 = filtered.slice(0, 10);
+
+  if (top10.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:24px; color:var(--text-muted);">Nenhuma linha com ${isGainers ? "aumento" : "redução"} de viagens encontrada.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = top10.map((item, idx) => {
+    const l = item.line;
+    const consClass = getConsortiumClass(l.latest_consortium);
+    const posClass = idx === 0 ? "ranking-pos-top1" : (idx === 1 ? "ranking-pos-top2" : (idx === 2 ? "ranking-pos-top3" : ""));
+    const sign = item.delta > 0 ? "+" : "";
+    const badgeClass = item.delta > 0 ? "badge-status-gain" : "badge-status-loss";
+
+    let deltaText = "";
+    if (isAbs) {
+      deltaText = `<strong>${sign}${item.delta.toFixed(1)} vg/dia</strong> <span style="font-size:0.75rem; opacity:0.85;">(${sign}${item.pct.toFixed(0)}%)</span>`;
+    } else {
+      deltaText = `<strong>${sign}${item.pct.toFixed(1)}%</strong> <span style="font-size:0.75rem; opacity:0.85;">(${sign}${item.delta.toFixed(1)} vg)</span>`;
+    }
+
+    const statusBadge = l.is_active === 1
+      ? `<span class="badge badge-status-active">Ativa</span>`
+      : `<span class="badge badge-status-extinct">Extinta</span>`;
+
+    return `
+      <tr onclick="openLineModal('${l.line_code}')" title="Clique para ver o histórico detalhado da linha ${escapeHTML(l.display_code || l.line_code)}">
+        <td><span class="ranking-pos-badge ${posClass}">#${idx + 1}</span></td>
+        <td><strong><span class="line-badge">${escapeHTML(l.display_code || l.line_code)}</span></strong></td>
+        <td>${escapeHTML(l.latest_name || "-")}</td>
+        <td><span class="badge ${consClass}">${escapeHTML(l.latest_consortium || "-")}</span></td>
+        <td style="text-align: right; color: var(--text-muted);">${item.init.toFixed(1)} vg</td>
+        <td style="text-align: right;"><strong>${item.latest.toFixed(1)} vg</strong></td>
+        <td style="text-align: right;"><span class="badge ${badgeClass}">${deltaText}</span></td>
+        <td style="text-align: center;">${statusBadge}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const indicator = document.getElementById("ranking-count-indicator");
+  if (indicator) {
+    const metricLabel = isAbs ? "volume absoluto de viagens" : "variação percentual";
+    indicator.textContent = `Exibindo top ${top10.length} de ${filtered.length} linhas ordenadas por ${metricLabel}`;
+  }
 }
 
 /* ==========================================================================
@@ -422,7 +508,9 @@ function renderConsortiumChart(timeline) {
     if (s.includes("internorte")) return "#10b981";
     if (s.includes("transcarioca")) return "#f59e0b";
     if (s.includes("santa cruz")) return "#ef4444";
-    return "#8b5cf6";
+    if (s.includes("gtu") || s.includes("a2")) return "#8031A7";
+    if (s.includes("tuse") || s.includes("b2")) return "#FF7500";
+    return "#64748b";
   });
 
   if (state.charts.consortium) state.charts.consortium.destroy();
@@ -481,6 +569,16 @@ function setupEventListeners() {
     });
   });
 
+  // Filtros de Sistema
+  document.querySelectorAll("[data-filter-sys]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-filter-sys]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      state.activeFilterSystem = btn.getAttribute("data-filter-sys");
+      applyLineFilters();
+    });
+  });
+
   // Filtros de Status
   document.querySelectorAll("[data-filter-status]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -488,6 +586,25 @@ function setupEventListeners() {
       btn.classList.add("active");
       state.activeFilterStatus = btn.getAttribute("data-filter-status");
       applyLineFilters();
+    });
+  });
+
+  // Alternadores do Ranking de Variações
+  document.querySelectorAll("[data-ranking-dir]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-ranking-dir]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      state.rankingDirection = btn.getAttribute("data-ranking-dir");
+      renderVariationsRanking();
+    });
+  });
+
+  document.querySelectorAll("[data-ranking-metric]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-ranking-metric]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      state.rankingMetric = btn.getAttribute("data-ranking-metric");
+      renderVariationsRanking();
     });
   });
 
@@ -606,13 +723,20 @@ function applyLineFilters() {
       if (!matchesSearch) return false;
     }
 
-    // 2. Filtro de Consórcio
+    // 2. Filtro de Sistema
+    if (state.activeFilterSystem && state.activeFilterSystem !== "ALL") {
+      if (state.activeFilterSystem === "SPPO" && (line.latest_system || "SPPO") !== "SPPO") return false;
+      if (state.activeFilterSystem === "SISTEMA_RIO" && line.latest_system !== "SISTEMA_RIO") return false;
+      if (state.activeFilterSystem === "MISTO" && line.line_system !== "MISTO") return false;
+    }
+
+    // 3. Filtro de Consórcio
     if (state.activeFilterConsortium !== "ALL") {
       const cons = (line.latest_consortium || "").toUpperCase();
       if (!cons.includes(state.activeFilterConsortium)) return false;
     }
 
-    // 3. Filtro de Status
+    // 4. Filtro de Status
     if (state.activeFilterStatus === "ACTIVE" && line.is_active !== 1) return false;
     if (state.activeFilterStatus === "EXTINCT" && line.is_active !== 0) return false;
     if (state.activeFilterStatus === "INCREASED" && line.trip_change_pct <= 0) return false;
@@ -683,12 +807,37 @@ function populateDiffDropdowns(catalog) {
   sel2.selectedIndex = catalog.length - 1;
 }
 
+function detectSystem(entry) {
+  if (!entry) return "SPPO";
+  if (entry.system) return entry.system;
+  const c = (entry.consortium || "").toUpperCase();
+  if (c.includes("GTU") || c.includes("TUSE") || c.includes("SISTEMA RIO") || c.includes("A2") || c.includes("B2")) {
+    return "SISTEMA_RIO";
+  }
+  return "SPPO";
+}
+
+function getActiveEntryOnDate(timeline, targetDate, lineDetails) {
+  if (!timeline || timeline.length === 0) return null;
+  const exact = timeline.find(t => t.date === targetDate);
+  if (exact) return exact;
+
+  const isSR = (lineDetails && (lineDetails.latest_system === "SISTEMA_RIO" || lineDetails.system === "SISTEMA_RIO" || (lineDetails.latest_consortium && (lineDetails.latest_consortium.includes("GTU") || lineDetails.latest_consortium.includes("TUSE")))));
+  if (isSR && (!lineDetails || lineDetails.is_active === 1)) {
+    const srEntries = timeline.filter(t => t.date <= targetDate && detectSystem(t) === "SISTEMA_RIO");
+    if (srEntries.length > 0) {
+      return srEntries[srEntries.length - 1];
+    }
+  }
+
+  return null;
+}
+
 async function runClientDiff() {
   const d1 = document.getElementById("diff-select-1")?.value;
   const d2 = document.getElementById("diff-select-2")?.value;
   if (!d1 || !d2) return;
 
-  // Garante que os detalhes estão carregados
   if (Object.keys(state.linesDetailMap).length === 0) {
     try {
       const res = await fetch("planos-data/lines_detail.json");
@@ -699,21 +848,28 @@ async function runClientDiff() {
     }
   }
 
+  const allLines = state.linesSummary || [];
+  const linesDetail = state.linesDetailMap || {};
+
   const added = [];
   const removed = [];
   const increased = [];
   const decreased = [];
   const unchanged = [];
+
   const seenCanonicalKeys = new Set();
 
-  for (const [code, details] of Object.entries(state.linesDetailMap)) {
-    const canonicalKey = details.line_code || details.normalized_code || code;
+  for (const item of allLines) {
+    const code = item.line_code;
+    const details = linesDetail[code] || item;
+    const canonicalKey = details.canonical_key || details.equivalent_code || details.normalized_code || code;
+
     if (seenCanonicalKeys.has(canonicalKey)) continue;
     seenCanonicalKeys.add(canonicalKey);
 
     const timeline = details.timeline || [];
-    const entry1 = timeline.find(t => t.date === d1);
-    const entry2 = timeline.find(t => t.date === d2);
+    const entry1 = getActiveEntryOnDate(timeline, d1, details);
+    const entry2 = getActiveEntryOnDate(timeline, d2, details);
 
     if (!entry1 && entry2) {
       added.push({
@@ -721,6 +877,8 @@ async function runClientDiff() {
         display_code: details.display_code || code,
         name: entry2.route_name || details.latest_name,
         consortium: entry2.consortium || details.latest_consortium,
+        system1: null,
+        system2: detectSystem(entry2),
         trips1: 0,
         trips2: entry2.trips_du,
         delta: entry2.trips_du,
@@ -733,6 +891,8 @@ async function runClientDiff() {
         display_code: details.display_code || code,
         name: entry1.route_name || details.latest_name,
         consortium: entry1.consortium || details.latest_consortium,
+        system1: detectSystem(entry1),
+        system2: null,
         trips1: entry1.trips_du,
         trips2: 0,
         delta: -entry1.trips_du,
@@ -742,11 +902,15 @@ async function runClientDiff() {
     } else if (entry1 && entry2) {
       const diff = entry2.trips_du - entry1.trips_du;
       const pct = entry1.trips_du > 0 ? (diff / entry1.trips_du) * 100 : 0;
+      const s1 = detectSystem(entry1);
+      const s2 = detectSystem(entry2);
       const row = {
         code,
         display_code: details.display_code || code,
         name: entry2.route_name || entry1.route_name || details.latest_name,
         consortium: entry2.consortium || entry1.consortium || details.latest_consortium,
+        system1: s1,
+        system2: s2,
         trips1: entry1.trips_du,
         trips2: entry2.trips_du,
         delta: diff,
@@ -874,10 +1038,15 @@ function renderDiffTableResults() {
 
     const rowClass = item.status === "increased" || item.status === "added" ? "row-highlight-gain" : (item.status === "decreased" || item.status === "removed" ? "row-highlight-loss" : "");
 
+    let transitionTag = "";
+    if (item.system1 && item.system2 && item.system1 !== item.system2) {
+      transitionTag = `<span class="badge badge-system-trans" style="margin-left: 6px;"><i class="fa-solid fa-right-left"></i> ${item.system1} ➔ ${item.system2}</span>`;
+    }
+
     return `
       <tr class="${rowClass}" onclick="openLineModal('${item.code}')" style="cursor: pointer;">
         <td><strong><span class="line-badge" style="font-size:0.9rem;">${escapeHTML(item.display_code || item.code)}</span></strong></td>
-        <td>${escapeHTML(item.name || "-")}</td>
+        <td>${escapeHTML(item.name || "-")}${transitionTag}</td>
         <td><span class="badge ${getConsortiumClass(item.consortium)}">${escapeHTML(item.consortium || "-")}</span></td>
         <td>${item.trips1 !== undefined ? item.trips1 : "-"}</td>
         <td><strong>${item.trips2 !== undefined ? item.trips2 : "-"}</strong></td>
@@ -954,7 +1123,11 @@ async function openLineModal(lineCode) {
   state.currentModalLine = line;
   setText("modal-line-code", line.display_code || line.line_code);
   setText("modal-line-name", line.latest_name || "-");
-  setText("modal-line-consortium", line.latest_consortium || "-");
+  const consBadge = document.getElementById("modal-line-consortium");
+  if (consBadge) {
+    consBadge.className = `badge ${getConsortiumClass(line.latest_consortium)}`;
+    consBadge.textContent = line.latest_consortium || "-";
+  }
   setText("modal-line-trips", `${line.latest_trips_weekday || 0} viagens/dia`);
 
   const depBadge = document.getElementById("modal-line-departures");
@@ -1231,5 +1404,7 @@ function getConsortiumClass(consortium) {
   if (s.includes("internorte")) return "badge-internorte";
   if (s.includes("transcarioca")) return "badge-transcarioca";
   if (s.includes("santa cruz")) return "badge-santacruz";
+  if (s.includes("gtu") || s.includes("a2")) return "badge-a2-gtu";
+  if (s.includes("tuse") || s.includes("b2")) return "badge-b2-tuse";
   return "badge-intersul";
 }

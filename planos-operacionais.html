@@ -66,8 +66,8 @@
         <div class="obs-hero">
             <span class="eyebrow"><span class="eyebrow-dot"></span> Dados Oficiais SMTR-Rio (2022–2026)</span>
             <h1>Observatório de Planos Operacionais</h1>
-            <p>Monitore a evolução histórica das linhas municipais de ônibus do Rio de Janeiro (SPPO). Acompanhe
-                aumentos, cortes de viagens, linhas criadas e extinções.</p>
+            <p>Monitore a evolução histórica das linhas municipais de ônibus do Rio de Janeiro (SPPO & Sistema Rio). Acompanhe
+                aumentos, cortes de viagens, linhas criadas, transições e extinções.</p>
         </div>
 
         <!-- Navegação por Abas -->
@@ -272,7 +272,7 @@
                             <span class="cons-dot"></span>
                             <h3 class="cons-name">Santa Cruz</h3>
                         </div>
-                        <span class="cons-share" id="santacruz-share-badge">26.9% da frota</span>
+                        <span class="cons-share" id="santacruz-share-badge">- da frota</span>
                     </div>
                     <div class="cons-metrics">
                         <div class="cons-metric">
@@ -286,6 +286,64 @@
                         <div class="cons-metric">
                             <span class="cons-m-label">Km/DU</span>
                             <span class="cons-m-val" id="cons-santacruz-km">-</span>
+                        </div>
+                    </div>
+                    <div class="cons-footer-action">
+                        <span>Explorar Linhas</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <!-- Card A2 - GTU -->
+                <div class="cons-card cons-card-sistema-rio-a2" onclick="filterByConsortiumTab('A2 - GTU')">
+                    <div class="cons-card-header">
+                        <div class="cons-brand">
+                            <span class="cons-dot" style="background:#8031A7;"></span>
+                            <h3 class="cons-name">A2 - GTU</h3>
+                        </div>
+                        <span class="cons-share" id="gtu-a2-share-badge">Lote A2 • AP5</span>
+                    </div>
+                    <div class="cons-metrics">
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Linhas</span>
+                            <span class="cons-m-val" id="cons-gtu-a2-lines">-</span>
+                        </div>
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Viagens/DU</span>
+                            <span class="cons-m-val" id="cons-gtu-a2-trips">-</span>
+                        </div>
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Km/DU</span>
+                            <span class="cons-m-val" id="cons-gtu-a2-km">-</span>
+                        </div>
+                    </div>
+                    <div class="cons-footer-action">
+                        <span>Explorar Linhas</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <!-- Card B2 - TUSE -->
+                <div class="cons-card cons-card-sistema-rio-b2" onclick="filterByConsortiumTab('B2 - TUSE')">
+                    <div class="cons-card-header">
+                        <div class="cons-brand">
+                            <span class="cons-dot" style="background:#FF7500;"></span>
+                            <h3 class="cons-name">B2 - TUSE</h3>
+                        </div>
+                        <span class="cons-share" id="tuse-b2-share-badge">Lote B2 • AP5</span>
+                    </div>
+                    <div class="cons-metrics">
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Linhas</span>
+                            <span class="cons-m-val" id="cons-tuse-b2-lines">-</span>
+                        </div>
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Viagens/DU</span>
+                            <span class="cons-m-val" id="cons-tuse-b2-trips">-</span>
+                        </div>
+                        <div class="cons-metric">
+                            <span class="cons-m-label">Km/DU</span>
+                            <span class="cons-m-val" id="cons-tuse-b2-km">-</span>
                         </div>
                     </div>
                     <div class="cons-footer-action">
@@ -351,70 +409,141 @@
                 </div>
             </div>
 
-            <!-- Destaques -->
-            <div class="highlights-grid">
-                <div class="highlight-box">
-                    <h3 style="color:#10b981;"><i class="fa-solid fa-arrow-up-right-dots"></i> Maiores Aumentos de
-                        Viagens</h3>
-                    <div class="highlight-list" id="list-gainers"></div>
+            <!-- Ranking Interativo de Variações de Oferta -->
+            <div class="ranking-section-card">
+                <div class="ranking-header">
+                    <div class="ranking-title-wrap">
+                        <div class="ranking-icon-badge">
+                            <i class="fa-solid fa-ranking-star"></i>
+                        </div>
+                        <div>
+                            <h3 id="ranking-title">Ranking de Variações de Oferta (2022–2026)</h3>
+                            <p class="ranking-subtitle">Linhas com maiores aumentos ou reduções de viagens programadas desde o início do monitoramento.</p>
+                        </div>
+                    </div>
+                    <div class="ranking-controls">
+                        <div class="ranking-btn-group" id="ranking-direction-group">
+                            <button class="ranking-toggle-btn active" data-ranking-dir="gainers">
+                                <i class="fa-solid fa-arrow-trend-up"></i> Maiores Aumentos
+                            </button>
+                            <button class="ranking-toggle-btn" data-ranking-dir="losers">
+                                <i class="fa-solid fa-arrow-trend-down"></i> Maiores Reduções
+                            </button>
+                        </div>
+                        <div class="ranking-btn-group" id="ranking-metric-group">
+                            <button class="ranking-toggle-btn active" data-ranking-metric="abs">
+                                Viagens (Δ vg)
+                            </button>
+                            <button class="ranking-toggle-btn" data-ranking-metric="pct">
+                                Percentual (%)
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="highlight-box">
-                    <h3 style="color:#ef4444;"><i class="fa-solid fa-arrow-down-right-dots"></i> Maiores Reduções de
-                        Viagens</h3>
-                    <div class="highlight-list" id="list-losers"></div>
+                <div class="obs-table-wrap" style="margin-bottom: 0;">
+                    <table class="obs-table ranking-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">Posição</th>
+                                <th style="width: 140px;">Linha</th>
+                                <th>Itinerário Oficial</th>
+                                <th>Consórcio / Operador</th>
+                                <th style="text-align: right;">Viagens Iniciais</th>
+                                <th style="text-align: right;">Viagens Atuais</th>
+                                <th style="text-align: right;">Variação</th>
+                                <th style="text-align: center;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-variations-ranking">
+                            <tr>
+                                <td colspan="8" style="text-align:center; padding:24px; color:var(--text-muted);">Carregando ranking de variações...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="ranking-footer-note">
+                    <span><i class="fa-solid fa-circle-info"></i> Clique em qualquer linha para abrir a série histórica completa, gráfico e partidas diárias.</span>
+                    <span id="ranking-count-indicator">Exibindo top 10 linhas</span>
                 </div>
             </div>
 
-            <!-- Seção de Contexto & Metodologia do SPPO -->
-            <div class="obs-section-header" style="margin-top:16px;">
+            <!-- Seção de Contexto & Metodologia: Entenda o Transporte Municipal -->
+            <div class="obs-section-header" style="margin-top:20px;">
                 <div class="obs-section-title">
                     <i class="fa-solid fa-book-open-reader" style="color:var(--primary);"></i>
                     <div>
                         <h2>Entenda o Transporte Municipal e os Planos Operacionais</h2>
-                        <p>Principais conceitos, regras regulatórias da SMTR-Rio e metodologia do observatório.</p>
+                        <p>Principais conceitos, regras regulatórias da SMTR-Rio e a transição para o novo modelo de concessão.</p>
                     </div>
                 </div>
             </div>
 
             <div class="info-guide-grid">
+                <!-- Card 1: O Plano Operacional -->
                 <div class="info-guide-card">
                     <div class="info-guide-icon" style="background:rgba(37,99,235,0.1); color:var(--primary);">
                         <i class="fa-solid fa-file-contract"></i>
                     </div>
                     <div class="info-guide-content">
                         <h4>O que é o Plano Operacional da SMTR?</h4>
-                        <p>É o instrumento regulatório oficial expedido pela Secretaria Municipal de Transportes (SMTR-Rio) e publicado no Diário Oficial. O plano estabelece as obrigações contratuais das concessionárias: itinerários autorizados, frotas mínimas em operação (FRO), partidas diárias e a quantidade programada de viagens e quilometragem que devem ser rigorosamente cumpridas em dias úteis, sábados e domingos/feriados.</p>
+                        <p>É o instrumento regulatório oficial expedido pela Secretaria Municipal de Transportes (SMTR-Rio) e publicado no Diário Oficial. O plano estabelece as obrigações contratuais das operadoras: itinerários autorizados, frotas mínimas em operação (FRO), partidas diárias e a quantidade programada de viagens e quilometragem que devem ser rigorosamente cumpridas em dias úteis, sábados e domingos/feriados.</p>
                     </div>
                 </div>
 
+                <!-- Card 2: A Nova Licitação do Sistema Rio -->
+                <div class="info-guide-card">
+                    <div class="info-guide-icon" style="background:rgba(128,49,167,0.1); color:#8031A7;">
+                        <i class="fa-solid fa-bus-simple"></i>
+                    </div>
+                    <div class="info-guide-content">
+                        <h4>O que é o Sistema Rio?</h4>
+                        <p>O <strong>Sistema Rio</strong> é a <strong>nova licitação das linhas municipais de ônibus</strong> do Rio de Janeiro, estruturada pela Prefeitura para <strong>substituir gradualmente os antigos contratos dos consórcios do SPPO</strong> (licitados em 2010). O novo modelo começou na Zona Oeste (Bacia AP5) com os lotes <strong>A2 - GTU</strong> e <strong>B2 - TUSE</strong>, e avançará progressivamente para as demais bacias da capital, com exigência de ar-condicionado e bilhetagem digital Jaé.</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: A Transição Contratual SPPO -> Sistema Rio -->
+                <div class="info-guide-card">
+                    <div class="info-guide-icon" style="background:rgba(255,117,0,0.1); color:#FF7500;">
+                        <i class="fa-solid fa-right-left"></i>
+                    </div>
+                    <div class="info-guide-content">
+                        <h4>Transição Contratual: SPPO ➔ Sistema Rio</h4>
+                        <p>Durante o processo licitatório de renovação da malha municipal, as linhas deixam a operação dos antigos consórcios (como o Consórcio Santa Cruz na AP5) e passam a ser operadas pelas novas concessionárias do Sistema Rio. O observatório integra os dois sistemas em uma série histórica contínua, permitindo monitorar o cumprimento de viagens antes e depois da migração.</p>
+                    </div>
+                </div>
+
+                <!-- Card 4: Linha Experimental de Coleta de Dados (LECD) -->
                 <div class="info-guide-card">
                     <div class="info-guide-icon" style="background:rgba(16,185,129,0.1); color:#10b981;">
-                        <i class="fa-solid fa-code-merge"></i>
+                        <i class="fa-solid fa-flask-vial"></i>
                     </div>
                     <div class="info-guide-content">
                         <h4>Linha Experimental de Coleta de Dados (LECD)</h4>
-                        <p>A sigla <strong>LECD</strong> significa <strong>Linha Experimental de Coleta de Dados</strong>. Trata-se de uma designação técnica temporária criada pela SMTR para testar novos trajetos, tempos de percurso e demanda real de passageiros antes de consolidar o serviço no SPPO. Quando a viabilidade é atestada, a SMTR publica Resolução oficial conferindo o número regular definitivo (ex: LECD 28 &rarr; 311, LECD 32 &rarr; 817, LECD 66 &rarr; 764, LECD 70 &rarr; 798). O observatório unifica o período experimental ao histórico definitivo da linha.</p>
+                        <p>A sigla <strong>LECD</strong> indica um serviço técnico temporário criado pela SMTR para testar traçados, tempos de percurso e demanda de passageiros antes da consolidação no sistema regular. Quando a viabilidade é atestada, a SMTR oficializa o número definitivo (ex: LECD 28 &rarr; 311, LECD 66 &rarr; 764, LECD 70 &rarr; 798). O observatório unifica todo o período experimental à linha definitiva.</p>
                     </div>
                 </div>
 
+                <!-- Card 5: Acordo Judicial & Subsídio por GPS -->
                 <div class="info-guide-card">
                     <div class="info-guide-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b;">
                         <i class="fa-solid fa-scale-balanced"></i>
                     </div>
                     <div class="info-guide-content">
                         <h4>Acordo Judicial & Subsídio por GPS</h4>
-                        <p>Firmado em 2022 entre o Município do Rio, SMTR, Ministério Público (MPRJ) e as concessionárias, o Termo de Conciliação Judicial condicionou o repasse do subsídio tarifário público à prestação efetiva do serviço: os consórcios só são remunerados mediante a comprovação da quilometragem rodada e viagens atestadas por telemetria GPS e bilhetagem eletrônica. Esse mecanismo viabilizou a reativação de mais de 80 linhas desativadas em toda a cidade.</p>
+                        <p>Firmado em 2022 entre Município, SMTR, Ministério Público (MPRJ) e operadoras, o Termo de Conciliação Judicial vinculou o repasse do subsídio público à prestação real do serviço: as empresas são remuneradas apenas mediante comprovação de viagens e quilometragem apuradas via GPS e bilhetagem eletrônica. O acordo viabilizou a reativação de dezenas de linhas desativadas.</p>
                     </div>
                 </div>
 
+                <!-- Card 6: Prefixos e Sufixos Operacionais -->
                 <div class="info-guide-card">
-                    <div class="info-guide-icon" style="background:rgba(139,92,246,0.1); color:#8b5cf6;">
+                    <div class="info-guide-icon" style="background:rgba(6,182,212,0.1); color:#06b6d4;">
                         <i class="fa-solid fa-arrows-split-up-and-left"></i>
                     </div>
                     <div class="info-guide-content">
-                        <h4>Prefixos e Sufixos Operacionais do SPPO</h4>
-                        <p>O sistema municipal adota prefixos e sufixos normatizados pela SMTR para distinguir variantes de serviço da linha principal: <strong>SV</strong> (Serviço Variante com desvio de itinerário), <strong>SN</strong> (Serviço Noturno na madrugada), <strong>SP</strong> (Serviço Parcial com trajeto encurtado em trechos de pico), <strong>SR</strong> (Serviço Rápido/Semi-Direto) e <strong>SE</strong> (Serviço Especial temporário para eventos ou contingências).</p>
+                        <h4>Prefixos e Variantes Operacionais</h4>
+                        <p>A SMTR normatiza convenções de prefixos para distinguir variantes da linha principal: <strong>SV</strong> (Serviço Variante com desvio de trajeto), <strong>SN</strong> (Serviço Noturno na madrugada), <strong>SP</strong> (Serviço Parcial para reforço nos picos), <strong>SR</strong> (Serviço Rápido ou Semi-Direto) e <strong>SE</strong> (Serviço Especial temporário para grandes eventos ou contingências).</p>
                     </div>
                 </div>
             </div>
@@ -430,11 +559,20 @@
                 </div>
 
                 <div class="filter-group">
+                    <button class="filter-chip active" data-filter-sys="ALL">Todos os Sistemas</button>
+                    <button class="filter-chip" data-filter-sys="SPPO">SPPO</button>
+                    <button class="filter-chip" data-filter-sys="SISTEMA_RIO">Sistema Rio</button>
+                    <button class="filter-chip" data-filter-sys="MISTO">Transição</button>
+                </div>
+
+                <div class="filter-group">
                     <button class="filter-chip active" data-filter-cons="ALL">Todos</button>
                     <button class="filter-chip" data-filter-cons="INTERSUL">Intersul</button>
                     <button class="filter-chip" data-filter-cons="INTERNORTE">Internorte</button>
                     <button class="filter-chip" data-filter-cons="TRANSCARIOCA">Transcarioca</button>
                     <button class="filter-chip" data-filter-cons="SANTA CRUZ">Santa Cruz</button>
+                    <button class="filter-chip" data-filter-cons="A2 - GTU">A2 - GTU</button>
+                    <button class="filter-chip" data-filter-cons="B2 - TUSE">B2 - TUSE</button>
                 </div>
 
                 <div class="filter-group">
